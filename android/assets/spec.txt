@@ -1,0 +1,80 @@
+MyGame.vnb
+\-metadata.lua
+\-audio
+  \-voice
+    \-chapter1
+      \-voice1.ogg
+      \-voice2.ogg
+    \-chapter2
+      \-voice1.ogg
+      \-voice2.ogg
+  \-music
+    \-bg1.ogg
+    \-bg2.ogg
+  \-sound
+    \-sfx1.ogg
+    \-sfx2.ogg
+\-video
+  \-op.mp4
+  \-ed.mp4
+\-image
+  \-ui
+    \-frame.png
+    \-actionbutton-quicksave.png
+    \-actionbutton-quickload.png
+    \-actionbutton-menu.png
+    \-titlelogo.png
+  \-background
+    \-school.png
+    \-home.png
+  \-cg
+    \-cg1.png
+    \-cg2.png
+  \-character
+    \-alice
+      \-happy.png
+      \-sad.png
+      \-summerclothes.png
+      \-winterclothes.png
+    \-bob
+      \-happy.png
+      \-mad.png
+      \-pajamas.png
+      \-uniform.png
+  \-object
+    \-rock.png
+    \-letter.png
+    \-banana.png
+\-script
+  \-character
+    \-alice.lua
+    \-bob.lua
+  \-ui
+    \-mainmenu.lua
+    \-saveload.lua
+    \-options.lua
+  \-game
+    \-chapter1.lua
+    \-chapter2.lua
+\-language
+  \-ja
+    \-text
+      \-common.lua
+      \-chapter1-strs.lua
+      \-chapter2-strs.lua
+  \-en
+    \-text
+      \-common.lua
+      \-chapter1-strs.lua
+      \-chapter2-strs.lua
+
+
+MyGame.zh-CN.vnl
+\-metadata.lua
+\-image
+  \-ui
+    \-titlelogo.png
+\-text
+  \-common.lua
+  \-chapter1-strs.lua
+  \-chapter2-strs.lua

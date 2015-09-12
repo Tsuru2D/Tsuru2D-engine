@@ -1,0 +1,3 @@
+<resources>
+    <style name="SystemTheme" parent="android:Theme.DeviceDefault" />
+</resources>
