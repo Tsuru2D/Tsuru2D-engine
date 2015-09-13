@@ -57,11 +57,6 @@ import java.lang.reflect.Modifier;
             javaArgs[destIndex++] = bridgeLuaToJava(args.arg(srcIndex++));
         }
 
-        // Fill in missing arguments with null
-        while (destIndex < javaArgs.length) {
-            javaArgs[destIndex++] = null;
-        }
-
         // Invoke the method using reflection
         Object returnValue;
         try {

@@ -25,8 +25,8 @@ import java.util.Map;
 
 public class TsuruEngineMain extends ApplicationAdapter {
     private FileHandleResolver mLoader;
-	private SpriteBatch batch;
-	private Texture img;
+    private SpriteBatch batch;
+    private Texture img;
     private Globals globals;
     private OrthographicCamera camera;
     private Map<String, Sound> soundMap;
@@ -45,17 +45,17 @@ public class TsuruEngineMain extends ApplicationAdapter {
         }
     }
 
-    @ExposeToLua(name="getDimensions")
+    @ExposeToLua(name = "getDimensions")
     public Varargs getDim() {
         LuaInteger width = LuaInteger.valueOf(Gdx.graphics.getWidth());
         LuaInteger height = LuaInteger.valueOf(Gdx.graphics.getHeight());
         return LuaValue.varargsOf(width, height);
     }
 
-	@Override
-	public void create() {
-		batch = new SpriteBatch();
-		globals = JsePlatform.standardGlobals();
+    @Override
+    public void create() {
+        batch = new SpriteBatch();
+        globals = JsePlatform.standardGlobals();
         AssetManager assetManager = new AssetManager(mLoader);
         assetManager.setLoader(LuaValue.class, new LuaFileLoader(mLoader));
         globals.set("engine", new ExposedJavaClass(this));
@@ -84,8 +84,8 @@ public class TsuruEngineMain extends ApplicationAdapter {
         camera.update();
     }
 
-	@Override
-	public void render() {
+    @Override
+    public void render() {
         if (Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT)) {
             int x = Gdx.input.getX();
             int y = Gdx.input.getY();
@@ -99,10 +99,10 @@ public class TsuruEngineMain extends ApplicationAdapter {
         Varargs pos = globals.get("move").invoke();
         float x = pos.arg(1).tofloat();
         float y = pos.arg(2).tofloat();
-		Gdx.gl.glClearColor(1, 0, 0, 1);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.draw(img, x, y);
-		batch.end();
-	}
+        Gdx.gl.glClearColor(1, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+        batch.begin();
+        batch.draw(img, x, y);
+        batch.end();
+    }
 }

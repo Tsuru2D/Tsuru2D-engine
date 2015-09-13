@@ -1,9 +1,6 @@
 package com.tsuru2d.engine.lua;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.lang.annotation.*;
 
 /**
  * Marks a Java method to be exposed to Lua. Only methods
@@ -14,6 +11,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
+@Inherited
 public @interface ExposeToLua {
     /**
      * The name of the method when imported into Lua.

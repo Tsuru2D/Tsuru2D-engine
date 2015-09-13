@@ -1,4 +1,4 @@
-package com.tsuru2d.engine.saves;
+package com.tsuru2d.engine.io;
 
 import java.util.List;
 

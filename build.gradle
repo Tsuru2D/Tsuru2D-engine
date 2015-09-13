@@ -76,6 +76,8 @@ project(":core") {
     dependencies {
         compile "com.badlogicgames.gdx:gdx:$gdxVersion"
         compile "org.luaj:luaj-jse:3.0.1"
+        compile "org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.0"
+
     }
 }
 

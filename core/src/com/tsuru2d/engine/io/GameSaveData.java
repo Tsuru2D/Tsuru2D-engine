@@ -1,4 +1,4 @@
-package com.tsuru2d.engine.saves;
+package com.tsuru2d.engine.io;
 
 import org.luaj.vm2.LuaTable;
 
