@@ -13,15 +13,16 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.tsuru2d.engine.loader.LuaFileLoader;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
+import com.tsuru2d.engine.lua.JavaVarargs;
+import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaInteger;
+import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
 import java.util.HashMap;
 import java.util.Map;
-
 
 public class TsuruEngineMain extends ApplicationAdapter {
     private FileHandleResolver mLoader;
@@ -47,9 +48,15 @@ public class TsuruEngineMain extends ApplicationAdapter {
 
     @ExposeToLua(name = "getDimensions")
     public Varargs getDim() {
-        LuaInteger width = LuaInteger.valueOf(Gdx.graphics.getWidth());
-        LuaInteger height = LuaInteger.valueOf(Gdx.graphics.getHeight());
-        return LuaValue.varargsOf(width, height);
+        int width = Gdx.graphics.getWidth();
+        int height = Gdx.graphics.getHeight();
+        return JavaVarargs.of(width, height);
+    }
+
+    @ExposeToLua
+    public Varargs test(String a, LuaTable b, int c, float d, double e, Double s) {
+        Xlog.d("a=%s, b=%s, c=%d, d=%f, e=%f, s=%s", a, b, c, d, e, s);
+        return JavaVarargs.of(a, b, c, d, e, s);
     }
 
     @Override
@@ -69,16 +76,13 @@ public class TsuruEngineMain extends ApplicationAdapter {
         img = assetManager.get("badlogic.jpg");
         soundMap = new HashMap<String, Sound>();
         soundMap.put("sfx", (Sound)assetManager.get("sfx.ogg"));
-
-        globals.get("init").invoke(new LuaValue[] {
-            LuaInteger.valueOf(img.getWidth()),
-            LuaInteger.valueOf(img.getHeight())
-        });
+        globals.get("init").invoke(JavaVarargs.of(img.getWidth(), img.getHeight()));
         camera = new OrthographicCamera();
     }
 
     @Override
     public void resize(int width, int height) {
+        globals.get("onDimensionsChanged").invoke(JavaVarargs.of(width, height));
         camera.setToOrtho(true, width, height);
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
         camera.update();
@@ -89,10 +93,7 @@ public class TsuruEngineMain extends ApplicationAdapter {
         if (Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT)) {
             int x = Gdx.input.getX();
             int y = Gdx.input.getY();
-            globals.get("onClick").invoke(new LuaValue[] {
-                LuaInteger.valueOf(x),
-                LuaInteger.valueOf(y)
-            });
+            globals.get("onClick").invoke(JavaVarargs.of(x, y));
         }
         camera.update();
         batch.setProjectionMatrix(camera.combined);

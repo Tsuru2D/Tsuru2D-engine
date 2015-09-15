@@ -1,9 +1,16 @@
 package com.tsuru2d.engine.util;
 
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 
 public final class Xlog {
     private static final String TAG = "Tsuru2D";
+    private static final int LOG_LEVEL = Application.LOG_DEBUG;
+
+    static {
+        Gdx.app.setLogLevel(LOG_LEVEL);
+    }
+
     private Xlog() { }
 
     public static void d(String message, Object... args) {

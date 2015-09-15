@@ -4,6 +4,8 @@ local objwidth = 0
 local objheight = 0
 local speedx = 0
 local speedy = 0
+local width = 0
+local height = 0
 
 function init(objw, objh)
     local width, height = engine:getDimensions()
@@ -17,8 +19,27 @@ function init(objw, objh)
     print("Hello, world!")
 end
 
+function onDimensionsChanged(w, h)
+    width = w
+    height = h
+end
+
 function move()
-    local width, height = engine:getDimensions()
+    local a = nil
+    local b = nil
+    local c = 1
+    local d = 2
+    local e = 3
+    local s = nil
+    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
+    b = {k=3}
+    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
+    a = 1
+    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
+    a = "blah"
+    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
+
+
     x = x + speedx
     y = y + speedy
     if x <= 0 then

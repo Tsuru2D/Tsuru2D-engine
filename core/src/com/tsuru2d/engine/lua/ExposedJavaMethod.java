@@ -13,7 +13,7 @@ import java.lang.reflect.Modifier;
  */
 /* package */ class ExposedJavaMethod extends VarArgFunction {
     private final Method mJavaMethod;
-    private final int mParameterCount;
+    private final Class<?>[] mParameterTypes;
 
     /**
      * Constructs a new Java method wrapper.
@@ -21,13 +21,7 @@ import java.lang.reflect.Modifier;
      */
     public ExposedJavaMethod(Method method) {
         mJavaMethod = method;
-        int parameterCount;
-        try {
-            parameterCount = method.getParameterCount();
-        } catch (NoSuchMethodError e) {
-            parameterCount = method.getParameterTypes().length;
-        }
-        mParameterCount = parameterCount;
+        mParameterTypes = method.getParameterTypes();
     }
 
     @Override
@@ -50,11 +44,12 @@ import java.lang.reflect.Modifier;
 
         // TODO: Change this to a field if the excessive memory allocations
         // and deallocations prove to be a problem
-        Object[] javaArgs = new Object[mParameterCount];
+        Object[] javaArgs = new Object[mParameterTypes.length];
 
         // Convert arguments to native Java objects
         while (destIndex < argCount && destIndex < javaArgs.length) {
-            javaArgs[destIndex++] = bridgeLuaToJava(args.arg(srcIndex++));
+            Class<?> expectedType = mParameterTypes[destIndex];
+            javaArgs[destIndex++] = LuaUtils.bridgeLuaToJava(args.arg(srcIndex++), expectedType);
         }
 
         // Invoke the method using reflection
@@ -67,50 +62,11 @@ import java.lang.reflect.Modifier;
             throw new LuaError(e);
         }
 
-        // Wrap return value if there is one
-        if (mJavaMethod.getReturnType() != Void.TYPE) {
-            return bridgeJavaToLua(returnValue);
-        } else {
-            return LuaValue.NIL;
-        }
-    }
-
-    private static Varargs bridgeJavaToLua(Object javaValue) {
-        if (javaValue == null) {
-            return LuaValue.NIL;
-        } else if (javaValue instanceof String) {
-            return LuaValue.valueOf((String)javaValue);
-        } else if (javaValue instanceof Boolean) {
-            return LuaValue.valueOf((Boolean)javaValue);
-        } else if (javaValue instanceof Integer) {
-            return LuaValue.valueOf((Integer)javaValue);
-        } else if (javaValue instanceof Double) {
-            return LuaValue.valueOf((Double)javaValue);
-        } else if (javaValue instanceof Float) {
-            return LuaValue.valueOf((Float)javaValue);
-        } else if (javaValue instanceof Varargs) {
-            return (Varargs)javaValue;
-        } else {
-            return new LuaUserdata(javaValue);
-        }
-    }
-
-    private static Object bridgeLuaToJava(LuaValue luaValue) {
-        switch (luaValue.type()) {
-        case LuaValue.TNIL:
-            return null;
-        case LuaValue.TSTRING:
-            return luaValue.tojstring();
-        case LuaValue.TBOOLEAN:
-            return luaValue.toboolean();
-        case LuaValue.TINT:
-            return luaValue.toint();
-        case LuaValue.TNUMBER:
-            return luaValue.todouble();
-        case LuaValue.TUSERDATA:
-            return luaValue.touserdata();
-        default:
-            return luaValue;
-        }
+        // Wrap return value if there is one.
+        // If the method returns void, the return value
+        // from invoke() will be null, which will be wrapped
+        // to nil anyways, so we don't have to check the
+        // method return type.
+        return LuaUtils.bridgeJavaToLuaOut(returnValue);
     }
 }
