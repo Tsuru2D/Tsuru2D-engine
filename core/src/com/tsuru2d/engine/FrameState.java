@@ -45,7 +45,7 @@ public class FrameState {
     }
 
     @ExposeToLua
-    public void transformCamera(LuaTable values) {
+    public void transformCamera(LuaTable transformationInfo) {
 
     }
 }

@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.lua;
 
+import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.*;
 import org.luaj.vm2.lib.VarArgFunction;
 
@@ -14,14 +15,12 @@ import java.lang.reflect.Modifier;
 /* package */ class ExposedJavaMethod extends VarArgFunction {
     private final Method mJavaMethod;
     private final Class<?>[] mParameterTypes;
+    private final Object[] mParameters;
 
-    /**
-     * Constructs a new Java method wrapper.
-     * @param method The Java method to expose to Lua.
-     */
     public ExposedJavaMethod(Method method) {
         mJavaMethod = method;
         mParameterTypes = method.getParameterTypes();
+        mParameters = new Object[mParameterTypes.length];
     }
 
     @Override
@@ -42,24 +41,31 @@ import java.lang.reflect.Modifier;
             argCount--;
         }
 
-        // TODO: Change this to a field if the excessive memory allocations
-        // and deallocations prove to be a problem
-        Object[] javaArgs = new Object[mParameterTypes.length];
-
         // Convert arguments to native Java objects
-        while (destIndex < argCount && destIndex < javaArgs.length) {
+        while (destIndex < argCount && destIndex < mParameters.length) {
             Class<?> expectedType = mParameterTypes[destIndex];
-            javaArgs[destIndex++] = LuaUtils.bridgeLuaToJava(args.arg(srcIndex++), expectedType);
+            mParameters[destIndex++] = LuaUtils.bridgeLuaToJava(
+                args.arg(srcIndex++), expectedType);
+        }
+
+        if (argCount != mParameters.length) {
+            Xlog.d("Lua->Java parameter count mismatch (expected %d, got %d)",
+                mParameters.length, argCount);
         }
 
         // Invoke the method using reflection
         Object returnValue;
         try {
-            returnValue = mJavaMethod.invoke(thisObject, javaArgs);
+            returnValue = mJavaMethod.invoke(thisObject, mParameters);
         } catch (IllegalAccessException e) {
             throw new AssertionError(e);
         } catch (InvocationTargetException e) {
             throw new LuaError(e);
+        }
+
+        // Clear argument buffer for next use
+        while (--destIndex >= 0) {
+            mParameters[destIndex] = null;
         }
 
         // Wrap return value if there is one.

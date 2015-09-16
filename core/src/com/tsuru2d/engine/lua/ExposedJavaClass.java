@@ -12,10 +12,6 @@ import java.lang.reflect.Method;
  * while instance methods should be called using {@code obj:method()}.
  */
 public class ExposedJavaClass extends LuaUserdata {
-    /**
-     * Constructs a new Java object wrapper.
-     * @param obj The Java object to expose to Lua.
-     */
     public ExposedJavaClass(Object obj) {
         super(obj, createMetatable(obj));
     }

@@ -19,27 +19,19 @@ function init(objw, objh)
     print("Hello, world!")
 end
 
+function generateTable()
+    return {
+        {1, 2.3, {a=false, b="bananas"}, nil, 4},
+        {1, {"item"}, 4}
+    }
+end
+
 function onDimensionsChanged(w, h)
     width = w
     height = h
 end
 
 function move()
-    local a = nil
-    local b = nil
-    local c = 1
-    local d = 2
-    local e = 3
-    local s = nil
-    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
-    b = {k=3}
-    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
-    a = 1
-    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
-    a = "blah"
-    a, b, c, d, e, s = engine:test(a, b, c, d, e, s)
-
-
     x = x + speedx
     y = y + speedy
     if x <= 0 then

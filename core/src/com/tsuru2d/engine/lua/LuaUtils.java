@@ -2,7 +2,9 @@ package com.tsuru2d.engine.lua;
 
 import org.luaj.vm2.*;
 
-/* package */ class LuaUtils {
+public final class LuaUtils {
+    private LuaUtils() { }
+
     /**
      * Converts a Java object to its Lua equivalent. The logic
      * is as follows:
@@ -65,27 +67,23 @@ import org.luaj.vm2.*;
     }
 
     /**
-     * Converts a Lua object to its Java equivalent. This method
-     * performs type checking and unboxing of primitive wrappers.
-     *
+     * Converts a Lua object to its Java equivalent.
      * <p>
-     * If {@code luaValue} is nil and {@code expectedType} does not
-     * refer to a primitive type, {@code null} will be returned.
-     *
+     * If {@code luaValue} is {@code nil} and {@code expectedType}
+     * does not refer to a primitive type, {@code null} will be returned.
+     * If {@code expectedType} does refer to a primitive type, an
+     * exception will be thrown.
      * <p>
      * If {@code expectedType} refers to a Java primitive type or its
      * corresponding wrapper type, {@code luaValue} will be converted
      * to the wrapper type.
-     *
      * <p>
      * If {@code expectedType} refers to a subclass of {@link LuaValue},
      * the Lua object will be directly returned.
-     *
      * <p>
      * If {@code expectedType} refers to any other Java class,
      * {@code luaValue} must be an instance of {@link LuaUserdata} that
      * wraps that type.
-     *
      * @param luaValue The value to convert.
      * @param expectedType The Java class to convert the value to.
      */
@@ -112,7 +110,7 @@ import org.luaj.vm2.*;
             return (char)luaValue.checkint();
         } else if (LuaValue.class.isAssignableFrom(expectedType)) {
             if (!expectedType.isAssignableFrom(luaValue.getClass())) {
-                throw new LuaError("Cannot convert " + luaValue.getClass().getName() +
+                throw new LuaError("Cannot convert " + luaValue.typename() +
                     " to " + expectedType.getName());
             }
             return luaValue;
@@ -120,4 +118,55 @@ import org.luaj.vm2.*;
             return luaValue.checkuserdata(expectedType);
         }
     }
+
+    /**
+     * Converts a Lua object to its Java equivalent. Automatically
+     * determines the output object type based on the type of the Lua
+     * object. Can only convert {@link LuaNil}, {@link LuaString},
+     * {@link LuaBoolean, {@link LuaInteger}, {@link LuaDouble}, and
+     * {@link LuaUserdata}. All other values will pass through
+     * unconverted.
+     * @param luaValue The value to convert.
+     */
+    public static Object bridgeLuaToJava(LuaValue luaValue) {
+        switch (luaValue.type()) {
+        case LuaValue.TNIL:
+            return null;
+        case LuaValue.TSTRING:
+            return luaValue.tojstring();
+        case LuaValue.TBOOLEAN:
+            return luaValue.toboolean();
+        case LuaValue.TINT:
+            return luaValue.toint();
+        case LuaValue.TNUMBER:
+            return luaValue.todouble();
+        case LuaValue.TUSERDATA:
+            return luaValue.touserdata();
+        default:
+            return luaValue;
+        }
+    }
+
+    /**
+     * Checks whether the specified table is an array - that is,
+     * all keys are integers and in the sequence {1, 2, ..., N},
+     * where N is the number of elements in the table.
+     * @param table The table to check.
+     */
+    public static boolean isArray(LuaTable table) {
+        // Algorithm from http://stackoverflow.com/a/6080274/1808989
+        // Basically, we just check whether the number of items
+        // returned from ipairs() is the same as the number of items
+        // returned from pairs(). If true, then the table is an array.
+        int i = 0;
+        LuaMapIterator iterator = new LuaMapIterator(table);
+        while (iterator.hasNext()) {
+            iterator.next();
+            if (table.get(++i).isnil()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

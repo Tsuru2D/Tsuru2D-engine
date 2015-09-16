@@ -10,6 +10,10 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonWriter;
+import com.tsuru2d.engine.io.GameSaveData;
+import com.tsuru2d.engine.io.JsonLuaTableSerializer;
 import com.tsuru2d.engine.loader.LuaFileLoader;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
@@ -78,6 +82,30 @@ public class TsuruEngineMain extends ApplicationAdapter {
         soundMap.put("sfx", (Sound)assetManager.get("sfx.ogg"));
         globals.get("init").invoke(JavaVarargs.of(img.getWidth(), img.getHeight()));
         camera = new OrthographicCamera();
+
+        Json json = new Json(JsonWriter.OutputType.json);
+        json.setSerializer(LuaTable.class, new JsonLuaTableSerializer());
+        GameSaveData saveData = new GameSaveData();
+        saveData.mId = 42;
+        saveData.mVersion = 1;
+        saveData.mCreationTime = System.currentTimeMillis();
+        saveData.mRawData = globals.get("generateTable").call().checktable();
+        /*
+        saveData.mRawData = json.fromJson(LuaTable.class, "[\n" +
+            "    {\n" +
+            "        \"key1\": 1,\n" +
+            "        \"key2\": 2.4\n" +
+            "    },\n" +
+            "    {\n" +
+            "        \"key3\": \"value3\",\n" +
+            "        \"key4\": true\n" +
+            "    },\n" +
+            "    [\n" +
+            "        1, \"b\", 3.4, false, null\n" +
+            "    ]\n" +
+            "]\n");
+        */
+        System.out.println(json.toJson(saveData));
     }
 
     @Override
