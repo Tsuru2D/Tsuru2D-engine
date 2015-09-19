@@ -123,7 +123,7 @@ public final class LuaUtils {
      * Converts a Lua object to its Java equivalent. Automatically
      * determines the output object type based on the type of the Lua
      * object. Can only convert {@link LuaNil}, {@link LuaString},
-     * {@link LuaBoolean, {@link LuaInteger}, {@link LuaDouble}, and
+     * {@link LuaBoolean}, {@link LuaInteger}, {@link LuaDouble}, and
      * {@link LuaUserdata}. All other values will pass through
      * unconverted.
      * @param luaValue The value to convert.

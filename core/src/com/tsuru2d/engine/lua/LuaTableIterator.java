@@ -7,7 +7,7 @@ import org.luaj.vm2.Varargs;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 
-/* protected */ abstract class LuaTableIterator implements Iterator<Varargs> {
+/* package */ abstract class LuaTableIterator implements Iterator<Varargs> {
     private LuaTable mTable;
     private LuaValue mCurrentKey;
 

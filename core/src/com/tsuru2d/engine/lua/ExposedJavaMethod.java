@@ -13,6 +13,8 @@ import java.lang.reflect.Modifier;
  * that it can be called from a Lua script.
  */
 /* package */ class ExposedJavaMethod extends VarArgFunction {
+    private static final Object[] EMPTY_PARAMS = new Object[0];
+
     private final Method mJavaMethod;
     private final Class<?>[] mParameterTypes;
     private final Object[] mParameters;
@@ -20,7 +22,11 @@ import java.lang.reflect.Modifier;
     public ExposedJavaMethod(Method method) {
         mJavaMethod = method;
         mParameterTypes = method.getParameterTypes();
-        mParameters = new Object[mParameterTypes.length];
+        if (mParameterTypes.length == 0) {
+            mParameters = EMPTY_PARAMS;
+        } else {
+            mParameters = new Object[mParameterTypes.length];
+        }
     }
 
     @Override
