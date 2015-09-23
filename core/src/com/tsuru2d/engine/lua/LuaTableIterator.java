@@ -32,5 +32,10 @@ import java.util.NoSuchElementException;
         return entry;
     }
 
+    @Override
+    public void remove() {
+        throw new UnsupportedOperationException("remove");
+    }
+
     protected abstract Varargs peekNext(LuaTable table, LuaValue currentKey);
 }
