@@ -1,6 +1,6 @@
 package com.tsuru2d.engine;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
@@ -28,7 +28,7 @@ import org.luaj.vm2.lib.jse.JsePlatform;
 import java.util.HashMap;
 import java.util.Map;
 
-public class TsuruEngineMain extends ApplicationAdapter {
+public class TsuruEngineMain extends Game {
     private FileHandleResolver mLoader;
     private SpriteBatch batch;
     private Texture img;
@@ -89,7 +89,7 @@ public class TsuruEngineMain extends ApplicationAdapter {
         saveData.mId = 42;
         saveData.mVersion = 1;
         saveData.mCreationTime = System.currentTimeMillis();
-        saveData.mRawData = globals.get("generateTable").call().checktable();
+        saveData.mCustomData = globals.get("generateTable").call().checktable();
         /*
         saveData.mRawData = json.fromJson(LuaTable.class, "[\n" +
             "    {\n" +
@@ -110,6 +110,7 @@ public class TsuruEngineMain extends ApplicationAdapter {
 
     @Override
     public void resize(int width, int height) {
+        super.resize(width, height);
         globals.get("onDimensionsChanged").invoke(JavaVarargs.of(width, height));
         camera.setToOrtho(true, width, height);
         camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
@@ -118,6 +119,7 @@ public class TsuruEngineMain extends ApplicationAdapter {
 
     @Override
     public void render() {
+        super.render();
         if (Gdx.input.justTouched() || Gdx.input.isKeyJustPressed(Input.Buttons.LEFT)) {
             int x = Gdx.input.getX();
             int y = Gdx.input.getY();

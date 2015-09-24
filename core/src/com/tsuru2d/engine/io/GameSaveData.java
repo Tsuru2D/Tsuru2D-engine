@@ -28,9 +28,32 @@ public class GameSaveData {
     public long mCreationTime;
 
     /**
+     * The ID of the scene that the player was in for this
+     * save file.
+     */
+    private String mSceneId;
+
+    /**
+     * The base ID of the frame that the player was on.
+     * Since not all frames have IDs, the actual frame
+     * will be determined by this value and the value
+     * of {@link #mFrameOffset}.
+     */
+    private String mFrameId;
+
+    /**
+     * An offset from {@link #mFrameId} that determines the
+     * exact frame that the player was on. For example, if
+     * this value is 0, the player will start on the frame
+     * with ID {@link #mFrameId}. If this value is two, the
+     * player will start two frames after that frame, and so on.
+     */
+    private int mFrameOffset;
+
+    /**
      * Game-defined save data. Make sure that all non-array
      * keys are strings and that you do not store circular
      * references in this table.
      */
-    public LuaTable mRawData;
+    public LuaTable mCustomData;
 }

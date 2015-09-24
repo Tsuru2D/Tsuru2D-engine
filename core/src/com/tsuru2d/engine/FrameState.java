@@ -1,46 +1,47 @@
 package com.tsuru2d.engine;
 
+import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
 public class FrameState {
     @ExposeToLua
-    public GameObject createObject(AssetIdentifier id, LuaTable values) {
+    public Object createObject(AssetID id, LuaTable values) {
         return null;
     }
 
     @ExposeToLua
-    public GameObject getObject(AssetIdentifier id) {
+    public Object getObject(AssetID id) {
         return null;
     }
 
     @ExposeToLua
-    public void deleteObject(AssetIdentifier id) {
+    public void deleteObject(AssetID id) {
 
     }
 
     @ExposeToLua
-    public void playSound(AssetIdentifier id) {
+    public void playSound(AssetID id) {
 
     }
 
     @ExposeToLua
-    public void playMusic(AssetIdentifier id) {
+    public void playMusic(AssetID id) {
 
     }
 
     @ExposeToLua
-    public void setCharacter(AssetIdentifier id) {
+    public void setCharacter(AssetID id) {
 
     }
 
     @ExposeToLua
-    public void setText(AssetIdentifier id) {
+    public void setText(AssetID id) {
 
     }
 
     @ExposeToLua
-    public void setBackgroundImage(AssetIdentifier id) {
+    public void setBackgroundImage(AssetID id) {
 
     }
 

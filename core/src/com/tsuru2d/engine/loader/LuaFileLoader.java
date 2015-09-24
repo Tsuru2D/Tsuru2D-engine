@@ -17,6 +17,8 @@ import java.io.InputStream;
  * An asset loader for Lua scripts. Will execute the script
  * in the given environment, and return the return value
  * of the script itself.
+ *
+ * TODO: Delete this, Lua file loading doesn't work well with AssetManager
  */
 public class LuaFileLoader extends SynchronousAssetLoader<LuaValue, LuaFileLoader.LuaFileParameter> {
     public static class LuaFileParameter extends AssetLoaderParameters<LuaValue> {
