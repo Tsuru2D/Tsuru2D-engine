@@ -1,6 +1,7 @@
 package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 
 public class ManagedAsset<T> implements Pool.Poolable {
@@ -103,6 +104,9 @@ public class ManagedAsset<T> implements Pool.Poolable {
 
     @Override
     public void reset() {
+        if (mAsset instanceof Disposable) {
+            ((Disposable)mAsset).dispose();
+        }
         mAssetID = null;
         mAsset = null;
         mAssetClass = null;

@@ -7,6 +7,8 @@ local speedy = 0
 local width = 0
 local height = 0
 
+engine:testAssetID(R.music.this.is.a.very.long.path)
+
 function init(objw, objh)
     local width, height = engine:getDimensions()
     x = width / 2

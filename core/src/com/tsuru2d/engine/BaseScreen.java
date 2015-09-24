@@ -2,8 +2,8 @@ package com.tsuru2d.engine;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.tsuru2d.engine.loader.AssetLoader;
 import org.luaj.vm2.LuaTable;
 
 public abstract class BaseScreen implements Screen {
@@ -51,5 +51,9 @@ public abstract class BaseScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    public AssetLoader getAssetLoader() {
+        return mGame.getAssetLoader();
     }
 }

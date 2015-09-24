@@ -1,21 +1,29 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
-import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
+import com.tsuru2d.engine.lua.ExposeToLua;
 
 public class Button implements AssetObserver<String> {
+    private BaseScreen mScreen;
     private TextButton mButton;
-    private AssetLoader mAssetLoader;
     private ManagedAsset<String> mText;
 
+    public Button(BaseScreen screen) {
+        mScreen = screen;
+        mButton = new TextButton(null, new TextButton.TextButtonStyle());
+    }
+
+    @ExposeToLua
     public void setText(AssetID text) {
         if (mText != null) {
-            mAssetLoader.freeAsset(mText);
+            mText.removeObserver(this);
+            mScreen.getAssetLoader().freeAsset(mText);
         }
-        mText = mAssetLoader.getText(text);
+        mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(this);
     }
 
@@ -25,7 +33,9 @@ public class Button implements AssetObserver<String> {
     }
 
     public void dispose() {
-        mText.removeObserver(this);
-        mAssetLoader.freeAsset(mText);
+        if (mText != null) {
+            mText.removeObserver(this);
+            mScreen.getAssetLoader().freeAsset(mText);
+        }
     }
 }

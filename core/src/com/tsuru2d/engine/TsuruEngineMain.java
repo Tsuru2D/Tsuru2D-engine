@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.io.JsonLuaTableSerializer;
+import com.tsuru2d.engine.loader.LuaAssetIDBuilder;
 import com.tsuru2d.engine.loader.LuaFileLoader;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
@@ -25,6 +26,7 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -63,6 +65,12 @@ public class TsuruEngineMain extends Game {
         return JavaVarargs.of(a, b, c, d, e, s);
     }
 
+    @ExposeToLua
+    public void testAssetID(LuaAssetIDBuilder id) {
+        System.out.println("Asset ID -> type: " + id.getAssetID().getType() +
+            ", value: " + Arrays.toString(id.getAssetID().getPath()));
+    }
+
     @Override
     public void create() {
         batch = new SpriteBatch();
@@ -70,6 +78,8 @@ public class TsuruEngineMain extends Game {
         AssetManager assetManager = new AssetManager(mLoader);
         assetManager.setLoader(LuaValue.class, new LuaFileLoader(mLoader));
         globals.set("engine", new ExposedJavaClass(this));
+        LuaAssetIDBuilder.install(globals);
+
 
         assetManager.load("main.lua", LuaValue.class, new LuaFileLoader.LuaFileParameter(globals));
         assetManager.load("badlogic.jpg", Texture.class);

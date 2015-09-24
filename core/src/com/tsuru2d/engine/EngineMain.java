@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.tsuru2d.engine.loader.AssetLoader;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.compiler.LuaC;
@@ -27,6 +28,7 @@ public class EngineMain implements ApplicationListener {
     private BaseScreen mScreen;
     private Viewport mViewport;
     private SpriteBatch mSpriteBatch;
+    private AssetLoader mAssetLoader;
 
     public EngineMain() {
         // TODO: Somehow get an asset loader thing here
@@ -37,6 +39,7 @@ public class EngineMain implements ApplicationListener {
         mLuaContext = createLuaContext();
         mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         mSpriteBatch = new SpriteBatch();
+        mAssetLoader = new AssetLoader();
     }
 
     @Override
@@ -79,6 +82,10 @@ public class EngineMain implements ApplicationListener {
 
     public Viewport getViewport() {
         return mViewport;
+    }
+
+    public AssetLoader getAssetLoader() {
+        return mAssetLoader;
     }
 
     public void setScreen(BaseScreen screen, Action action) {
