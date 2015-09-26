@@ -13,6 +13,11 @@ public class LuaAssetIDBuilder extends LuaTable {
         }
 
         @Override
+        protected AssetType fillAssetID(StringBuilder stringBuilder) {
+            return mAssetType;
+        }
+
+        @Override
         public AssetID getAssetID() {
             throw new UnsupportedOperationException();
         }
@@ -30,10 +35,10 @@ public class LuaAssetIDBuilder extends LuaTable {
     private static final LuaAssetIDBuilderRoot SOUND = new LuaAssetIDBuilderRoot(AssetType.SOUND);
     private static final LuaAssetIDBuilderRoot MUSIC = new LuaAssetIDBuilderRoot(AssetType.MUSIC);
     private static final LuaAssetIDBuilderRoot TEXT = new LuaAssetIDBuilderRoot(AssetType.TEXT);
+    // TODO: Add the rest...
 
     private final LuaAssetIDBuilder mParent;
     private final String mSubPath;
-    private final int mDepth;
 
     private LuaAssetIDBuilder() {
         this(null, null);
@@ -42,26 +47,30 @@ public class LuaAssetIDBuilder extends LuaTable {
     private LuaAssetIDBuilder(LuaAssetIDBuilder parent, String subPath) {
         mParent = parent;
         mSubPath = subPath;
-        mDepth = (parent == null) ? 0 : parent.mDepth + 1;
         setmetatable(this);
         set("__index", CHILD_INDEX_FUNC);
     }
 
+    protected AssetType fillAssetID(StringBuilder sb) {
+        AssetType assetType = mParent.fillAssetID(sb);
+        sb.append(mSubPath);
+        sb.append('/');
+        return assetType;
+    }
+
     public AssetID getAssetID() {
-        String[] path = new String[mDepth];
-        int i = mDepth;
-        LuaAssetIDBuilder curr = this;
-        while (--i >= 0) {
-            path[i] = curr.mSubPath;
-            curr = curr.mParent;
-        }
-        return new AssetID(((LuaAssetIDBuilderRoot)curr).mAssetType, path);
+        StringBuilder sb = new StringBuilder();
+        AssetType type = fillAssetID(sb);
+        sb.setLength(sb.length() - 1);
+        String path = sb.toString();
+        return new AssetID(type, path);
     }
 
     public static void install(LuaTable environment) {
         LuaTable root = new LuaTable();
         root.set("sound", SOUND);
         root.set("music", MUSIC);
+        root.set("voice", VOICE);
         root.set("text", TEXT);
         environment.set("R", root);
     }

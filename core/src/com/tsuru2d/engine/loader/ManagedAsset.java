@@ -8,7 +8,6 @@ public class ManagedAsset<T> implements Pool.Poolable {
     private final AssetLoader mLoader;
     private AssetID mAssetID;
     private T mAsset;
-    private Class<T> mAssetClass;
     private int mReferenceCount;
     private Array<AssetObserver<T>> mObservers;
 
@@ -24,18 +23,13 @@ public class ManagedAsset<T> implements Pool.Poolable {
         mAssetID = assetID;
     }
 
-    /* package */ void setRawValue(T value, Class<T> valueCls) {
-        mAsset = value;
-        mAssetClass = valueCls;
-    }
-
     /* package */ void invalidate() {
-        mAsset = mLoader.getAssetRaw(mAssetID, mAssetClass);
+        mAsset = null;
 
-        // TODO: This code will need to be changed if the
-        // callback ever decides to register a new observer
-        // (this can happen indirectly too)
-        for (AssetObserver<T> observer : mObservers) {
+        // We call toArray() here to make a copy of the observer
+        // list, so that callback code can add or remove observers
+        // in the middle of iteration.
+        for (AssetObserver<T> observer : mObservers.toArray()) {
             observer.onAssetUpdated(this);
         }
     }
@@ -97,8 +91,14 @@ public class ManagedAsset<T> implements Pool.Poolable {
      *     <li>Text: {@code drawString(asset.get(), x, y)}</li>
      *     <li>Sound: {@code asset.get().play()}</li>
      * </ul>
+     * <p>
+     * If this asset is not fully loaded when this method
+     * is called, it will block until the asset is ready.
      */
     public T get() {
+        if (mAsset == null) {
+            mAsset = mLoader.getAssetRaw(mAssetID);
+        }
         return mAsset;
     }
 
@@ -109,6 +109,5 @@ public class ManagedAsset<T> implements Pool.Poolable {
         }
         mAssetID = null;
         mAsset = null;
-        mAssetClass = null;
     }
 }

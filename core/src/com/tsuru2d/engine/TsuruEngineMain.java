@@ -26,8 +26,8 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.jse.JsePlatform;
 
-import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 public class TsuruEngineMain extends Game {
@@ -68,11 +68,12 @@ public class TsuruEngineMain extends Game {
     @ExposeToLua
     public void testAssetID(LuaAssetIDBuilder id) {
         System.out.println("Asset ID -> type: " + id.getAssetID().getType() +
-            ", value: " + Arrays.toString(id.getAssetID().getPath()));
+            ", value: " + id.getAssetID().getPath());
     }
 
     @Override
     public void create() {
+        System.out.println(Locale.forLanguageTag("zh-Hans").getDisplayName());
         batch = new SpriteBatch();
         globals = JsePlatform.standardGlobals();
         AssetManager assetManager = new AssetManager(mLoader);

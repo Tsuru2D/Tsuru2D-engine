@@ -8,9 +8,18 @@ import org.luaj.vm2.LuaTable;
 public class GameSaveData {
     /**
      * The ID number of the save file. This number must be unique
-     * for all (game, user) pairs.
+     * for all (game, user) pairs. Never re-use an existing ID
+     * number; if you want to replace an existing save file, see
+     * {@link #mIndex}.
      */
     public long mId;
+
+    /**
+     * The index of the save file. The client may request a
+     * subset of save files by specifying an index range;
+     * this will speed up loading on slow connections.
+     */
+    public int mIndex;
 
     /**
      * The version of the game which created the save file.
@@ -18,7 +27,7 @@ public class GameSaveData {
      * table schema and retain backwards compatibility with
      * save data created in a previous version of the game.
      */
-    public long mVersion;
+    public int mVersion;
 
     /**
      * The time at which the save file was created, in milliseconds
@@ -31,7 +40,7 @@ public class GameSaveData {
      * The ID of the scene that the player was in for this
      * save file.
      */
-    private String mSceneId;
+    public String mSceneId;
 
     /**
      * The base ID of the frame that the player was on.
@@ -39,16 +48,16 @@ public class GameSaveData {
      * will be determined by this value and the value
      * of {@link #mFrameOffset}.
      */
-    private String mFrameId;
+    public String mFrameId;
 
     /**
      * An offset from {@link #mFrameId} that determines the
      * exact frame that the player was on. For example, if
      * this value is 0, the player will start on the frame
-     * with ID {@link #mFrameId}. If this value is two, the
+     * with ID {@link #mFrameId}. If this value is 2, the
      * player will start two frames after that frame, and so on.
      */
-    private int mFrameOffset;
+    public int mFrameOffset;
 
     /**
      * Game-defined save data. Make sure that all non-array

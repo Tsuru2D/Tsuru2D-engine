@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.model.ScreenInfo;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -14,7 +15,7 @@ import org.luaj.vm2.LuaValue;
  * features to Lua.
  */
 public class MenuScreen extends BaseScreen {
-    public MenuScreen(EngineMain game) {
+    public MenuScreen(EngineMain game, ScreenInfo screenInfo) {
         super(game);
     }
 
@@ -25,7 +26,7 @@ public class MenuScreen extends BaseScreen {
     }
 
     @ExposeToLua
-    private void pushScreen(AssetID id, LuaTable data) {
+    private void pushScreen(LuaTable data) {
 
     }
 

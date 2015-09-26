@@ -36,10 +36,11 @@ public class EngineMain implements ApplicationListener {
 
     @Override
     public void create() {
+        mAssetLoader = new AssetLoader(null);
         mLuaContext = createLuaContext();
+        // TODO: These values should be the native res of the game
         mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         mSpriteBatch = new SpriteBatch();
-        mAssetLoader = new AssetLoader();
     }
 
     @Override
@@ -51,6 +52,7 @@ public class EngineMain implements ApplicationListener {
 
     @Override
     public void render() {
+        mAssetLoader.update();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (mScreen != null) {
             mScreen.render(Gdx.graphics.getDeltaTime());

@@ -30,7 +30,7 @@ public abstract class BaseScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
-
+        mStage.getViewport().setWorldSize(width, height);
     }
 
     @Override
