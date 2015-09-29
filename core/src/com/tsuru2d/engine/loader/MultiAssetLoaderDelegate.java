@@ -59,10 +59,9 @@ import java.util.Map;
 
     @Override
     protected void onRawAssetInvalidated(AssetID baseRawAssetID) {
-        // Use mAssets and not mRawAssets here, because for each key in
-        // mRawAssets, there must be a key in mAssets, but the reverse
-        // is not true when there are assets that are not finished loading.
-        Iterator<AssetID> it = mAssets.keySet().iterator();
+        // We can use mRawAssets here instead of mAssets, because
+        // invalidating an asset that's not yet loaded does nothing
+        Iterator<AssetID> it = mRawAssets.keySet().iterator();
         while (it.hasNext()) {
             AssetID rawAssetID = it.next();
             if (baseRawAssetID.isParentOrEqual(rawAssetID)) {
