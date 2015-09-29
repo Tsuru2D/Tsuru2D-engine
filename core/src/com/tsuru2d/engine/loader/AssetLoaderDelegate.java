@@ -17,8 +17,8 @@ import com.badlogic.gdx.assets.AssetManager;
         }
     }
 
-    protected final AssetLoader mAssetLoader;
-    protected final Class<TRaw> mRawType;
+    private final AssetLoader mAssetLoader;
+    private final Class<TRaw> mRawType;
 
     public AssetLoaderDelegate(AssetLoader assetLoader, Class<TRaw> rawType) {
         mAssetLoader = assetLoader;
@@ -31,6 +31,14 @@ import com.badlogic.gdx.assets.AssetManager;
     protected abstract AssetID getRawAssetID(AssetID assetID);
     protected abstract void onRawAssetLoaded(AssetID rawAssetID, TRaw value);
     protected abstract void onRawAssetInvalidated(AssetID baseRawAssetID);
+
+    protected ManagedAsset<T> obtainAssetFromPool() {
+        return mAssetLoader.obtainAssetFromPool();
+    }
+
+    protected void releaseAssetToPool(ManagedAsset<T> asset) {
+        mAssetLoader.releaseAssetToPool(asset);
+    }
 
     protected void startLoadingRaw(AssetID rawAssetID) {
         mAssetLoader.startLoadingRaw(rawAssetID, mRawType, new LoadedCallbackImpl(rawAssetID));

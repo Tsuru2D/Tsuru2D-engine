@@ -45,6 +45,7 @@ import java.util.Map;
             mAssets.remove(rawAssetID);
             unloadRaw(rawAssetID);
         }
+        releaseAssetToPool(asset);
     }
 
     @Override
@@ -86,7 +87,7 @@ import java.util.Map;
 
     private ManagedAsset<T> createNewAsset(AssetID assetID, AssetID rawAssetID) {
         Array<ManagedAsset<T>> container = mAssets.get(rawAssetID);
-        ManagedAsset<T> asset = mAssetLoader.createAsset();
+        ManagedAsset<T> asset = obtainAssetFromPool();
         asset.setAssetID(assetID);
         asset.setLoader(this);
         if (container == null) {

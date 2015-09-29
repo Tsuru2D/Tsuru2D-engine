@@ -28,6 +28,7 @@ import com.badlogic.gdx.utils.Array;
     /* package */ void freeAsset(ManagedAsset<T> asset) {
         mAssets.removeValue(asset, true);
         unloadRaw(getRawAssetID(asset.getAssetID()));
+        releaseAssetToPool(asset);
     }
 
     @Override
@@ -53,7 +54,7 @@ import com.badlogic.gdx.utils.Array;
     }
 
     private ManagedAsset<T> createNewAsset(AssetID assetID) {
-        ManagedAsset<T> asset = mAssetLoader.createAsset();
+        ManagedAsset<T> asset = obtainAssetFromPool();
         asset.setAssetID(assetID);
         asset.setLoader(this);
         startLoadingRaw(getRawAssetID(assetID));

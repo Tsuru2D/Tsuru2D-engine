@@ -75,8 +75,12 @@ public class AssetLoader {
     }
 
     @SuppressWarnings("unchecked")
-    /* package */ <T> ManagedAsset<T> createAsset() {
+    /* package */ <T> ManagedAsset<T> obtainAssetFromPool() {
         return (ManagedAsset<T>)mAssetPool.obtain();
+    }
+
+    /* package */ <T> void releaseAssetToPool(ManagedAsset<T> asset) {
+        mAssetPool.free(asset);
     }
 
     /* package */ <T> void startLoadingRaw(AssetID rawAssetID, Class<T> type, AssetLoaderParameters.LoadedCallback callback) {
@@ -121,7 +125,6 @@ public class AssetLoader {
         if (asset.decrementRef() == 0) {
             AssetLoaderDelegate<T, ?> delegate = getDelegate(asset.getAssetID());
             delegate.freeAsset(asset);
-            mAssetPool.free(asset);
         }
     }
 
