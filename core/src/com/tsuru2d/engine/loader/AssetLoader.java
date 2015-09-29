@@ -1,148 +1,104 @@
 package com.tsuru2d.engine.loader;
 
+import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
 import com.tsuru2d.engine.model.CharacterInfo;
 import com.tsuru2d.engine.model.SceneInfo;
 import com.tsuru2d.engine.model.ScreenInfo;
+import org.luaj.vm2.LuaValue;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AssetLoader {
-    private String mLanguageCode;
-    private AssetManager mAssetManager;
-    private Map<AssetType, Array<ManagedAsset<?>>> mLoadedAssets;
-    private Pool<ManagedAsset<?>> mAssetPool;
+    private final AssetManager mAssetManager;
+    private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
+    private final Pool<ManagedAsset<?>> mAssetPool;
 
-    public AssetLoader(FileHandleResolver handleResolver) {
+    public AssetLoader(FileHandleResolver handleResolver, AssetPathResolver pathResolver) {
         mAssetManager = new AssetManager(handleResolver);
-        mLoadedAssets = new HashMap<AssetType, Array<ManagedAsset<?>>>();
+        mAssetManager.setLoader(LuaValue.class, new LuaFileLoader(handleResolver));
+        mLoaderDelegates = new HashMap<AssetType, AssetLoaderDelegate<?, ?>>();
+        mLoaderDelegates.put(AssetType.SOUND, new SingleAssetLoaderDelegate<Sound>(this, pathResolver, Sound.class));
+        mLoaderDelegates.put(AssetType.MUSIC, new SingleAssetLoaderDelegate<Music>(this, pathResolver, Music.class));
+        mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, pathResolver, Sound.class));
+        mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this, pathResolver));
+        // TODO: Add other types
         mAssetPool = new Pool<ManagedAsset<?>>() {
             @Override
             protected ManagedAsset<?> newObject() {
-                return new ManagedAsset<Object>(AssetLoader.this);
+                return new ManagedAsset<Object>();
             }
         };
     }
 
-    public String getLanguage() {
-        // TODO: Also remove
-        return mLanguageCode;
-    }
-
-    public void setLanguage(String languageCode) {
-        // TODO: This method should be moved to some external class.
-        // That method will swap the FileHandleResolver of this class, and
-        // all file paths that changed should be invalidated.
-        if (languageCode.equals(mLanguageCode)) {
-            return;
-        }
-
-        mLanguageCode = languageCode;
-        // TODO: Re-load some stuff here
-        // TODO: Update assetmanager
-
-        // Only invalidate text strings for now
-        Array<ManagedAsset<?>> mTextRes = mLoadedAssets.get(AssetType.TEXT);
-        for (ManagedAsset<?> asset : mTextRes) {
-            asset.invalidate();
-        }
-    }
-
     public ManagedAsset<Sound> getSound(AssetID id) {
-        id.checkType(AssetType.MUSIC);
-        return getAsset(id, Sound.class);
+        return getAsset(id.checkType(AssetType.MUSIC));
     }
 
     public ManagedAsset<Music> getMusic(AssetID id) {
-        id.checkType(AssetType.SOUND);
-        return getAsset(id, Music.class);
+        return getAsset(id.checkType(AssetType.SOUND));
     }
 
     public ManagedAsset<Sound> getVoice(AssetID id) {
-        id.checkType(AssetType.VOICE);
-        return getAsset(id, Sound.class);
+        return getAsset(id.checkType(AssetType.VOICE));
     }
 
     public ManagedAsset<String> getText(AssetID id) {
-        id.checkType(AssetType.TEXT);
-        return getAsset(id, String.class);
+        return getAsset(id.checkType(AssetType.TEXT));
     }
 
     public ManagedAsset<ScreenInfo> getScreen(AssetID id) {
-        id.checkType(AssetType.SCREEN);
-        return null;
+        return getAsset(id.checkType(AssetType.SCREEN));
     }
 
     public ManagedAsset<SceneInfo> getScene(AssetID id) {
-        id.checkType(AssetType.SCENE);
-        return null;
+        return getAsset(id.checkType(AssetType.SCENE));
     }
 
     public ManagedAsset<CharacterInfo> getCharacter(AssetID id) {
-        id.checkType(AssetType.CHARACTER);
-        return null;
+        return getAsset(id.checkType(AssetType.CHARACTER));
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T> AssetLoaderDelegate<T, ?> getDelegate(AssetID id) {
+        return (AssetLoaderDelegate<T, ?>)mLoaderDelegates.get(id.getType());
+    }
+
+    @SuppressWarnings("unchecked")
+    /* package */ <T> ManagedAsset<T> createAsset() {
+        return (ManagedAsset<T>)mAssetPool.obtain();
+    }
+
+    /* package */ <T> void startLoadingRaw(String path, Class<T> type, AssetLoaderParameters.LoadedCallback callback) {
+        AssetLoaderParameters<T> params = new AssetLoaderParameters<T>();
+        params.loadedCallback = callback;
+        mAssetManager.load(path, type, params);
+    }
+
+    /* package */ void finishLoadingRaw(String path) {
+        mAssetManager.finishLoadingAsset(path);
+    }
+
+    /* package */ void unloadRaw(String path) {
+        mAssetManager.unload(path);
     }
 
     /**
      * Gets an asset with the specified asset ID, and increment its
      * reference counter. Make sure to call {@link #freeAsset(ManagedAsset)}
      * once you are done using the asset.
-     * @param id The ID used to search for the asset.
-     * @param type The type of the raw asset.
+     * @param id The managed ID used to search for the asset.
      */
-    private <T> ManagedAsset<T> getAsset(AssetID id, Class<T> type) {
-        ManagedAsset<T> asset = loadCachedAsset(id);
-        if (asset == null) {
-            asset = loadNewAsset(id, type);
-        }
+    private <T> ManagedAsset<T> getAsset(AssetID id) {
+        AssetLoaderDelegate<T, ?> delegate = getDelegate(id);
+        ManagedAsset<T> asset = delegate.getAsset(id);
         asset.incrementRef();
         return asset;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> ManagedAsset<T> loadCachedAsset(AssetID id) {
-        Array<ManagedAsset<?>> assetsOfSameType = mLoadedAssets.get(id.getType());
-        for (ManagedAsset<?> asset : assetsOfSameType) {
-            if (asset.getAssetID().equals(id)) {
-                return (ManagedAsset<T>)asset;
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unchecked")
-    private <T> ManagedAsset<T> loadNewAsset(AssetID id, Class<T> type) {
-        ManagedAsset<T> asset = (ManagedAsset<T>)mAssetPool.obtain();
-        asset.setAssetID(id);
-        // Pre-load the asset.
-        switch (id.getType()) {
-        case SOUND:
-        case MUSIC:
-        case VOICE:
-            mAssetManager.load(id.getPath(), type);
-        default:
-            // TODO: Custom load here
-        }
-        return asset;
-    }
-
-    /* package */ <T> T getAssetRaw(AssetID id) {
-        switch (id.getType()) {
-        case SOUND:
-        case MUSIC:
-        case VOICE:
-            mAssetManager.finishLoadingAsset(id.getPath());
-            return mAssetManager.get(id.getPath());
-        default:
-            // TODO: Custom load here
-            return null;
-        }
     }
 
     /**
@@ -155,9 +111,8 @@ public class AssetLoader {
      */
     public <T> void freeAsset(ManagedAsset<T> asset) {
         if (asset.decrementRef() == 0) {
-            AssetID id = asset.getAssetID();
-            mAssetManager.unload(id.getPath());
-            mLoadedAssets.get(id.getType()).removeValue(asset, true);
+            AssetLoaderDelegate<T, ?> delegate = getDelegate(asset.getAssetID());
+            delegate.freeAsset(asset);
             mAssetPool.free(asset);
         }
     }

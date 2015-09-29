@@ -36,7 +36,7 @@ public class EngineMain implements ApplicationListener {
 
     @Override
     public void create() {
-        mAssetLoader = new AssetLoader(null);
+        mAssetLoader = new AssetLoader(null, null);
         mLuaContext = createLuaContext();
         // TODO: These values should be the native res of the game
         mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());

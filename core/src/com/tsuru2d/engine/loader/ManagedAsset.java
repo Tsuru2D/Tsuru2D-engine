@@ -5,13 +5,17 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 
 public class ManagedAsset<T> implements Pool.Poolable {
-    private final AssetLoader mLoader;
+    private AssetLoaderDelegate<T, ?> mLoader;
     private AssetID mAssetID;
     private T mAsset;
     private int mReferenceCount;
     private Array<AssetObserver<T>> mObservers;
 
-    /* package */ ManagedAsset(AssetLoader loader) {
+    /* package */ ManagedAsset() {
+
+    }
+
+    public void setLoader(AssetLoaderDelegate<T, ?> loader) {
         mLoader = loader;
     }
 
@@ -23,15 +27,27 @@ public class ManagedAsset<T> implements Pool.Poolable {
         mAssetID = assetID;
     }
 
-    /* package */ void invalidate() {
-        mAsset = null;
-
-        // We call toArray() here to make a copy of the observer
-        // list, so that callback code can add or remove observers
-        // in the middle of iteration.
-        for (AssetObserver<T> observer : mObservers.toArray()) {
-            observer.onAssetUpdated(this);
+    /* package */ void setRawAsset(T value) {
+        if (mAsset == value) {
+            return;
         }
+
+        disposeCurrentAsset();
+        mAsset = value;
+
+        if (mObservers != null && mObservers.size > 0) {
+            // We call toArray() here to make a copy of the observer
+            // list, so that callback code can add or remove observers
+            // in the middle of iteration.
+            for (AssetObserver<T> observer : mObservers.toArray()) {
+                observer.onAssetUpdated(this);
+            }
+        }
+    }
+
+    /* package */ void invalidate() {
+        disposeCurrentAsset();
+        mAsset = null;
     }
 
     /* package */ int incrementRef() {
@@ -97,17 +113,25 @@ public class ManagedAsset<T> implements Pool.Poolable {
      */
     public T get() {
         if (mAsset == null) {
-            mAsset = mLoader.getAssetRaw(mAssetID);
+            mLoader.fillRawAsset(this);
         }
         return mAsset;
     }
 
-    @Override
-    public void reset() {
+    private void disposeCurrentAsset() {
         if (mAsset instanceof Disposable) {
             ((Disposable)mAsset).dispose();
         }
+    }
+
+    @Override
+    public void reset() {
+        disposeCurrentAsset();
+        mLoader = null;
         mAssetID = null;
         mAsset = null;
+        if (mObservers != null) {
+            mObservers.shrink();
+        }
     }
 }

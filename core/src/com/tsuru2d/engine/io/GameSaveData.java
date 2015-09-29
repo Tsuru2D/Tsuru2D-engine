@@ -1,11 +1,13 @@
 package com.tsuru2d.engine.io;
 
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonValue;
 import org.luaj.vm2.LuaTable;
 
 /**
  * Container class for save data.
  */
-public class GameSaveData {
+public class GameSaveData implements Json.Serializable {
     /**
      * The ID number of the save file. This number must be unique
      * for all (game, user) pairs. Never re-use an existing ID
@@ -65,4 +67,28 @@ public class GameSaveData {
      * references in this table.
      */
     public LuaTable mCustomData;
+
+    @Override
+    public void write(Json json) {
+        json.writeValue("id", mId);
+        json.writeValue("index", mIndex);
+        json.writeValue("version", mVersion);
+        json.writeValue("time", mCreationTime);
+        json.writeValue("scene", mSceneId);
+        json.writeValue("frame", mFrameId);
+        json.writeValue("frameOffset", mFrameOffset);
+        json.writeValue("state", mCustomData);
+    }
+
+    @Override
+    public void read(Json json, JsonValue jsonData) {
+        mId = json.readValue("id", long.class, jsonData);
+        mIndex = json.readValue("index", int.class, jsonData);
+        mVersion = json.readValue("version", int.class, jsonData);
+        mCreationTime = json.readValue("time", long.class, jsonData);
+        mSceneId = json.readValue("scene", String.class, jsonData);
+        mFrameId = json.readValue("frame", String.class, jsonData);
+        mFrameOffset = json.readValue("frameOffset", int.class, jsonData);
+        mCustomData = json.readValue("state", LuaTable.class, jsonData);
+    }
 }

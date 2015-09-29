@@ -1,4 +1,4 @@
-package com.tsuru2d.engine.loader;
+package com.tsuru2d.engine.loader.zip;
 
 import com.badlogic.gdx.Files;
 import com.badlogic.gdx.files.FileHandleStream;

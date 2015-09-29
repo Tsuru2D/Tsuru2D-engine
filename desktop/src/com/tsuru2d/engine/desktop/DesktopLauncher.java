@@ -3,7 +3,7 @@ package com.tsuru2d.engine.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.tsuru2d.engine.TsuruEngineMain;
-import com.tsuru2d.engine.loader.ZipFileHandleResolver;
+import com.tsuru2d.engine.loader.zip.ZipFileHandleResolver;
 
 import java.io.IOException;
 import java.util.zip.ZipFile;
