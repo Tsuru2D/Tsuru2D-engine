@@ -64,7 +64,7 @@ import java.util.Map;
         Iterator<AssetID> it = mAssets.keySet().iterator();
         while (it.hasNext()) {
             AssetID rawAssetID = it.next();
-            if (baseRawAssetID.isParentOf(rawAssetID)) {
+            if (baseRawAssetID.isParentOrEqual(rawAssetID)) {
                 it.remove();
                 Array<ManagedAsset<T>> assets = mAssets.get(rawAssetID);
                 for (ManagedAsset<T> asset : assets) {

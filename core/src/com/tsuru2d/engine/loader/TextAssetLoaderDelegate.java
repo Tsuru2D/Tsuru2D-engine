@@ -4,7 +4,7 @@ import org.luaj.vm2.LuaValue;
 
 /* package */ class TextAssetLoaderDelegate extends MultiAssetLoaderDelegate<String, LuaValue> {
     public TextAssetLoaderDelegate(AssetLoader assetLoader) {
-        super(assetLoader,  LuaValue.class);
+        super(assetLoader, LuaValue.class);
     }
 
     @Override

@@ -12,7 +12,6 @@ import com.badlogic.gdx.assets.AssetManager;
         }
 
         @Override
-        @SuppressWarnings("unchecked")
         public void finishedLoading(AssetManager assetManager, String fileName, Class type) {
             onRawAssetLoaded(mRawAssetID, assetManager.get(fileName, mRawType));
         }

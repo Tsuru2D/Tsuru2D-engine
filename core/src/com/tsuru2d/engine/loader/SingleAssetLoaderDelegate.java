@@ -45,7 +45,7 @@ import com.badlogic.gdx.utils.Array;
     protected void onRawAssetInvalidated(AssetID baseRawAssetID) {
         for (ManagedAsset<T> asset : mAssets) {
             AssetID rawAssetID = getRawAssetID(asset.getAssetID());
-            if (baseRawAssetID.isParentOf(rawAssetID)) {
+            if (baseRawAssetID.isParentOrEqual(rawAssetID)) {
                 asset.invalidate();
                 startReloadingRaw(rawAssetID);
             }

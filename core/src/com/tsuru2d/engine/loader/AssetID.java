@@ -22,9 +22,9 @@ public class AssetID {
         return mPath;
     }
 
-    public boolean isParentOf(AssetID other) {
+    public boolean isParentOrEqual(AssetID other) {
         if (mType != other.mType) return false;
-        if (mPath.length >= other.mPath.length) return false;
+        if (mPath.length > other.mPath.length) return false;
         for (int i = 0; i < mPath.length; ++i) {
             if (!mPath[i].equals(other.mPath[i])) {
                 return false;
