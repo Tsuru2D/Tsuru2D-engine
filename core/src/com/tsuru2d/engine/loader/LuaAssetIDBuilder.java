@@ -50,7 +50,7 @@ public class LuaAssetIDBuilder extends LuaTable {
         mSubPath = subPath;
         mDepth = (parent == null) ? 0 : parent.mDepth + 1;
         setmetatable(this);
-        set("__index", CHILD_INDEX_FUNC);
+        set(LuaValue.INDEX, CHILD_INDEX_FUNC);
     }
 
     protected AssetType fillAssetID(String[] path, int index) {

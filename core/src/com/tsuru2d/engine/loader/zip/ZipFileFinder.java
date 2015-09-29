@@ -33,13 +33,14 @@ public class ZipFileFinder implements FileFinder {
 
         public String findByFileName(String nameWithoutExtension) {
             for (int i = 0; i < mChildren.size; ++i) {
-                String name = mChildren.get(i).mName;
+                String sourceName = mChildren.get(i).mName;
+                String name = sourceName;
                 int extensionIndex = name.lastIndexOf('.');
                 if (extensionIndex >= 0) {
                     name = name.substring(0, extensionIndex);
                 }
-                if (extensionIndex < 0 && name.equalsIgnoreCase(nameWithoutExtension)) {
-                    return name;
+                if (name.equalsIgnoreCase(nameWithoutExtension)) {
+                    return sourceName;
                 }
             }
             return null;

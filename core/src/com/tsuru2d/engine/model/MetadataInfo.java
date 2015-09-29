@@ -10,6 +10,7 @@ public class MetadataInfo {
     public String mVersionName;
     public int mVersionCode;
     public String[] mLanguages;
+    public String mLocalizationDir;
     public String mResolution;
     public Map<AssetType, String> mAssetDirs;
     public AssetID mTitle;

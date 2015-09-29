@@ -1,18 +1,19 @@
 package = "com.oxycode.myvisualnovel"
-version = "1.0.3"
-language = {"ja", "en"}
-defaultLanguage = "ja"
+versionCode = 2
+versionName = "1.0.3"
+languages = {"ja", "en"}
 resolution = "1280x720" -- Your videos & backgrounds should be this big, please use 16:9
-paths = {
+localizationPath = "localization"
+assetPaths = {
     voice = "audio/voice",
     music = "audio/music",
     sound = "audio/sound",
     video = "audio/video",
+    text = "text",
     image = "image",
     character = "script/character",
     screen = "script/screen",
-    language = "language"
+    scene = "script/scene"
 }
 title = R.text.common.title
 author = R.text.common.author
-initialScreen = R.screen.splash

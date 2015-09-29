@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tsuru2d.engine.loader.AssetLoader;
+import com.tsuru2d.engine.loader.LuaAssetIDBuilder;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LoadState;
 import org.luaj.vm2.compiler.LuaC;
@@ -24,6 +25,8 @@ import org.luaj.vm2.lib.jse.JseMathLib;
  * screens. This is the entry point for the engine code.
  */
 public class EngineMain implements ApplicationListener {
+    private static final String METADATA_PATH = "metadata.lua";
+
     private Globals mLuaContext;
     private BaseScreen mScreen;
     private Viewport mViewport;
@@ -114,6 +117,7 @@ public class EngineMain implements ApplicationListener {
         globals.load(new JseMathLib());
         LoadState.install(globals);
         LuaC.install(globals);
+        LuaAssetIDBuilder.install(globals);
         return globals;
     }
 }
