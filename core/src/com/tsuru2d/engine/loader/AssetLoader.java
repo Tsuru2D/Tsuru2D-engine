@@ -16,17 +16,22 @@ import java.util.Map;
 
 public class AssetLoader {
     private final AssetManager mAssetManager;
+    private final Map<AssetID, String> mResolvePathCache;
+    private final AssetPathResolver mPathResolver;
     private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
     private final Pool<ManagedAsset<?>> mAssetPool;
 
     public AssetLoader(FileHandleResolver handleResolver, AssetPathResolver pathResolver) {
         mAssetManager = new AssetManager(handleResolver);
         mAssetManager.setLoader(LuaValue.class, new LuaFileLoader(handleResolver));
+        mResolvePathCache = new HashMap<AssetID, String>();
+        mPathResolver = pathResolver;
+        mPathResolver.setAssetLoader(this);
         mLoaderDelegates = new HashMap<AssetType, AssetLoaderDelegate<?, ?>>();
-        mLoaderDelegates.put(AssetType.SOUND, new SingleAssetLoaderDelegate<Sound>(this, pathResolver, Sound.class));
-        mLoaderDelegates.put(AssetType.MUSIC, new SingleAssetLoaderDelegate<Music>(this, pathResolver, Music.class));
-        mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, pathResolver, Sound.class));
-        mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this, pathResolver));
+        mLoaderDelegates.put(AssetType.SOUND, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
+        mLoaderDelegates.put(AssetType.MUSIC, new SingleAssetLoaderDelegate<Music>(this, Music.class));
+        mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
+        mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this));
         // TODO: Add other types
         mAssetPool = new Pool<ManagedAsset<?>>() {
             @Override
@@ -74,17 +79,20 @@ public class AssetLoader {
         return (ManagedAsset<T>)mAssetPool.obtain();
     }
 
-    /* package */ <T> void startLoadingRaw(String path, Class<T> type, AssetLoaderParameters.LoadedCallback callback) {
+    /* package */ <T> void startLoadingRaw(AssetID rawAssetID, Class<T> type, AssetLoaderParameters.LoadedCallback callback) {
+        String path = mPathResolver.resolve(rawAssetID);
+        mResolvePathCache.put(rawAssetID, path);
         AssetLoaderParameters<T> params = new AssetLoaderParameters<T>();
         params.loadedCallback = callback;
         mAssetManager.load(path, type, params);
     }
 
-    /* package */ void finishLoadingRaw(String path) {
-        mAssetManager.finishLoadingAsset(path);
+    /* package */ void finishLoadingRaw(AssetID rawAssetID) {
+        mAssetManager.finishLoadingAsset(mResolvePathCache.get(rawAssetID));
     }
 
-    /* package */ void unloadRaw(String path) {
+    /* package */ void unloadRaw(AssetID rawAssetID) {
+        String path = mResolvePathCache.remove(rawAssetID);
         mAssetManager.unload(path);
     }
 

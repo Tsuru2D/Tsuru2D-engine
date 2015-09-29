@@ -10,8 +10,8 @@ import java.util.Map;
     private final Map<AssetID, TRaw> mRawAssets;
     private final Map<AssetID, Array<ManagedAsset<T>>> mAssets;
 
-    public MultiAssetLoaderDelegate(AssetLoader assetLoader, AssetPathResolver resolver, Class<TRaw> rawType) {
-        super(assetLoader, resolver, rawType);
+    public MultiAssetLoaderDelegate(AssetLoader assetLoader, Class<TRaw> rawType) {
+        super(assetLoader, rawType);
         mRawAssets = new HashMap<AssetID, TRaw>();
         mAssets = new HashMap<AssetID, Array<ManagedAsset<T>>>();
     }
@@ -71,8 +71,7 @@ import java.util.Map;
                     asset.invalidate();
                 }
             }
-            unloadRaw(rawAssetID);
-            startLoadingRaw(rawAssetID);
+            startReloadingRaw(rawAssetID);
         }
     }
 

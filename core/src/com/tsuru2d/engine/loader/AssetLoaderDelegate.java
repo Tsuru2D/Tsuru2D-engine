@@ -5,28 +5,25 @@ import com.badlogic.gdx.assets.AssetManager;
 
 /* package */ abstract class AssetLoaderDelegate<T, TRaw> {
     private class LoadedCallbackImpl implements AssetLoaderParameters.LoadedCallback {
-        private final AssetID mID;
+        private final AssetID mRawAssetID;
 
         public LoadedCallbackImpl(AssetID id) {
-            mID = id;
+            mRawAssetID = id;
         }
 
         @Override
         @SuppressWarnings("unchecked")
         public void finishedLoading(AssetManager assetManager, String fileName, Class type) {
-            onRawAssetLoaded(mID, assetManager.get(fileName, mRawType));
+            onRawAssetLoaded(mRawAssetID, assetManager.get(fileName, mRawType));
         }
     }
 
     protected final AssetLoader mAssetLoader;
-    private final AssetPathResolver mPathResolver;
     protected final Class<TRaw> mRawType;
 
-    public AssetLoaderDelegate(AssetLoader assetLoader, AssetPathResolver pathResolver, Class<TRaw> rawType) {
+    public AssetLoaderDelegate(AssetLoader assetLoader, Class<TRaw> rawType) {
         mAssetLoader = assetLoader;
-        mPathResolver = pathResolver;
         mRawType = rawType;
-        pathResolver.addObserver(this);
     }
 
     /* package */ abstract ManagedAsset<T> getAsset(AssetID assetID);
@@ -37,18 +34,19 @@ import com.badlogic.gdx.assets.AssetManager;
     protected abstract void onRawAssetInvalidated(AssetID baseRawAssetID);
 
     protected void startLoadingRaw(AssetID rawAssetID) {
-        mAssetLoader.startLoadingRaw(resolvePath(rawAssetID), mRawType, new LoadedCallbackImpl(rawAssetID));
+        mAssetLoader.startLoadingRaw(rawAssetID, mRawType, new LoadedCallbackImpl(rawAssetID));
+    }
+
+    protected void startReloadingRaw(AssetID rawAssetID) {
+        unloadRaw(rawAssetID);
+        startLoadingRaw(rawAssetID);
     }
 
     protected void finishLoadingRaw(AssetID rawAssetID) {
-        mAssetLoader.finishLoadingRaw(resolvePath(rawAssetID));
+        mAssetLoader.finishLoadingRaw(rawAssetID);
     }
 
     protected void unloadRaw(AssetID rawAssetID) {
-        mAssetLoader.unloadRaw(resolvePath(rawAssetID));
-    }
-
-    private String resolvePath(AssetID rawAssetID) {
-        return mPathResolver.resolve(rawAssetID);
+        mAssetLoader.unloadRaw(rawAssetID);
     }
 }

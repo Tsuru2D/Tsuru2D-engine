@@ -5,8 +5,8 @@ import com.badlogic.gdx.utils.Array;
 /* package */ class SingleAssetLoaderDelegate<T> extends AssetLoaderDelegate<T, T> {
     private final Array<ManagedAsset<T>> mAssets;
 
-    public SingleAssetLoaderDelegate(AssetLoader assetLoader, AssetPathResolver resolver, Class<T> rawType) {
-        super(assetLoader, resolver, rawType);
+    public SingleAssetLoaderDelegate(AssetLoader assetLoader, Class<T> rawType) {
+        super(assetLoader, rawType);
         mAssets = new Array<ManagedAsset<T>>();
     }
 
@@ -47,8 +47,7 @@ import com.badlogic.gdx.utils.Array;
             AssetID rawAssetID = getRawAssetID(asset.getAssetID());
             if (baseRawAssetID.isParentOf(rawAssetID)) {
                 asset.invalidate();
-                unloadRaw(rawAssetID);
-                startLoadingRaw(rawAssetID);
+                startReloadingRaw(rawAssetID);
             }
         }
     }
