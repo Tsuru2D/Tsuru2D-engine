@@ -68,7 +68,7 @@ public class TsuruEngineMain extends Game {
     @ExposeToLua
     public void testAssetID(LuaAssetIDBuilder id) {
         System.out.println("Asset ID -> type: " + id.getAssetID().getType() +
-            ", value: " + id.getAssetID().getPath());
+            ", value: " + id.getAssetID());
     }
 
     @Override

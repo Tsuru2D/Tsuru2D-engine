@@ -65,6 +65,9 @@ public class ManagedAsset<T> implements Pool.Poolable {
      * the asset is used, you may cache the value and register
      * an observer instead.
      * <p>
+     * The callback may be called from within {@link #get()}
+     * if the call causes the asset to be loaded.
+     * <p>
      * Remember to call {@link #removeObserver(AssetObserver)}
      * after you are done using the asset, or it will not get
      * garbage collected!

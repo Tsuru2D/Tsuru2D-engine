@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.loader;
 
-import com.badlogic.gdx.utils.Array;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
@@ -14,7 +13,7 @@ public class LuaAssetIDBuilder extends LuaTable {
         }
 
         @Override
-        protected AssetType fillAssetID(Array<String> path) {
+        protected AssetType fillAssetID(String[] path, int index) {
             return mAssetType;
         }
 
@@ -40,6 +39,7 @@ public class LuaAssetIDBuilder extends LuaTable {
 
     private final LuaAssetIDBuilder mParent;
     private final String mSubPath;
+    private final int mDepth;
 
     private LuaAssetIDBuilder() {
         this(null, null);
@@ -48,20 +48,21 @@ public class LuaAssetIDBuilder extends LuaTable {
     private LuaAssetIDBuilder(LuaAssetIDBuilder parent, String subPath) {
         mParent = parent;
         mSubPath = subPath;
+        mDepth = (parent == null) ? 0 : parent.mDepth + 1;
         setmetatable(this);
         set("__index", CHILD_INDEX_FUNC);
     }
 
-    protected AssetType fillAssetID(Array<String> path) {
-        AssetType assetType = mParent.fillAssetID(path);
-        path.add(mSubPath);
+    protected AssetType fillAssetID(String[] path, int index) {
+        AssetType assetType = mParent.fillAssetID(path, index - 1);
+        path[index] = mSubPath;
         return assetType;
     }
 
     public AssetID getAssetID() {
-        Array<String> path = new Array<String>();
-        AssetType type = fillAssetID(path);
-        return new AssetID(type, path.shrink());
+        String[] path = new String[mDepth];
+        AssetType type = fillAssetID(path, mDepth - 1);
+        return new AssetID(type, path);
     }
 
     public static void install(LuaTable environment) {
