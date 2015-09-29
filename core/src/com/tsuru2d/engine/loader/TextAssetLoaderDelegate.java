@@ -9,7 +9,8 @@ import org.luaj.vm2.LuaValue;
 
     @Override
     protected void consumeRawAsset(ManagedAsset<String> asset, LuaValue table) {
-        String key = asset.getAssetID().getPath()[-1];
+        String[] path = asset.getAssetID().getPath();
+        String key = path[path.length - 1];
         String value = table.get(key).checkjstring();
         asset.setRawAsset(value);
     }
