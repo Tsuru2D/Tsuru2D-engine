@@ -3,7 +3,7 @@ package com.tsuru2d.engine.desktop;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.tsuru2d.engine.TsuruEngineMain;
-import com.tsuru2d.engine.loader.zip.ZipFileFinder;
+import com.tsuru2d.engine.loader.zip.ZipAssetFinder;
 import com.tsuru2d.engine.loader.zip.ZipFileHandleResolver;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public class DesktopLauncher {
             throw new RuntimeException("Could not load game data");
         }
         ZipFileHandleResolver resolver = new ZipFileHandleResolver(zipFile);
-        ZipFileFinder finder = new ZipFileFinder(zipFile);
+        ZipAssetFinder finder = new ZipAssetFinder(zipFile);
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         new LwjglApplication(new TsuruEngineMain(resolver, finder), config);
     }

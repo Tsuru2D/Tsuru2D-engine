@@ -76,7 +76,11 @@ import java.util.Map;
     }
 
     private ManagedAsset<T> getCachedAsset(AssetID assetID, AssetID rawAssetID) {
-        for (ManagedAsset<T> asset : mAssets.get(rawAssetID)) {
+        Array<ManagedAsset<T>> container = mAssets.get(rawAssetID);
+        if (container == null) {
+            return null;
+        }
+        for (ManagedAsset<T> asset : container) {
             if (asset.getAssetID().equals(assetID)) {
                 return asset;
             }
@@ -95,9 +99,11 @@ import java.util.Map;
             startLoadingRaw(rawAssetID);
         } else {
             TRaw table = mRawAssets.get(rawAssetID);
-            // The asset cannot possibly have any observers attached at
-            // this point, so this action is safe
-            consumeRawAsset(asset, table);
+            if (table != null) {
+                // The asset cannot possibly have any observers attached at
+                // this point, so this action is safe
+                consumeRawAsset(asset, table);
+            }
         }
         container.add(asset);
         return asset;

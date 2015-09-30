@@ -43,7 +43,8 @@ public class LuaFileLoader extends SynchronousAssetLoader<LuaValue, LuaFileLoade
         LuaValue environment = parameter.mEnvironment;
         InputStream scriptStream = file.read();
         try {
-            return globals.load(scriptStream, fileName, "t", environment).call();
+            globals.load(scriptStream, fileName, "t", environment).call();
+            return environment;
         } finally {
             StreamUtils.closeQuietly(scriptStream);
         }

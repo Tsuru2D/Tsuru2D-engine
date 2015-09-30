@@ -6,22 +6,26 @@ import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Pool;
+import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.model.CharacterInfo;
 import com.tsuru2d.engine.model.SceneInfo;
 import com.tsuru2d.engine.model.ScreenInfo;
+import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.LuaValue;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class AssetLoader {
+    private final EngineMain mGame;
     private final AssetManager mAssetManager;
     private final Map<AssetID, String> mResolvePathCache;
     private final AssetPathResolver mPathResolver;
     private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
     private final Pool<ManagedAsset<?>> mAssetPool;
 
-    public AssetLoader(FileHandleResolver handleResolver, AssetPathResolver pathResolver) {
+    public AssetLoader(EngineMain game, FileHandleResolver handleResolver, AssetPathResolver pathResolver) {
+        mGame = game;
         mAssetManager = new AssetManager(handleResolver);
         mAssetManager.setLoader(LuaValue.class, new LuaFileLoader(handleResolver));
         mResolvePathCache = new HashMap<AssetID, String>();
@@ -39,6 +43,10 @@ public class AssetLoader {
                 return new ManagedAsset<Object>();
             }
         };
+    }
+
+    public EngineMain getGame() {
+        return mGame;
     }
 
     public ManagedAsset<Sound> getSound(AssetID id) {
@@ -83,12 +91,11 @@ public class AssetLoader {
         mAssetPool.free(asset);
     }
 
-    /* package */ <T> void startLoadingRaw(AssetID rawAssetID, Class<T> type, AssetLoaderParameters.LoadedCallback callback) {
+    /* package */ <T> void startLoadingRaw(AssetID rawAssetID, Class<T> type, AssetLoaderParameters<T> params) {
         String path = mPathResolver.resolve(rawAssetID);
         mResolvePathCache.put(rawAssetID, path);
-        AssetLoaderParameters<T> params = new AssetLoaderParameters<T>();
-        params.loadedCallback = callback;
         mAssetManager.load(path, type, params);
+        Xlog.d("Started loading asset: %s", rawAssetID);
     }
 
     /* package */ void finishLoadingRaw(AssetID rawAssetID) {
@@ -98,6 +105,7 @@ public class AssetLoader {
     /* package */ void unloadRaw(AssetID rawAssetID) {
         String path = mResolvePathCache.remove(rawAssetID);
         mAssetManager.unload(path);
+        Xlog.d("Unloading asset: %s", rawAssetID);
     }
 
     /**

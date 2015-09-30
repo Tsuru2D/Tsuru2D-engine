@@ -31,6 +31,11 @@ import com.badlogic.gdx.assets.AssetManager;
     protected abstract AssetID getRawAssetID(AssetID assetID);
     protected abstract void onRawAssetLoaded(AssetID rawAssetID, TRaw value);
     protected abstract void onRawAssetInvalidated(AssetID baseRawAssetID);
+    protected abstract AssetLoaderParameters<TRaw> getParameters();
+
+    protected AssetLoader getAssetLoader() {
+        return mAssetLoader;
+    }
 
     protected ManagedAsset<T> obtainAssetFromPool() {
         return mAssetLoader.obtainAssetFromPool();
@@ -41,7 +46,9 @@ import com.badlogic.gdx.assets.AssetManager;
     }
 
     protected void startLoadingRaw(AssetID rawAssetID) {
-        mAssetLoader.startLoadingRaw(rawAssetID, mRawType, new LoadedCallbackImpl(rawAssetID));
+        AssetLoaderParameters<TRaw> params = getParameters();
+        params.loadedCallback = new LoadedCallbackImpl(rawAssetID);
+        mAssetLoader.startLoadingRaw(rawAssetID, mRawType, params);
     }
 
     protected void startReloadingRaw(AssetID rawAssetID) {

@@ -14,9 +14,7 @@ import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonWriter;
 import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.io.JsonLuaTableSerializer;
-import com.tsuru2d.engine.loader.FileFinder;
-import com.tsuru2d.engine.loader.LuaAssetIDBuilder;
-import com.tsuru2d.engine.loader.LuaFileLoader;
+import com.tsuru2d.engine.loader.*;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import com.tsuru2d.engine.lua.JavaVarargs;
@@ -34,16 +32,16 @@ import java.util.Map;
 
 public class TsuruEngineMain extends Game {
     private FileHandleResolver mHandleResolver;
-    private FileFinder mFileFinder;
+    private AssetFinder mAssetFinder;
     private SpriteBatch batch;
     private Texture img;
     private Globals globals;
     private OrthographicCamera camera;
     private Map<String, Sound> soundMap;
 
-    public TsuruEngineMain(FileHandleResolver fileHandleResolver, FileFinder fileFinder) {
+    public TsuruEngineMain(FileHandleResolver fileHandleResolver, AssetFinder assetFinder) {
         mHandleResolver = fileHandleResolver;
-        mFileFinder = fileFinder;
+        mAssetFinder = assetFinder;
     }
 
     @ExposeToLua
@@ -70,9 +68,9 @@ public class TsuruEngineMain extends Game {
     }
 
     @ExposeToLua
-    public void testAssetID(LuaAssetIDBuilder id) {
-        System.out.println("Asset ID -> type: " + id.getAssetID().getType() +
-            ", value: " + id.getAssetID());
+    public void testAssetID(AssetID id) {
+        System.out.println("Asset ID -> type: " + id.getType() +
+            ", value: " + id);
     }
 
     @Override
@@ -80,10 +78,10 @@ public class TsuruEngineMain extends Game {
         System.out.println(Locale.forLanguageTag("zh-Hans").getDisplayName());
         batch = new SpriteBatch();
         globals = JsePlatform.standardGlobals();
+        globals.load(new LuaAssetIDLib());
         AssetManager assetManager = new AssetManager(mHandleResolver);
         assetManager.setLoader(LuaValue.class, new LuaFileLoader(mHandleResolver));
         globals.set("engine", new ExposedJavaClass(this));
-        LuaAssetIDBuilder.install(globals);
 
         MetadataInfo metadataInfo = MetadataLoader.getMetadata(globals, mHandleResolver);
         System.out.println(metadataInfo.mPackageName);

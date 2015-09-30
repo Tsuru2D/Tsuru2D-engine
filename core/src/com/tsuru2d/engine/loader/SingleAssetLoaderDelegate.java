@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.loader;
 
+import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.utils.Array;
 
 /* package */ class SingleAssetLoaderDelegate<T> extends AssetLoaderDelegate<T, T> {
@@ -51,6 +52,11 @@ import com.badlogic.gdx.utils.Array;
                 startReloadingRaw(rawAssetID);
             }
         }
+    }
+
+    @Override
+    protected AssetLoaderParameters<T> getParameters() {
+        return null;
     }
 
     private ManagedAsset<T> createNewAsset(AssetID assetID) {

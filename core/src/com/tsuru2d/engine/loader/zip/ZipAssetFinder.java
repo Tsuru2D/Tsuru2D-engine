@@ -1,14 +1,14 @@
 package com.tsuru2d.engine.loader.zip;
 
 import com.badlogic.gdx.utils.Array;
-import com.tsuru2d.engine.loader.FileFinder;
+import com.tsuru2d.engine.loader.AssetFinder;
 
 import java.io.File;
 import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-public class ZipFileFinder implements FileFinder {
+public class ZipAssetFinder implements AssetFinder {
     private static class ZipEntryNode {
         private final String mName;
         private final Array<ZipEntryNode> mChildren;
@@ -58,7 +58,7 @@ public class ZipFileFinder implements FileFinder {
 
     private final ZipEntryNode mRootNode;
 
-    public ZipFileFinder(ZipFile zipFile) {
+    public ZipAssetFinder(ZipFile zipFile) {
         Enumeration<? extends ZipEntry> entries = zipFile.entries();
         ZipEntryNode rootNode = new ZipEntryNode(null, false);
         while (entries.hasMoreElements()) {
@@ -81,7 +81,7 @@ public class ZipFileFinder implements FileFinder {
     private ZipEntryNode getParentDirNode(File parentDir) {
         File parentParent = parentDir.getParentFile();
         if (parentParent == null) {
-            return mRootNode;
+            return mRootNode.get(parentDir.getName());
         }
         ZipEntryNode node = getParentDirNode(parentParent);
         node = node.get(parentDir.getName());

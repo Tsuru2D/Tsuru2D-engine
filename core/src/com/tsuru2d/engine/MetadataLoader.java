@@ -3,6 +3,7 @@ package com.tsuru2d.engine;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.StreamUtils;
+import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.lua.LuaArrayIterator;
 import com.tsuru2d.engine.model.MetadataInfo;
@@ -14,8 +15,11 @@ import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MetadataLoader {
+public final class MetadataLoader {
     private static final String METADATA_FILE = "metadata.lua";
+
+    private MetadataLoader() { }
+
     public static MetadataInfo getMetadata(Globals globals, FileHandleResolver handleResolver) {
         LuaTable env = loadMetadataFile(globals, handleResolver);
         return parseMetadataFile(env);
@@ -30,6 +34,8 @@ public class MetadataLoader {
         info.mLocalizationDir = env.get("localizationPath").checkjstring();
         info.mResolution = env.get("resolution").checkjstring(); // TODO
         info.mAssetDirs = parseAssetDirs(env.get("assetPaths"));
+        info.mTitle = (AssetID)env.get("title").checkuserdata();
+        info.mAuthor = (AssetID)env.get("author").checkuserdata();
         // TODO: Others
         return info;
     }

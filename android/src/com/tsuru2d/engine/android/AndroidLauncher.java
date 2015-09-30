@@ -13,6 +13,7 @@ public class AndroidLauncher extends AndroidApplication {
         AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
         config.useImmersiveMode = true;
         InternalFileHandleResolver resolver = new InternalFileHandleResolver();
-        initialize(new TsuruEngineMain(resolver), config);
+        // AssetFinder assetFinder = new AndroidInternalFileFinder(getAssets());
+        initialize(new TsuruEngineMain(resolver, null), config);
     }
 }

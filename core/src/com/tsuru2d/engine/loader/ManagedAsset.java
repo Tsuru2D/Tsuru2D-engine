@@ -77,7 +77,7 @@ public class ManagedAsset<T> implements Pool.Poolable {
         if (mObservers == null) {
             // Use an initial capacity of one, since in the typical
             // use case only one observer is required
-            mObservers = new Array<AssetObserver<T>>(1);
+            mObservers = new Array<AssetObserver<T>>(false, 1, AssetObserver.class);
         }
 
         if (!mObservers.contains(observer, true)) {
