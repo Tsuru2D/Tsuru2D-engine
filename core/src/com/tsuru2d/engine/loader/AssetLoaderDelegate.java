@@ -37,6 +37,10 @@ import com.badlogic.gdx.assets.AssetManager;
         return mAssetLoader;
     }
 
+    protected Class<TRaw> getRawType() {
+        return mRawType;
+    }
+
     protected ManagedAsset<T> obtainAssetFromPool() {
         return mAssetLoader.obtainAssetFromPool();
     }

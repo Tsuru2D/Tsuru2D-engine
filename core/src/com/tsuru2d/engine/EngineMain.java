@@ -40,6 +40,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private SpriteBatch mSpriteBatch;
     private AssetLoader mAssetLoader;
     private ManagedAsset<String> mTitle;
+    int mInt = 0;
 
     public EngineMain(FileHandleResolver handleResolver, AssetFinder assetFinder) {
         mHandleResolver = handleResolver;
@@ -51,8 +52,8 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         mLuaContext = createLuaContext();
         mMetadata = MetadataLoader.getMetadata(mLuaContext, mHandleResolver);
         mPathResolver = new AssetPathResolver(mAssetFinder, mMetadata.mLocalizationDir, mMetadata.mAssetDirs);
-        mPathResolver.setLanguage("en");
         mAssetLoader = new AssetLoader(this, mHandleResolver, mPathResolver);
+        mPathResolver.setLanguage("en");
         mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         mSpriteBatch = new SpriteBatch();
 
@@ -92,6 +93,9 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     @Override
     public void render() {
+        if (++mInt % 100 == 0) {
+            mPathResolver.setLanguage((mInt % 200 == 0) ? "en" : "zh");
+        }
         mAssetLoader.update();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (mScreen != null) {

@@ -108,6 +108,12 @@ public class AssetLoader {
         Xlog.d("Unloading asset: %s", rawAssetID);
     }
 
+    /* package */ void invalidatePath(AssetID baseRawAssetID) {
+        for (AssetLoaderDelegate<?, ?> delegate : mLoaderDelegates.values()) {
+            delegate.onRawAssetInvalidated(baseRawAssetID);
+        }
+    }
+
     /**
      * Gets an asset with the specified asset ID, and increment its
      * reference counter. Make sure to call {@link #freeAsset(ManagedAsset)}

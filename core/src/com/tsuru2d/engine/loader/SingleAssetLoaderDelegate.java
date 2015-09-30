@@ -56,7 +56,7 @@ import com.badlogic.gdx.utils.Array;
 
     @Override
     protected AssetLoaderParameters<T> getParameters() {
-        return null;
+        return LoaderParamFactory.get(getRawType());
     }
 
     private ManagedAsset<T> createNewAsset(AssetID assetID) {

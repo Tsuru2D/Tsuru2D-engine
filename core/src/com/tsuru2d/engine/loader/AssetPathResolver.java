@@ -40,6 +40,7 @@ public class AssetPathResolver {
         }
 
         mLanguageCode = languageCode;
+        mAssetLoader.invalidatePath(AssetID.TEXT);
         // TODO: Invalidate observers
     }
 
