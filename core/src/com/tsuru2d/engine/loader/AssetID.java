@@ -1,70 +1,138 @@
 package com.tsuru2d.engine.loader;
 
-import java.util.Arrays;
+import com.badlogic.gdx.utils.Array;
+
+import java.lang.ref.WeakReference;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A key that is used to look up a {@link ManagedAsset}.
  * Game developers can use abstract paths such as
  * {@code R.localization.en.text.chapter1.scene1.hello} instead of
  * {@code "localization.en.text/chapter1/scene1.lua:hello"}. The asset
- * IDs will be mapped to actual file paths on disk by
- * {@link AssetPathResolver}.
+ * IDs will be mapped to a file asset ID by {@link AssetLoaderDelegate},
+ * and then mapped to an actual path on disk by {@link AssetPathResolver}.
  */
-public class AssetID {
-    private static final String[] EMPTY_PATH = new String[0];
-    public static final AssetID SOUND = new AssetID(AssetType.SOUND, EMPTY_PATH);
-    public static final AssetID MUSIC = new AssetID(AssetType.MUSIC, EMPTY_PATH);
-    public static final AssetID VOICE = new AssetID(AssetType.VOICE, EMPTY_PATH);
-    public static final AssetID TEXT = new AssetID(AssetType.TEXT, EMPTY_PATH);
+public abstract class AssetID {
+    public static final AssetID SOUND = new RootAssetID(AssetType.SOUND);
+    public static final AssetID MUSIC = new RootAssetID(AssetType.MUSIC);
+    public static final AssetID VOICE = new RootAssetID(AssetType.VOICE);
+    public static final AssetID TEXT = new RootAssetID(AssetType.TEXT);
 
-    private final AssetType mType;
-    private final String[] mPath;
+    private static class RootAssetID extends AssetID {
+        private final AssetType mType;
 
-    public AssetID(AssetType type, String[] path) {
-        mType = type;
-        mPath = path;
+        private RootAssetID(AssetType type) {
+            mType = type;
+        }
+
+        @Override
+        public AssetType getType() {
+            return mType;
+        }
+
+        @Override
+        public AssetID getParent() {
+            return null;
+        }
+
+        @Override
+        public String getName() {
+            return null;
+        }
+
+        @Override
+        public int hashCode() {
+            return mType.hashCode();
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof RootAssetID)) return false;
+            RootAssetID other = (RootAssetID)obj;
+            return mType == other.mType;
+        }
+
+        @Override
+        public String toString() {
+            return "R." + mType.name().toLowerCase();
+        }
     }
 
-    public AssetType getType() {
-        return mType;
+    private static class ChildAssetID extends AssetID {
+        private final AssetID mParent;
+        private final String mName;
+
+        private ChildAssetID(AssetID parent, String path) {
+            mParent = parent;
+            mName = path;
+        }
+
+        public AssetType getType() {
+            return mParent.getType();
+        }
+
+        @Override
+        public AssetID getParent() {
+            return mParent;
+        }
+
+        @Override
+        public String getName() {
+            return mName;
+        }
+
+        @Override
+        public String toString() {
+            return mParent.toString() + "." + mName;
+        }
+    }
+
+    private Map<String, WeakReference<AssetID>> mChildren;
+
+    private AssetID() { }
+
+    private void fillPath(Array<String> path) {
+        AssetID parent = getParent();
+        if (parent != null) {
+            parent.fillPath(path);
+            path.add(getName());
+        }
     }
 
     public String[] getPath() {
-        return mPath;
+        Array<String> path = new Array<String>(String.class);
+        fillPath(path);
+        return path.shrink();
     }
 
     public boolean isParentOrEqual(AssetID other) {
-        if (mType != other.mType) return false;
-        if (mPath.length > other.mPath.length) return false;
-        for (int i = 0; i < mPath.length; ++i) {
-            if (!mPath[i].equals(other.mPath[i])) {
-                return false;
+        for (AssetID obj = this; obj != null; obj = obj.getParent()) {
+            if (obj == other) {
+                return true;
             }
         }
-        return true;
-    }
-
-    // TODO: getParent() and getChild() are very memory inefficient.
-    // It would be best to create a tree of asset IDs, which are reused
-    // for multiple objects. getPath() would then walk up the tree and
-    // create the path array on demand. This is reasonable since getPath()
-    // will not be called too often, but getChild() will be called
-    // multiple times while creating a single asset ID.
-    public AssetID getParent() {
-        String[] path = new String[mPath.length - 1];
-        System.arraycopy(mPath, 0, path, 0, path.length);
-        return new AssetID(mType, path);
+        return false;
     }
 
     public AssetID getChild(String subPath) {
-        String[] path = new String[mPath.length + 1];
-        System.arraycopy(mPath, 0, path, 0, mPath.length);
-        path[path.length - 1] = subPath;
-        return new AssetID(mType, path);
+        WeakReference<AssetID> childRef = null;
+        if (mChildren == null) {
+            mChildren = new HashMap<String, WeakReference<AssetID>>();
+        } else {
+            childRef = mChildren.get(subPath);
+        }
+        AssetID child;
+        if (childRef == null || (child = childRef.get()) == null) {
+            child = new ChildAssetID(this, subPath);
+            mChildren.put(subPath, new WeakReference<AssetID>(child));
+        }
+        return child;
     }
 
     /* package */ AssetID checkType(AssetType expectedType) throws AssetTypeMismatchException {
-        if (mType != expectedType) {
+        if (getType() != expectedType) {
             throw new AssetTypeMismatchException(
                 "Attempting to load asset of type " + expectedType +
                 " with asset ID: " + toString());
@@ -72,29 +140,14 @@ public class AssetID {
         return this;
     }
 
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("R.");
-        sb.append(mType.name().toLowerCase());
-        for (String pathSection : mPath) {
-            sb.append('.');
-            sb.append(pathSection);
-        }
-        return sb.toString();
-    }
+    public abstract AssetType getType();
+    public abstract AssetID getParent();
+    public abstract String getName();
+    public abstract String toString();
 
-    @Override
-    public int hashCode() {
-        return mType.hashCode() * 31 + Arrays.hashCode(mPath);
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (!(obj instanceof AssetID)) return false;
-        AssetID other = (AssetID)obj;
-        if (mType != other.mType) return false;
-        if (!Arrays.equals(mPath, other.mPath)) return false;
-        return true;
-    }
+    // There is no need to override hashCode() and equals(),
+    // since asset IDs are cached based on value. If
+    // any two asset IDs exist at the same time and
+    // have the same values, they must refer to the
+    // same object.
 }
