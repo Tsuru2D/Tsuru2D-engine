@@ -44,7 +44,6 @@ public class LuaAssetIDLib extends TwoArgFunction {
         root.set("voice", VOICE);
         root.set("text", TEXT);
         env.set("R", root);
-        env.get("package").get("loaded").set("R", root);
         return LuaValue.NIL;
     }
 }
