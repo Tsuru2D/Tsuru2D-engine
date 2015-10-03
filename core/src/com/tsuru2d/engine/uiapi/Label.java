@@ -1,7 +1,8 @@
 package com.tsuru2d.engine.uiapi;
 
+
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
@@ -11,14 +12,14 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public class Button extends TextButton implements Disposable{
+public class Label extends com.badlogic.gdx.scenes.scene2d.ui.Label implements Disposable{
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private final LuaTable mLuaTable;
 
-    public Button(BaseScreen screen, LuaTable data) {
-        super(null, new TextButton.TextButtonStyle());
+    public Label(BaseScreen screen, LuaTable data) {
+        super("", new Skin()); // new Skin() gets a place holder Skin object
         this.mLuaTable = data;
         mScreen = screen;
         mObserver = new TextObserver();

@@ -11,7 +11,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public class TableLayout extends Table implements UIComponents{
+public class TableLayout extends Table implements Disposable{
     private BaseScreen mScreen;
     private LuaTable mLuaTable;
 
@@ -43,7 +43,7 @@ public class TableLayout extends Table implements UIComponents{
     }
 
     @ExposeToLua
-    public void addCell(UIComponents actor) {
+    public void addCell(Disposable actor) {
         this.add((Actor)actor);
     }
 
@@ -56,7 +56,7 @@ public class TableLayout extends Table implements UIComponents{
     public void dispose() {
         Array<Cell> mCells = getCells();
         for(Cell mC : mCells) {
-            UIComponents mUI = (UIComponents) mC;
+            Disposable mUI = (Disposable) mC;
             mUI.dispose();
         }
     }
