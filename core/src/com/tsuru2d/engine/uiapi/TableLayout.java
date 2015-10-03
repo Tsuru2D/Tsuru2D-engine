@@ -52,6 +52,15 @@ public class TableLayout extends Table implements Disposable{
         this.row();
     }
 
+    /*
+     * x is the ratio of the width of table to the width of the window.
+     * x should be in the range [0,1]
+     */
+    @ExposeToLua
+    public void setTableWidth(float ratio) {
+        this.setWidth(mScreen.getWidth() * ratio);
+    }
+
     @Override
     public void dispose() {
         Array<Cell> mCells = getCells();
