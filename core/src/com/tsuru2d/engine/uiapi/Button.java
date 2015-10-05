@@ -11,7 +11,6 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
 
 public class Button extends ClickListener implements UIWrapper {
     private BaseScreen mScreen;

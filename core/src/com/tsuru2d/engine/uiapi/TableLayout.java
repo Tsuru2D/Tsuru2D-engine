@@ -38,7 +38,7 @@ public class TableLayout extends ClickListener implements UIWrapper {
     }
 
     @ExposeToLua
-    public boolean removeContent(UIWrapper wrapper) {
+    public boolean remove(UIWrapper wrapper) {
         return mTable.removeActor(wrapper.getActor());
     }
 
@@ -80,10 +80,10 @@ public class TableLayout extends ClickListener implements UIWrapper {
 
     @Override
     public void dispose() {
-        Array<Cell> mCells = mTable.getCells();
-        for (Cell mC : mCells) {
-            Disposable mUI = (Disposable) mC;
-            mUI.dispose();
+        Array<Cell> cells = mTable.getCells();
+        for (Cell c : cells) {
+            Disposable ui = (Disposable) c;
+            ui.dispose();
         }
     }
 }
