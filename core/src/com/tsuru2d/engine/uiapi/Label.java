@@ -1,37 +1,47 @@
 package com.tsuru2d.engine.uiapi;
 
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
 
-public class Label extends com.badlogic.gdx.scenes.scene2d.ui.Label implements Disposable{
+public class Label extends ClickListener implements UIWrapper {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private final LuaTable mLuaTable;
+    private LuaFunction mOnClickCallback;
+    private final com.badlogic.gdx.scenes.scene2d.ui.Label mLabel;
 
     public Label(BaseScreen screen, LuaTable data) {
-        super("", new Skin()); // new Skin() gets a place holder Skin object
-        this.mLuaTable = data;
+        mLuaTable = data;
         mScreen = screen;
         mObserver = new TextObserver();
-        addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                LuaValue mScript = mLuaTable.get("onClick");
-                if(mScript != null){
-                    mScript.call();
-                }
-            }
-        });
+        mLabel = new com.badlogic.gdx.scenes.scene2d.ui.Label(null, mScreen.getSkin());
+    }
+
+    @Override
+    public void clicked(InputEvent event, float x, float y) {
+        if (mOnClickCallback != null) {
+            mOnClickCallback.call();
+        }
+    }
+
+    @ExposeToLua
+    public void setOnClick(LuaFunction callback) {
+        mOnClickCallback = callback;
+        if (callback != null) {
+            mLabel.addListener(this);
+        } else {
+            mLabel.removeListener(this);
+        }
     }
 
     @ExposeToLua
@@ -39,6 +49,11 @@ public class Label extends com.badlogic.gdx.scenes.scene2d.ui.Label implements D
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
+    }
+
+    @Override
+    public Actor getActor() {
+        return mLabel;
     }
 
     @Override
@@ -53,7 +68,7 @@ public class Label extends com.badlogic.gdx.scenes.scene2d.ui.Label implements D
 
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            setText(asset.get());
+            mLabel.setText(asset.get());
         }
     }
 }

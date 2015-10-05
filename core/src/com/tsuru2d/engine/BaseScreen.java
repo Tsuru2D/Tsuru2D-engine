@@ -53,6 +53,14 @@ public abstract class BaseScreen implements Screen {
 
     }
 
+    public float getWidth() {
+        return mStage.getWidth();
+    }
+
+    public float getHight() {
+        return mStage.getHeight();
+    }
+
     public AssetLoader getAssetLoader() {
         return mGame.getAssetLoader();
     }

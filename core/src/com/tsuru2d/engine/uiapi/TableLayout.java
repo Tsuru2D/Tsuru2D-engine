@@ -6,50 +6,45 @@ import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
 
-public class TableLayout extends Table implements Disposable{
+public class TableLayout extends ClickListener implements UIWrapper {
     private BaseScreen mScreen;
     private LuaTable mLuaTable;
+    private final Table mTable;
+    private LuaFunction mCallBack;
 
     public TableLayout(BaseScreen screen, LuaTable data) {
-        super();
-        this.mLuaTable = data;
+        mTable = new Table();
+        mLuaTable = data;
         mScreen = screen;
-        setDebug(false);
+        mTable.setDebug(false);
     }
 
     public TableLayout(BaseScreen screen, LuaTable data, boolean debug) {
-        super();
-        this.mLuaTable = data;
+        mTable = new Table();
+        mLuaTable = data;
         mScreen = screen;
-        setDebug(debug);
-    }
-
-    private void addClickListener() {
-        this.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                LuaValue mScript = mLuaTable.get("onClick");
-                if(mScript != null){
-                    String parameters = x + " " + y;
-                    mScript.call(parameters);
-                }
-            }
-        });
+        mTable.setDebug(debug);
     }
 
     @ExposeToLua
-    public void addCell(Disposable actor) {
-        this.add((Actor)actor);
+    public void add(UIWrapper wrapper) {
+        mTable.add(wrapper.getActor());
     }
 
     @ExposeToLua
-    public void newRow() {
-        this.row();
+    public boolean removeContent(UIWrapper wrapper) {
+        return mTable.removeActor(wrapper.getActor());
+    }
+
+    @ExposeToLua
+    public void row() {
+        mTable.row();
     }
 
     /*
@@ -58,13 +53,35 @@ public class TableLayout extends Table implements Disposable{
      */
     @ExposeToLua
     public void setTableWidth(float ratio) {
-        this.setWidth(mScreen.getWidth() * ratio);
+        mTable.setWidth(mScreen.getWidth() * ratio);
+    }
+
+    @ExposeToLua
+    public void setOnClick(LuaFunction callBack) {
+        mCallBack = callBack;
+        if (mCallBack != null) {
+            mTable.addListener(this);
+        } else {
+            mTable.removeListener(this);
+        }
+    }
+
+    @Override
+    public Actor getActor() {
+        return mTable;
+    }
+
+    @Override
+    public void clicked(InputEvent event, float x, float y) {
+        if (mCallBack != null) {
+            mCallBack.call();
+        }
     }
 
     @Override
     public void dispose() {
-        Array<Cell> mCells = getCells();
-        for(Cell mC : mCells) {
+        Array<Cell> mCells = mTable.getCells();
+        for (Cell mC : mCells) {
             Disposable mUI = (Disposable) mC;
             mUI.dispose();
         }

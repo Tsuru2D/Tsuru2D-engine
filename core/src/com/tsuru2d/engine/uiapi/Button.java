@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -8,29 +9,23 @@ import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public class Button extends TextButton implements Disposable{
+public class Button extends ClickListener implements UIWrapper {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private final LuaTable mLuaTable;
+    private LuaFunction mCallBack;
+    private final TextButton mButton;
 
     public Button(BaseScreen screen, LuaTable data) {
-        super(null, new TextButton.TextButtonStyle());
-        this.mLuaTable = data;
+        mLuaTable = data;
         mScreen = screen;
         mObserver = new TextObserver();
-        addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                LuaValue mScript = mLuaTable.get("onClick");
-                if(mScript != null){
-                    mScript.call();
-                }
-            }
-        });
+        mButton = new TextButton(null, new TextButton.TextButtonStyle());
     }
 
     @ExposeToLua
@@ -38,6 +33,29 @@ public class Button extends TextButton implements Disposable{
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
+    }
+
+    @ExposeToLua
+    public void setOnClick(LuaFunction callBack) {
+        mCallBack = callBack;
+        if(mCallBack != null) {
+            mButton.addListener(this);
+        }else {
+            mButton.removeListener(this);
+        }
+
+    }
+
+    @Override
+    public void clicked(InputEvent event, float x, float y) {
+        if(mCallBack != null) {
+            mCallBack.call();
+        }
+    }
+
+    @Override
+    public Actor getActor() {
+        return mButton;
     }
 
     @Override
@@ -52,7 +70,7 @@ public class Button extends TextButton implements Disposable{
 
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            setText(asset.get());
+            mButton.setText(asset.get());
         }
     }
 }
