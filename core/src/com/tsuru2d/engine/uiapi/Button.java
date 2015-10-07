@@ -11,7 +11,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class Button extends ClickListener implements UIWrapper {
+public class Button extends ClickListener implements UIWrapper<TextButton> {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;

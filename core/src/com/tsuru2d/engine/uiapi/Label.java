@@ -10,7 +10,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class Label extends ClickListener implements UIWrapper {
+public class Label extends ClickListener implements UIWrapper<com.badlogic.gdx.scenes.scene2d.ui.Label> {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
