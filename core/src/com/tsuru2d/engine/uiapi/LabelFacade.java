@@ -1,6 +1,8 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
@@ -10,19 +12,19 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class Label extends ClickListener implements UIWrapper<com.badlogic.gdx.scenes.scene2d.ui.Label> {
+public class LabelFacade extends ClickListener implements UIWrapper<Label> {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private final LuaTable mLuaTable;
     private LuaFunction mOnClickCallback;
-    private final com.badlogic.gdx.scenes.scene2d.ui.Label mLabel;
+    private final Label mLabel;
 
-    public Label(BaseScreen screen, LuaTable data) {
+    public LabelFacade(BaseScreen screen, LuaTable data) {
         mLuaTable = data;
         mScreen = screen;
         mObserver = new TextObserver();
-        mLabel = new com.badlogic.gdx.scenes.scene2d.ui.Label(null, mScreen.getSkin());
+        mLabel = new Label(null, new Skin());
     }
 
     @Override
@@ -50,7 +52,7 @@ public class Label extends ClickListener implements UIWrapper<com.badlogic.gdx.s
     }
 
     @Override
-    public com.badlogic.gdx.scenes.scene2d.ui.Label getActor() {
+    public Label getActor() {
         return mLabel;
     }
 

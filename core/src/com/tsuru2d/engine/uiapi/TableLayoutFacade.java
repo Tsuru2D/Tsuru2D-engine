@@ -11,20 +11,20 @@ import org.luaj.vm2.LuaTable;
 
 import java.util.HashMap;
 
-public class TableLayout extends ClickListener implements UIWrapper<Table> {
+public class TableLayoutFacade extends ClickListener implements UIWrapper<Table> {
     private BaseScreen mScreen;
     private final Table mTable;
     private LuaFunction mCallBack;
     private HashMap<Integer, UIWrapper> mMap;
 
-    public TableLayout(BaseScreen screen, LuaTable data) {
+    public TableLayoutFacade(BaseScreen screen, LuaTable data) {
         mTable = new Table();
         mScreen = screen;
         mTable.setDebug(false);
         mMap = new HashMap<>();
     }
 
-    public TableLayout(BaseScreen screen, LuaTable data, boolean debug) {
+    public TableLayoutFacade(BaseScreen screen, LuaTable data, boolean debug) {
         mTable = new Table();
         mScreen = screen;
         mTable.setDebug(debug);
