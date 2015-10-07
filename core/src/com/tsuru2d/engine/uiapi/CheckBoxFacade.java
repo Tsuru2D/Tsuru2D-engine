@@ -1,29 +1,26 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class Button extends ClickListener implements UIWrapper<TextButton> {
+public class CheckBoxFacade implements UIWrapper<CheckBox> {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private final LuaTable mLuaTable;
-    private LuaFunction mCallBack;
-    private final TextButton mButton;
+    private final CheckBox mCheckBox;
 
-    public Button(BaseScreen screen, LuaTable data) {
+    public CheckBoxFacade(BaseScreen screen, LuaTable data) {
         mLuaTable = data;
         mScreen = screen;
         mObserver = new TextObserver();
-        mButton = new TextButton(null, new TextButton.TextButtonStyle());
+        mCheckBox = new CheckBox("", new Skin());
     }
 
     @ExposeToLua
@@ -34,26 +31,13 @@ public class Button extends ClickListener implements UIWrapper<TextButton> {
     }
 
     @ExposeToLua
-    public void setOnClick(LuaFunction callBack) {
-        mCallBack = callBack;
-        if(mCallBack != null) {
-            mButton.addListener(this);
-        }else {
-            mButton.removeListener(this);
-        }
-
+    public boolean getChecked() {
+        return mCheckBox.isChecked();
     }
 
     @Override
-    public void clicked(InputEvent event, float x, float y) {
-        if(mCallBack != null) {
-            mCallBack.call();
-        }
-    }
-
-    @Override
-    public TextButton getActor() {
-        return mButton;
+    public CheckBox getActor() {
+        return mCheckBox;
     }
 
     @Override
@@ -68,7 +52,7 @@ public class Button extends ClickListener implements UIWrapper<TextButton> {
 
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            mButton.setText(asset.get());
+            mCheckBox.setText(asset.get());
         }
     }
 }
