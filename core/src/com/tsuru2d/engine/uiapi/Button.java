@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -53,7 +52,7 @@ public class Button extends ClickListener implements UIWrapper {
     }
 
     @Override
-    public Actor getActor() {
+    public TextButton getActor() {
         return mButton;
     }
 

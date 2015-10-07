@@ -1,7 +1,5 @@
 package com.tsuru2d.engine.uiapi;
 
-
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tsuru2d.engine.BaseScreen;
@@ -52,7 +50,7 @@ public class Label extends ClickListener implements UIWrapper {
     }
 
     @Override
-    public Actor getActor() {
+    public com.badlogic.gdx.scenes.scene2d.ui.Label getActor() {
         return mLabel;
     }
 

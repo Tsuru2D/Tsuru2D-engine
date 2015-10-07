@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
@@ -9,7 +8,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class TextField implements UIWrapper{
+public class TextField implements UIWrapper {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
@@ -62,7 +61,7 @@ public class TextField implements UIWrapper{
     }
 
     @Override
-    public Actor getActor() {
+    public com.badlogic.gdx.scenes.scene2d.ui.TextField getActor() {
         return mTextField;
     }
 

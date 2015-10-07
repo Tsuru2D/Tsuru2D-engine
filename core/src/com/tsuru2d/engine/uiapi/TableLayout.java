@@ -2,43 +2,43 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class TableLayout extends ClickListener implements UIWrapper {
+import java.util.HashMap;
+
+public class TableLayout extends ClickListener implements UIWrapper<Table> {
     private BaseScreen mScreen;
-    private LuaTable mLuaTable;
     private final Table mTable;
     private LuaFunction mCallBack;
+    private HashMap<Integer, UIWrapper> mMap;
 
     public TableLayout(BaseScreen screen, LuaTable data) {
         mTable = new Table();
-        mLuaTable = data;
         mScreen = screen;
         mTable.setDebug(false);
+        mMap = new HashMap<>();
     }
 
     public TableLayout(BaseScreen screen, LuaTable data, boolean debug) {
         mTable = new Table();
-        mLuaTable = data;
         mScreen = screen;
         mTable.setDebug(debug);
     }
 
     @ExposeToLua
-    public void add(UIWrapper wrapper) {
+    public void add(UIWrapper<?> wrapper) {
+        mMap.put(wrapper.hashCode(), wrapper);
         mTable.add(wrapper.getActor());
     }
 
     @ExposeToLua
     public boolean remove(UIWrapper wrapper) {
+        mMap.remove(wrapper.hashCode());
         return mTable.removeActor(wrapper.getActor());
     }
 
@@ -67,7 +67,7 @@ public class TableLayout extends ClickListener implements UIWrapper {
     }
 
     @Override
-    public Actor getActor() {
+    public Table getActor() {
         return mTable;
     }
 
@@ -80,10 +80,9 @@ public class TableLayout extends ClickListener implements UIWrapper {
 
     @Override
     public void dispose() {
-        Array<Cell> cells = mTable.getCells();
-        for (Cell c : cells) {
-            Disposable ui = (Disposable) c;
-            ui.dispose();
+        Object keys[] = mMap.keySet().toArray();
+        for(int i = 0; i < keys.length; i++) {
+            mMap.get(keys[i]).dispose();
         }
     }
 }
