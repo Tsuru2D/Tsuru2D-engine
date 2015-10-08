@@ -1,44 +1,71 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
 import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class CheckBoxFacade implements UIWrapper<CheckBox> {
+public class TextAreaFacade implements UIWrapper<TextArea> {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private final LuaTable mLuaTable;
-    private final CheckBox mCheckBox;
+    private LuaFunction mOnClickCallback;
+    private final TextArea mTextArea;
 
-    public CheckBoxFacade(BaseScreen screen, LuaTable data) {
-        mLuaTable = data;
+    public TextAreaFacade(BaseScreen screen, LuaTable data) {
         mScreen = screen;
+        mLuaTable = data;
         mObserver = new TextObserver();
-        mCheckBox = new CheckBox("", new Skin());
+        mTextArea = new TextArea("", new Skin());
     }
 
     @ExposeToLua
     public void setText(AssetID text) {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
-        mCheckBox.setText(mText.get());
+        mTextArea.setText(mText.get());
         mText.addObserver(mObserver);
     }
 
     @ExposeToLua
-    public boolean isChecked() {
-        return mCheckBox.isChecked();
+    public String getText() {
+        return mTextArea.getText();
+    }
+
+    @ExposeToLua
+    public void Disable() {
+        mTextArea.setDisabled(true);
+    }
+
+    @ExposeToLua
+    public void Enable() {
+        mTextArea.setDisabled(false);
+    }
+
+    @ExposeToLua
+    public boolean isDisabled() {
+        return mTextArea.isDisabled();
+    }
+
+    @ExposeToLua
+    public void setPasswordMode(boolean isPasswordMode) {
+        mTextArea.setPasswordMode(isPasswordMode);
+    }
+
+    @ExposeToLua
+    public boolean isPasswordMode() {
+        return mTextArea.isPasswordMode();
     }
 
     @Override
-    public CheckBox getActor() {
-        return mCheckBox;
+    public TextArea getActor() {
+        return mTextArea;
     }
 
     @Override
@@ -53,7 +80,8 @@ public class CheckBoxFacade implements UIWrapper<CheckBox> {
 
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            mCheckBox.setText(asset.get());
+            mTextArea.setText(asset.get());
         }
     }
+
 }
