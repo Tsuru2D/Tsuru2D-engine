@@ -70,8 +70,8 @@ import java.util.Map;
                 for (ManagedAsset<T> asset : assets) {
                     asset.invalidate();
                 }
+                startReloadingRaw(rawAssetID);
             }
-            startReloadingRaw(rawAssetID);
         }
     }
 

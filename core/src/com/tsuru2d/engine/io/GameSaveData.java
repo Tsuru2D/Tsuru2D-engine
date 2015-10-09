@@ -66,7 +66,7 @@ public class GameSaveData implements Json.Serializable {
      * keys are strings and that you do not store circular
      * references in this table.
      */
-    public LuaTable mCustomData;
+    public LuaTable mCustomState;
 
     @Override
     public void write(Json json) {
@@ -77,7 +77,7 @@ public class GameSaveData implements Json.Serializable {
         json.writeValue("scene", mSceneId);
         json.writeValue("frame", mFrameId);
         json.writeValue("frameOffset", mFrameOffset);
-        json.writeValue("state", mCustomData);
+        json.writeValue("state", mCustomState);
     }
 
     @Override
@@ -89,6 +89,6 @@ public class GameSaveData implements Json.Serializable {
         mSceneId = json.readValue("scene", String.class, jsonData);
         mFrameId = json.readValue("frame", String.class, jsonData);
         mFrameOffset = json.readValue("frameOffset", int.class, jsonData);
-        mCustomData = json.readValue("state", LuaTable.class, jsonData);
+        mCustomState = json.readValue("state", LuaTable.class, jsonData);
     }
 }

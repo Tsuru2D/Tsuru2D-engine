@@ -104,7 +104,7 @@ public class TsuruEngineMain extends Game {
         saveData.mId = 42;
         saveData.mVersion = 1;
         saveData.mCreationTime = System.currentTimeMillis();
-        saveData.mCustomData = globals.get("generateTable").call().checktable();
+        saveData.mCustomState = globals.get("generateTable").call().checktable();
         /*
         saveData.mRawData = json.fromJson(LuaTable.class, "[\n" +
             "    {\n" +

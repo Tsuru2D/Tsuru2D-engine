@@ -2,7 +2,6 @@ package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.utils.Pool;
@@ -18,19 +17,18 @@ import java.util.Map;
 
 public class AssetLoader {
     private final EngineMain mGame;
+    private final AssetFinder mAssetFinder;
     private final AssetManager mAssetManager;
     private final Map<AssetID, String> mResolvePathCache;
-    private final AssetPathResolver mPathResolver;
     private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
     private final Pool<ManagedAsset<?>> mAssetPool;
 
-    public AssetLoader(EngineMain game, FileHandleResolver handleResolver, AssetPathResolver pathResolver) {
+    public AssetLoader(EngineMain game, AssetFinder assetFinder) {
         mGame = game;
-        mAssetManager = new AssetManager(handleResolver);
-        mAssetManager.setLoader(LuaValue.class, new LuaFileLoader(handleResolver));
+        mAssetFinder = assetFinder;
+        mAssetManager = new AssetManager(assetFinder);
+        mAssetManager.setLoader(LuaValue.class, new LuaFileLoader(assetFinder));
         mResolvePathCache = new HashMap<AssetID, String>();
-        mPathResolver = pathResolver;
-        mPathResolver.setAssetLoader(this);
         mLoaderDelegates = new HashMap<AssetType, AssetLoaderDelegate<?, ?>>();
         mLoaderDelegates.put(AssetType.SOUND, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
         mLoaderDelegates.put(AssetType.MUSIC, new SingleAssetLoaderDelegate<Music>(this, Music.class));
@@ -92,7 +90,7 @@ public class AssetLoader {
     }
 
     /* package */ <T> void startLoadingRaw(AssetID rawAssetID, Class<T> type, AssetLoaderParameters<T> params) {
-        String path = mPathResolver.resolve(rawAssetID);
+        String path = mAssetFinder.findPath(rawAssetID);
         mResolvePathCache.put(rawAssetID, path);
         mAssetManager.load(path, type, params);
         Xlog.d("Started loading asset: %s", rawAssetID);

@@ -8,5 +8,4 @@ public interface FileManager {
     void writeSaveGame(GameSaveData data);
     void getConfig();
     void writeConfig(LuaTable data);
-
 }

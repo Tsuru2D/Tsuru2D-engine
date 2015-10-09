@@ -3,7 +3,6 @@ versionCode = 2
 versionName = "1.0.3"
 languages = {"ja", "en"}
 resolution = "1280x720" -- Your videos & backgrounds should be this big, please use 16:9
-localizationPath = "localization"
 assetPaths = {
     voice = "audio/voice",
     music = "audio/music",
