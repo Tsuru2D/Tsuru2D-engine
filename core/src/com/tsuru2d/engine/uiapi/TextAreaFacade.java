@@ -26,7 +26,7 @@ public class TextAreaFacade implements UIWrapper<TextArea> {
     }
 
     @ExposeToLua
-    public void setText(AssetID text) {
+    private void setText(AssetID text) {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mTextArea.setText(mText.get());
@@ -38,29 +38,15 @@ public class TextAreaFacade implements UIWrapper<TextArea> {
         return mTextArea.getText();
     }
 
+
     @ExposeToLua
-    public void Disable() {
-        mTextArea.setDisabled(true);
+    public void setEnabled(boolean enabled) {
+        mTextArea.setDisabled(!enabled);
     }
 
     @ExposeToLua
-    public void Enable() {
-        mTextArea.setDisabled(false);
-    }
-
-    @ExposeToLua
-    public boolean isDisabled() {
-        return mTextArea.isDisabled();
-    }
-
-    @ExposeToLua
-    public void setPasswordMode(boolean isPasswordMode) {
-        mTextArea.setPasswordMode(isPasswordMode);
-    }
-
-    @ExposeToLua
-    public boolean isPasswordMode() {
-        return mTextArea.isPasswordMode();
+    public boolean isEnabled() {
+        return !mTextArea.isDisabled();
     }
 
     @Override
