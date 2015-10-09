@@ -27,11 +27,12 @@ public class CheckBoxFacade implements UIWrapper<CheckBox> {
     public void setText(AssetID text) {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
+        mCheckBox.setText(mText.get());
         mText.addObserver(mObserver);
     }
 
     @ExposeToLua
-    public boolean getChecked() {
+    public boolean isChecked() {
         return mCheckBox.isChecked();
     }
 
