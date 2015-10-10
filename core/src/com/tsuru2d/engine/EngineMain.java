@@ -4,7 +4,6 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Action;
@@ -30,9 +29,7 @@ import java.util.regex.Pattern;
  * screens. This is the entry point for the engine code.
  */
 public class EngineMain implements ApplicationListener, AssetObserver<String> {
-    private FileHandleResolver mHandleResolver;
     private AssetFinder mAssetFinder;
-    private AssetPathResolver mPathResolver;
     private MetadataInfo mMetadata;
     private Globals mLuaContext;
     private BaseScreen mScreen;
@@ -42,17 +39,17 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private ManagedAsset<String> mTitle;
     int mInt = 0;
 
-    public EngineMain(FileHandleResolver handleResolver, AssetFinder assetFinder) {
-        mHandleResolver = handleResolver;
+    public EngineMain(AssetFinder assetFinder) {
         mAssetFinder = assetFinder;
     }
 
     @Override
     public void create() {
         mLuaContext = createLuaContext();
-        mMetadata = MetadataLoader.getMetadata(mLuaContext, mHandleResolver);
+        mMetadata = MetadataLoader.getMetadata(mLuaContext, mAssetFinder);
         mPathResolver = new AssetPathResolver(mAssetFinder, mMetadata.mLocalizationDir, mMetadata.mAssetDirs);
-        mAssetLoader = new AssetLoader(this, mHandleResolver, mPathResolver);
+        mAssetLoader = new AssetLoader(this, mPathResolver);
+        mAssetFinder.setPathListener(mAssetLoader);
         mPathResolver.setLanguage("en");
         mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         mSpriteBatch = new SpriteBatch();

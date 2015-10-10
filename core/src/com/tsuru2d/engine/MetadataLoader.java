@@ -1,8 +1,8 @@
 package com.tsuru2d.engine;
 
-import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.StreamUtils;
+import com.tsuru2d.engine.loader.AssetFinder;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.lua.LuaArrayIterator;
@@ -16,12 +16,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 public final class MetadataLoader {
-    private static final String METADATA_FILE = "metadata.lua";
-
     private MetadataLoader() { }
 
-    public static MetadataInfo getMetadata(Globals globals, FileHandleResolver handleResolver) {
-        LuaTable env = loadMetadataFile(globals, handleResolver);
+    public static MetadataInfo getMetadata(Globals globals, AssetFinder assetFinder) {
+        LuaTable env = loadMetadataFile(globals, assetFinder);
         return parseMetadataFile(env);
     }
 
@@ -67,8 +65,8 @@ public final class MetadataLoader {
         return languages;
     }
 
-    private static LuaTable loadMetadataFile(Globals globals, FileHandleResolver handleResolver) {
-        FileHandle metadataHandle = handleResolver.resolve(METADATA_FILE);
+    private static LuaTable loadMetadataFile(Globals globals, AssetFinder assetFinder) {
+        FileHandle metadataHandle = assetFinder.getMetadataHandle();
         LuaTable env = new LuaTable();
         env.set(LuaValue.INDEX, globals);
         env.setmetatable(env);

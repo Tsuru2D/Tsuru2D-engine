@@ -3,10 +3,13 @@
 -----------------------------------------
 -- TODO: How can we implement "go to frame after click" vs. "go to frame now"
 -- TODO: What about asset pre-fetching? Is that even possible with this model?
+--       The hacky way: have a "pre-fetch" mode where we virtualize everything
+--       and run the scene through a asset cacher
 -- TODO: What about scene transitions? Fade in/out, etc.
-scene("second_scene", function()
+-- TODO: Camera effects (bounce, shake, etc)
+scene("second_scene", function(scene)
     setup(function(state)
-        state.alice = create(R.character.alice, {
+        create("alice", R.character.alice, {
             x = 1.5,
             y = 0.5,
             z = 1,
@@ -14,24 +17,67 @@ scene("second_scene", function()
             clothes = "home",
             face = "happy",
         })
-        state.cg = create(R.image.cg.alice_happy, {
+
+        create("cg", R.image.cg.alice_happy, {
             bounds = {0,0,1,1},
             alpha = 0,
         })
-    end)
-    frame("f1", function(state)
+
+        alpha(0)
+        camera({bounds = {0.15,0.15,0.85,0.85}})
         background(R.image.bg.school)
-        delay(1, function()
-            camera:alpha(1).next(function()
-                state.alice:x(0.3)
-                camera:bounds({0.15,0.15,0.85,0.85})
-                music(R.music.bgm1)
+    end)
+
+    frame("f1", function()
+        character(R.character.alice)
+        music(R.music.bgm1)
+        alpha(1).next(function()
+            sound(R.sound.boom)
+            camera("shake")
+        end).next(function()
+            transform("alice", {x=0.3})
+            text(R.text.chapter1.scene1.what_was_that)
+            voice(R.voice.chapter1.scene1.alice_what_was_that)
+        end)
+
+        character(R.character.alice)
+        music(R.music.bgm1)
+        alpha(1).parallel(sound(R.sound.boom), camera("shake"))
+        transform(R.character.alice, {
+            x = 0.3,
+        }).transform(R.character.alice, {
+            y = animate(0,3, 0.4, "bounce")
+        })
+
+        parallel {
+            text(R.text.chapter1.scene1.what_was_that),
+            voice(R.voice.chapter1.scene1.alice_what_was_that)
+        }
+
+        delay(1)
+            .next(text(R.text.blah))
+            .next(function()
+                music(R.music.blah)
+                camera{bounds={0,0,1,1}}
+            end)
+            .next(interactive("player_name", {type = "textbox"}))
+
+        sound(R.sound.boom)
+            .next()
+        frame:delay(1, function()
+            frame.camera:alpha(1).next(function()
+                frame.state.alice:x(0.3)
+                frame:camera({
+                    bounds = {0.15,0.15,0.85,0.85}
+                })
+                frame:music(R.music.bgm1)
                 camera:bounds({0,0,1,1}) -- todo: camera effects (bounce, shake, etc)
-                character(R.character.alice)
-                text(R.text.chapter1.scene2.hello_world)
+                frame:character(R.character.alice)
+                frame:text(R.text.chapter1.scene2.hello_world)
             end)
         end)
     end)
+
     frame("f2", function()
         character(R.character.alice)
         text(R.text.chapter1.scene2.this_is_a_test)
