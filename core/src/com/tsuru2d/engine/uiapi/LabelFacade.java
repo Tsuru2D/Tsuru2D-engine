@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -12,35 +11,27 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class LabelFacade extends ClickListener implements UIWrapper<Label> {
-    private BaseScreen mScreen;
+public class LabelFacade extends UIWrapper<Label> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
-    private final LuaTable mLuaTable;
-    private LuaFunction mOnClickCallback;
+    private ClickHandler mClickHandler;
+    private LuaFunction mCallBack;
     private final Label mLabel;
 
-    public LabelFacade(BaseScreen screen, LuaTable data) {
+    public LabelFacade(LuaTable data) {
         mLuaTable = data;
-        mScreen = screen;
         mObserver = new TextObserver();
         mLabel = new Label(null, new Skin());
-    }
-
-    @Override
-    public void clicked(InputEvent event, float x, float y) {
-        if (mOnClickCallback != null) {
-            mOnClickCallback.call();
-        }
+        mClickHandler = new ClickHandler();
     }
 
     @ExposeToLua
     public void setOnClick(LuaFunction callback) {
-        mOnClickCallback = callback;
+        mCallBack = callback;
         if (callback != null) {
-            mLabel.addListener(this);
+            mLabel.addListener(mClickHandler);
         } else {
-            mLabel.removeListener(this);
+            mLabel.removeListener(mClickHandler);
         }
     }
 
@@ -61,6 +52,15 @@ public class LabelFacade extends ClickListener implements UIWrapper<Label> {
         if (mText != null && mObserver != null) {
             mText.removeObserver(mObserver);
             mScreen.getAssetLoader().freeAsset(mText);
+        }
+    }
+
+    private class ClickHandler extends ClickListener {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            if(mCallBack != null) {
+                mCallBack.call();
+            }
         }
     }
 

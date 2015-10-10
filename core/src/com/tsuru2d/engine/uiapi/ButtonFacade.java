@@ -9,21 +9,21 @@ import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
+
 import org.luaj.vm2.LuaTable;
 
-public class ButtonFacade extends ClickListener implements UIWrapper<TextButton> {
-    private BaseScreen mScreen;
+public class ButtonFacade extends UIWrapper<TextButton> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
-    private final LuaTable mLuaTable;
+    private ClickHandler mClickHandler;
     private LuaFunction mCallBack;
     private final TextButton mButton;
 
-    public ButtonFacade(BaseScreen screen, LuaTable data) {
+    public ButtonFacade(LuaTable data) {
         mLuaTable = data;
-        mScreen = screen;
         mObserver = new TextObserver();
         mButton = new TextButton(null, new TextButton.TextButtonStyle());
+        mClickHandler = new ClickHandler();
     }
 
     @ExposeToLua
@@ -31,24 +31,23 @@ public class ButtonFacade extends ClickListener implements UIWrapper<TextButton>
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
+
     }
 
     @ExposeToLua
     public void setOnClick(LuaFunction callBack) {
         mCallBack = callBack;
         if(mCallBack != null) {
-            mButton.addListener(this);
+            mButton.addListener(mClickHandler);
         }else {
-            mButton.removeListener(this);
+            mButton.removeListener(mClickHandler);
         }
 
     }
 
-    @Override
-    public void clicked(InputEvent event, float x, float y) {
-        if(mCallBack != null) {
-            mCallBack.call();
-        }
+    @ExposeToLua
+    public void setPosition(float x, float y) {
+        mButton.setPosition(x, y);
     }
 
     @Override
@@ -61,6 +60,15 @@ public class ButtonFacade extends ClickListener implements UIWrapper<TextButton>
         if (mText != null && mObserver != null) {
             mText.removeObserver(mObserver);
             mScreen.getAssetLoader().freeAsset(mText);
+        }
+    }
+
+    private class ClickHandler extends ClickListener {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            if(mCallBack != null) {
+                mCallBack.call();
+            }
         }
     }
 

@@ -11,23 +11,28 @@ import org.luaj.vm2.LuaTable;
 
 import java.util.HashMap;
 
-public class TableLayoutFacade extends ClickListener implements UIWrapper<Table> {
-    private BaseScreen mScreen;
+public class TableLayoutFacade extends UIWrapper<Table> {
     private final Table mTable;
     private LuaFunction mCallBack;
     private HashMap<Integer, UIWrapper> mMap;
+    private ClickHandler mClickHandler;
 
     public TableLayoutFacade(BaseScreen screen, LuaTable data) {
+        mLuaTable = data;
         mTable = new Table();
         mScreen = screen;
         mTable.setDebug(false);
         mMap = new HashMap<>();
+        mClickHandler = new ClickHandler();
     }
 
     public TableLayoutFacade(BaseScreen screen, LuaTable data, boolean debug) {
+        mLuaTable = data;
         mTable = new Table();
         mScreen = screen;
         mTable.setDebug(debug);
+        mMap = new HashMap<>();
+        mClickHandler = new ClickHandler();
     }
 
     @ExposeToLua
@@ -60,9 +65,9 @@ public class TableLayoutFacade extends ClickListener implements UIWrapper<Table>
     public void setOnClick(LuaFunction callBack) {
         mCallBack = callBack;
         if (mCallBack != null) {
-            mTable.addListener(this);
+            mTable.addListener(mClickHandler);
         } else {
-            mTable.removeListener(this);
+            mTable.removeListener(mClickHandler);
         }
     }
 
@@ -72,17 +77,19 @@ public class TableLayoutFacade extends ClickListener implements UIWrapper<Table>
     }
 
     @Override
-    public void clicked(InputEvent event, float x, float y) {
-        if (mCallBack != null) {
-            mCallBack.call();
-        }
-    }
-
-    @Override
     public void dispose() {
         Object keys[] = mMap.keySet().toArray();
         for(int i = 0; i < keys.length; i++) {
             mMap.get(keys[i]).dispose();
+        }
+    }
+
+    private class ClickHandler extends ClickListener {
+        @Override
+        public void clicked(InputEvent event, float x, float y) {
+            if(mCallBack != null) {
+                mCallBack.call();
+            }
         }
     }
 }

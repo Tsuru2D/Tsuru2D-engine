@@ -7,15 +7,12 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
-public class SliderFacade implements UIWrapper<Slider> {
-    private final BaseScreen mScreen;
-    private final LuaTable mLuaTable;
+public class SliderFacade extends UIWrapper<Slider> {
     private final Slider mSlider;
     private ManagedAsset<String> mText;
 
     public SliderFacade(BaseScreen screen, LuaTable data) {
         mLuaTable = data;
-        mScreen = screen;
         mSlider = new Slider(0.0f, 1.0f, 0.01f, false, new Skin());
     }
 
