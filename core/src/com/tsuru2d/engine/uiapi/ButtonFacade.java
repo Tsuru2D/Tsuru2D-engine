@@ -11,7 +11,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class Button extends ClickListener implements UIWrapper<TextButton> {
+public class ButtonFacade extends ClickListener implements UIWrapper<TextButton> {
     private BaseScreen mScreen;
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
@@ -19,7 +19,7 @@ public class Button extends ClickListener implements UIWrapper<TextButton> {
     private LuaFunction mCallBack;
     private final TextButton mButton;
 
-    public Button(BaseScreen screen, LuaTable data) {
+    public ButtonFacade(BaseScreen screen, LuaTable data) {
         mLuaTable = data;
         mScreen = screen;
         mObserver = new TextObserver();
