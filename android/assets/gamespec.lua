@@ -59,6 +59,7 @@
 --
 -- Some actions only have asynchronous forms. For example:
 --     music()
+--     sound() (unfortunately, due to a limitation in libGDX)
 --     character()
 -- Calling .wait() on these actions will do nothing.
 --
@@ -169,7 +170,7 @@ scene("second_scene", function()
             }
         })
     end)
-    frame("f7", function(state)
+    frame("f8", function(state)
         character(R.character.alice)
         text(R.text.chapter1.scene2.lets_go)
         voice(R.voice.chapter1.scene2.alice_lets_go)

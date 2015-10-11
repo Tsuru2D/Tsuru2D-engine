@@ -4,6 +4,7 @@ public enum AssetType {
     SOUND,
     MUSIC,
     VOICE,
+    IMAGE,
     TEXT,
     SCREEN,
     SCENE,

@@ -1,8 +1,7 @@
 package = "com.oxycode.myvisualnovel"
 versionCode = 2
-versionName = "1.0.3"
-languages = {"ja", "en"}
-resolution = "1280x720" -- Your videos & backgrounds should be this big, please use 16:9
+versionName = "1.0.1"
+resolution = "1280x720"
 assetPaths = {
     voice = "audio/voice",
     music = "audio/music",

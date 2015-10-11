@@ -18,6 +18,7 @@ function screen:onText(text)
 end
 
 function screen:onSound(sound)
+
     screen:playSound(sound)
 end
 

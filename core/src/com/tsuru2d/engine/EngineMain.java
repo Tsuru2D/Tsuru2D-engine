@@ -9,74 +9,46 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.Action;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.tsuru2d.engine.loader.*;
+import com.tsuru2d.engine.loader.AssetLoader;
+import com.tsuru2d.engine.loader.AssetObserver;
+import com.tsuru2d.engine.loader.ManagedAsset;
+import com.tsuru2d.engine.loader.MetadataLoader;
 import com.tsuru2d.engine.model.MetadataInfo;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LoadState;
-import org.luaj.vm2.compiler.LuaC;
-import org.luaj.vm2.lib.Bit32Lib;
-import org.luaj.vm2.lib.PackageLib;
-import org.luaj.vm2.lib.StringLib;
-import org.luaj.vm2.lib.TableLib;
-import org.luaj.vm2.lib.jse.JseBaseLib;
-import org.luaj.vm2.lib.jse.JseMathLib;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Similar to a {@link Game}, but allows custom transitions between
  * screens. This is the entry point for the engine code.
  */
 public class EngineMain implements ApplicationListener, AssetObserver<String> {
-    private AssetFinder mAssetFinder;
-    private MetadataInfo mMetadata;
-    private Globals mLuaContext;
+    private PlatformApi mPlatformApi;
     private BaseScreen mScreen;
+    private AssetLoader mAssetLoader;
     private Viewport mViewport;
     private SpriteBatch mSpriteBatch;
-    private AssetLoader mAssetLoader;
     private ManagedAsset<String> mTitle;
-    int mInt = 0;
 
-    public EngineMain(AssetFinder assetFinder) {
-        mAssetFinder = assetFinder;
+    public EngineMain(PlatformApi platformApi) {
+        mPlatformApi = platformApi;
     }
 
     @Override
     public void create() {
-        mLuaContext = createLuaContext();
-        mMetadata = MetadataLoader.getMetadata(mLuaContext, mAssetFinder);
-        mPathResolver = new AssetPathResolver(mAssetFinder, mMetadata.mLocalizationDir, mMetadata.mAssetDirs);
-        mAssetLoader = new AssetLoader(this, mPathResolver);
-        mAssetFinder.setPathListener(mAssetLoader);
-        mPathResolver.setLanguage("en");
+        mAssetLoader = new AssetLoader(mPlatformApi.getRawAssetLoader());
         mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
         mSpriteBatch = new SpriteBatch();
 
-        mTitle = mAssetLoader.getText(mMetadata.mTitle);
+        mTitle = mAssetLoader.getText(getMetadata().mTitle);
         mTitle.addObserver(this);
 
         if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
-            setDisplayResolution(mMetadata.mResolution);
-        }
-    }
-
-    private void setDisplayResolution(String resolution) {
-        Pattern pattern = Pattern.compile("(\\d+)x(\\d+)");
-        Matcher matcher = pattern.matcher(resolution);
-        if (matcher.matches()) {
-            int width = Integer.parseInt(matcher.group(1));
-            int height = Integer.parseInt(matcher.group(2));
-            Gdx.graphics.setDisplayMode(width, height, false);
-        } else {
-            throw new IllegalArgumentException("Invalid resolution string: " + resolution);
+            MetadataLoader.Resolution resolution = getMetadata().mResolution;
+            Gdx.graphics.setDisplayMode(resolution.getWidth(), resolution.getHeight(), false);
         }
     }
 
     @Override
     public void onAssetUpdated(ManagedAsset<String> asset) {
-        if (asset.getAssetID().equals(mMetadata.mTitle)) {
+        if (asset.getAssetID().equals(getMetadata().mTitle)) {
             Gdx.graphics.setTitle(asset.get());
         }
     }
@@ -90,9 +62,6 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     @Override
     public void render() {
-        if (++mInt % 100 == 0) {
-            mPathResolver.setLanguage((mInt % 200 == 0) ? "en" : "zh");
-        }
         mAssetLoader.update();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
         if (mScreen != null) {
@@ -118,11 +87,6 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     public void dispose() {
         mTitle.removeObserver(this);
         mAssetLoader.freeAsset(mTitle);
-        mLuaContext = null;
-    }
-
-    public Globals getLuaContext() {
-        return mLuaContext;
     }
 
     public SpriteBatch getSpriteBatch() {
@@ -150,22 +114,6 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     }
 
     public MetadataInfo getMetadata() {
-        return mMetadata;
-    }
-
-    private static Globals createLuaContext() {
-        // Games should never use the os and io
-        // libraries, so let's get rid of those
-        Globals globals = new Globals();
-        globals.load(new JseBaseLib());
-        globals.load(new PackageLib());
-        globals.load(new Bit32Lib());
-        globals.load(new TableLib());
-        globals.load(new StringLib());
-        globals.load(new JseMathLib());
-        globals.load(new LuaAssetIDLib());
-        LoadState.install(globals);
-        LuaC.install(globals);
-        return globals;
+        return mAssetLoader.getMetadata();
     }
 }

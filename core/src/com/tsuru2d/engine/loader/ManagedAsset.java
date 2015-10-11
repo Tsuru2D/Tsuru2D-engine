@@ -1,7 +1,6 @@
 package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 
 public class ManagedAsset<T> implements Pool.Poolable {
@@ -122,9 +121,14 @@ public class ManagedAsset<T> implements Pool.Poolable {
     }
 
     private void disposeCurrentAsset() {
-        if (mAsset instanceof Disposable) {
+        // TODO: I think this is actually incorrect -
+        // Assets obtained through AssetManager should only be
+        // released through AssetManager#unload(). Remove
+        // this code once this has been confirmed
+
+        /* if (mAsset instanceof Disposable) {
             ((Disposable)mAsset).dispose();
-        }
+        } */
     }
 
     @Override

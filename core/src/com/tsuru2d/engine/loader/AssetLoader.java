@@ -1,38 +1,31 @@
 package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.assets.AssetLoaderParameters;
-import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Pool;
-import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.model.CharacterInfo;
+import com.tsuru2d.engine.model.MetadataInfo;
 import com.tsuru2d.engine.model.SceneInfo;
 import com.tsuru2d.engine.model.ScreenInfo;
-import com.tsuru2d.engine.util.Xlog;
-import org.luaj.vm2.LuaValue;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class AssetLoader {
-    private final EngineMain mGame;
-    private final AssetFinder mAssetFinder;
-    private final AssetManager mAssetManager;
-    private final Map<AssetID, String> mResolvePathCache;
+    private final RawAssetLoader mRawAssetLoader;
     private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
     private final Pool<ManagedAsset<?>> mAssetPool;
 
-    public AssetLoader(EngineMain game, AssetFinder assetFinder) {
-        mGame = game;
-        mAssetFinder = assetFinder;
-        mAssetManager = new AssetManager(assetFinder);
-        mAssetManager.setLoader(LuaValue.class, new LuaFileLoader(assetFinder));
-        mResolvePathCache = new HashMap<AssetID, String>();
+    public AssetLoader(RawAssetLoader rawAssetLoader) {
+        mRawAssetLoader = rawAssetLoader;
         mLoaderDelegates = new HashMap<AssetType, AssetLoaderDelegate<?, ?>>();
         mLoaderDelegates.put(AssetType.SOUND, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
         mLoaderDelegates.put(AssetType.MUSIC, new SingleAssetLoaderDelegate<Music>(this, Music.class));
         mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
+        mLoaderDelegates.put(AssetType.IMAGE, new SingleAssetLoaderDelegate<Texture>(this, Texture.class));
         mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this));
         // TODO: Add other types
         mAssetPool = new Pool<ManagedAsset<?>>() {
@@ -43,8 +36,16 @@ public class AssetLoader {
         };
     }
 
-    public EngineMain getGame() {
-        return mGame;
+    public String getLanguage() {
+        return mRawAssetLoader.getLanguage();
+    }
+
+    public void setLanguage(String languageCode) {
+        List<AssetID> invalidatedIDs = mRawAssetLoader.setLanguage(languageCode);
+        for (AssetID baseRawAssetID : invalidatedIDs) {
+            AssetLoaderDelegate<?, ?> delegate = mLoaderDelegates.get(baseRawAssetID.getType());
+            delegate.onRawAssetInvalidated(baseRawAssetID);
+        }
     }
 
     public ManagedAsset<Sound> getSound(AssetID id) {
@@ -57,6 +58,10 @@ public class AssetLoader {
 
     public ManagedAsset<Sound> getVoice(AssetID id) {
         return getAsset(id.checkType(AssetType.VOICE));
+    }
+
+    public ManagedAsset<Texture> getImage(AssetID id) {
+        return getAsset(id.checkType(AssetType.IMAGE));
     }
 
     public ManagedAsset<String> getText(AssetID id) {
@@ -75,6 +80,10 @@ public class AssetLoader {
         return getAsset(id.checkType(AssetType.CHARACTER));
     }
 
+    public MetadataInfo getMetadata() {
+        return mRawAssetLoader.getMetadata();
+    }
+
     @SuppressWarnings("unchecked")
     private <T> AssetLoaderDelegate<T, ?> getDelegate(AssetID id) {
         return (AssetLoaderDelegate<T, ?>)mLoaderDelegates.get(id.getType());
@@ -90,26 +99,15 @@ public class AssetLoader {
     }
 
     /* package */ <T> void startLoadingRaw(AssetID rawAssetID, Class<T> type, AssetLoaderParameters<T> params) {
-        String path = mAssetFinder.findPath(rawAssetID);
-        mResolvePathCache.put(rawAssetID, path);
-        mAssetManager.load(path, type, params);
-        Xlog.d("Started loading asset: %s", rawAssetID);
+        mRawAssetLoader.startLoadingRaw(rawAssetID, type, params);
     }
 
     /* package */ void finishLoadingRaw(AssetID rawAssetID) {
-        mAssetManager.finishLoadingAsset(mResolvePathCache.get(rawAssetID));
+        mRawAssetLoader.finishLoadingRaw(rawAssetID);
     }
 
     /* package */ void unloadRaw(AssetID rawAssetID) {
-        String path = mResolvePathCache.remove(rawAssetID);
-        mAssetManager.unload(path);
-        Xlog.d("Unloading asset: %s", rawAssetID);
-    }
-
-    /* package */ void invalidatePath(AssetID baseRawAssetID) {
-        for (AssetLoaderDelegate<?, ?> delegate : mLoaderDelegates.values()) {
-            delegate.onRawAssetInvalidated(baseRawAssetID);
-        }
+        mRawAssetLoader.unloadRaw(rawAssetID);
     }
 
     /**
@@ -141,10 +139,6 @@ public class AssetLoader {
     }
 
     public void update() {
-        mAssetManager.update();
-    }
-
-    public void update(int millis) {
-        mAssetManager.update(millis);
+        mRawAssetLoader.update();
     }
 }

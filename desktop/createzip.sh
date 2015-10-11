@@ -1,4 +1,4 @@
 #!/bin/bash
-cd "../android/assets"
-rm -f ../../desktop/game.zip
-zip -r ../../desktop/game.zip *
+cd "../android/assets/common"
+rm -f ../../../desktop/com.oxycode.myvisualnovel.trgame
+zip -r ../../../desktop/com.oxycode.myvisualnovel.trgame *
