@@ -2,23 +2,19 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
-public class CheckBoxFacade implements UIWrapper<CheckBox> {
-    private BaseScreen mScreen;
+public class CheckBoxFacade extends UIWrapper<CheckBox> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
-    private final LuaTable mLuaTable;
     private final CheckBox mCheckBox;
 
-    public CheckBoxFacade(BaseScreen screen, LuaTable data) {
+    public CheckBoxFacade(LuaTable data) {
         mLuaTable = data;
-        mScreen = screen;
         mObserver = new TextObserver();
         mCheckBox = new CheckBox("", new Skin());
     }

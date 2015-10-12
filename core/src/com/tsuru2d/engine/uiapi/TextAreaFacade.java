@@ -2,7 +2,6 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextArea;
-import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -10,26 +9,23 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class TextAreaFacade implements UIWrapper<TextArea> {
-    private BaseScreen mScreen;
+public class TextAreaFacade extends UIWrapper<TextArea> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
-    private final LuaTable mLuaTable;
     private LuaFunction mOnClickCallback;
     private final TextArea mTextArea;
 
-    public TextAreaFacade(BaseScreen screen, LuaTable data) {
-        mScreen = screen;
+    public TextAreaFacade(LuaTable data) {
         mLuaTable = data;
         mObserver = new TextObserver();
         mTextArea = new TextArea("", new Skin());
     }
 
     @ExposeToLua
-    private void setText(AssetID text) {
+    private void setMessage(AssetID text) {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
-        mTextArea.setText(mText.get());
+        mTextArea.setMessageText(mText.get());
         mText.addObserver(mObserver);
     }
 
@@ -66,7 +62,7 @@ public class TextAreaFacade implements UIWrapper<TextArea> {
 
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            mTextArea.setText(asset.get());
+            mTextArea.setMessageText(asset.get());
         }
     }
 
