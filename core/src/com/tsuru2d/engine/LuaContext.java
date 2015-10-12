@@ -13,6 +13,8 @@ import org.luaj.vm2.lib.TableLib;
 import org.luaj.vm2.lib.jse.JseBaseLib;
 import org.luaj.vm2.lib.jse.JseMathLib;
 
+import java.io.InputStream;
+
 public final class LuaContext {
     private static Globals sGlobals;
     static {
@@ -30,6 +32,10 @@ public final class LuaContext {
     }
 
     private LuaContext() { }
+
+    public static LuaValue load(InputStream luaScriptStream, String chunkName, LuaTable environment) {
+        return sGlobals.load(luaScriptStream, chunkName, "t", environment).call();
+    }
 
     public static LuaValue load(String luaScript, String chunkName, LuaTable environment) {
         return sGlobals.load(luaScript, chunkName, environment).call();

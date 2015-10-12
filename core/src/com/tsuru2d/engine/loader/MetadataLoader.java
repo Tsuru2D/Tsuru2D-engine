@@ -1,6 +1,7 @@
 package com.tsuru2d.engine.loader;
 
-import com.tsuru2d.engine.model.MetadataInfo;
+import com.tsuru2d.engine.model.GameMetadataInfo;
+import com.tsuru2d.engine.model.LangMetadataInfo;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -30,19 +31,28 @@ public final class MetadataLoader {
 
     private MetadataLoader() { }
 
-    public static MetadataInfo getMetadata(LuaTable table) {
-        return parseMetadataFile(table);
+    public static LangMetadataInfo parseLangMetadata(LuaTable env) {
+        LangMetadataInfo info = new LangMetadataInfo();
+        info.mTargetPackageName = env.get("targetPackage").checkjstring();
+        info.mTargetVersionCode = env.get("targetVersionCode").checkint();
+        info.mLanguageCode = env.get("languageCode").checkjstring();
+        info.mLanguageName = env.get("languageName").checkjstring();
+        return info;
     }
 
-    private static MetadataInfo parseMetadataFile(LuaTable env) {
-        MetadataInfo info = new MetadataInfo();
+    public static GameMetadataInfo parseGameMetadata(LuaTable env) {
+        GameMetadataInfo info = new GameMetadataInfo();
         info.mPackageName = env.get("package").checkjstring();
         info.mVersionCode = env.get("versionCode").checkint();
         info.mVersionName = env.get("versionName").checkjstring();
         info.mResolution = parseResolution(env.get("resolution"));
+        info.mLanguageCode = env.get("languageCode").optjstring(null);
+        info.mLanguageName = env.get("languageName").optjstring(null);
         info.mAssetDirs = parseAssetDirs(env.get("assetPaths"));
         info.mTitle = (AssetID)env.get("title").checkuserdata();
         info.mAuthor = (AssetID)env.get("author").checkuserdata();
+        info.mMainScreen = (AssetID)env.get("mainScreen").checkuserdata();
+        info.mGameScreen = (AssetID)env.get("gameScreen").checkuserdata();
         return info;
     }
 

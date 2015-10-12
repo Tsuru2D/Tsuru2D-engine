@@ -13,7 +13,7 @@ import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.loader.MetadataLoader;
-import com.tsuru2d.engine.model.MetadataInfo;
+import com.tsuru2d.engine.model.GameMetadataInfo;
 
 /**
  * Similar to a {@link Game}, but allows custom transitions between
@@ -113,7 +113,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         }
     }
 
-    public MetadataInfo getMetadata() {
+    public GameMetadataInfo getMetadata() {
         return mAssetLoader.getMetadata();
     }
 }

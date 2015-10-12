@@ -9,16 +9,20 @@ import java.util.Map;
 /**
  * A key that is used to look up a {@link ManagedAsset}.
  * Game developers can use abstract paths such as
- * {@code R.localization.en.text.chapter1.scene1.hello} instead of
- * {@code "localization.en.text/chapter1/scene1.lua:hello"}. The asset
+ * {@code R.text.chapter1.scene1.hello} instead of
+ * {@code "text/chapter1/scene1.lua:hello"}. The asset
  * IDs will be mapped to a file asset ID by {@link AssetLoaderDelegate},
- * and then mapped to an actual path on disk by {@link AssetPathResolver}.
+ * which will then be loaded by an instance of {@link RawAssetLoader}.
  */
 public abstract class AssetID {
     public static final AssetID SOUND = new RootAssetID(AssetType.SOUND);
     public static final AssetID MUSIC = new RootAssetID(AssetType.MUSIC);
     public static final AssetID VOICE = new RootAssetID(AssetType.VOICE);
+    public static final AssetID IMAGE = new RootAssetID(AssetType.IMAGE);
     public static final AssetID TEXT = new RootAssetID(AssetType.TEXT);
+    public static final AssetID SCREEN = new RootAssetID(AssetType.SCREEN);
+    public static final AssetID SCENE = new RootAssetID(AssetType.SCENE);
+    public static final AssetID CHARACTER = new RootAssetID(AssetType.CHARACTER);
 
     private static class RootAssetID extends AssetID {
         private final AssetType mType;

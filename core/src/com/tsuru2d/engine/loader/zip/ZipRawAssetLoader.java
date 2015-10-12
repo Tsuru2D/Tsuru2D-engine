@@ -4,16 +4,17 @@ import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.files.FileHandle;
-import com.tsuru2d.engine.loader.AssetID;
-import com.tsuru2d.engine.loader.AssetType;
-import com.tsuru2d.engine.loader.LuaFileLoader;
-import com.tsuru2d.engine.loader.MetadataLoader;
-import com.tsuru2d.engine.model.MetadataInfo;
-import com.tsuru2d.engine.loader.RawAssetLoader;
+import com.badlogic.gdx.utils.StreamUtils;
+import com.tsuru2d.engine.LuaContext;
+import com.tsuru2d.engine.loader.*;
+import com.tsuru2d.engine.model.GameMetadataInfo;
+import com.tsuru2d.engine.model.LangMetadataInfo;
 import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.LuaTable;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -23,8 +24,9 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
     private final Map<String, ZipFile> mLanguagePackFiles;
     private final AssetManager mAssetManager;
     private final Map<AssetID, String> mResolvePathCache;
+    private final Map<AssetType, String> mAssetTypePathMap;
     private String mLanguageCode;
-    private MetadataInfo mMetadataInfo;
+    private GameMetadataInfo mMetadataInfo;
     private ZipEntryNode mZipRootNode;
 
     public ZipRawAssetLoader(ZipFile mainFile, ZipFile... languagePacks) {
@@ -34,7 +36,7 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
         mAssetManager.setLoader(LuaTable.class, new LuaFileLoader(this));
         mZipRootNode = buildNodeTree(mainFile);
         mResolvePathCache = new HashMap<AssetID, String>();
-        mAssetManager.load("metadata.lua", LuaTable.class);
+        mAssetTypePathMap = mMetadataInfo.mAssetDirs;
     }
 
     @Override
@@ -63,14 +65,19 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
     }
 
     @Override
-    public MetadataInfo getMetadata() {
+    public GameMetadataInfo getMetadata() {
         if (mMetadataInfo != null) {
             return mMetadataInfo;
         }
         mAssetManager.finishLoadingAsset("metadata.lua");
         LuaTable metadataTable = mAssetManager.get("metadata.lua");
-        mMetadataInfo = MetadataLoader.getMetadata(metadataTable);
+        mMetadataInfo = MetadataLoader.parseGameMetadata(metadataTable);
         return mMetadataInfo;
+    }
+
+    @Override
+    public List<String> getAvailableLanguages() {
+        return null;
     }
 
     @Override
@@ -119,6 +126,47 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
 
     private File getLocalizedRootPath(AssetType type) {
         return new File(getMetadata().mAssetDirs.get(type));
+    }
+
+    private static LangMetadataInfo getLangMetadata(ZipFile zipFile) {
+        // TODO: fix code duplication
+        ZipEntry zipEntry = zipFile.getEntry("metadata.lua");
+        if (zipEntry == null) {
+            throw new InvalidMetadataException("metadata.lua not found");
+        }
+        InputStream metadataStream;
+        try {
+            metadataStream = zipFile.getInputStream(zipEntry);
+        } catch (IOException e) {
+            throw new InvalidMetadataException("Could not read metadata.lua");
+        }
+        try {
+            LuaTable metadataEnv = new LuaTable();
+            LuaContext.load(metadataStream, "metadata.lua", metadataEnv);
+            return MetadataLoader.parseLangMetadata(metadataEnv);
+        } finally {
+            StreamUtils.closeQuietly(metadataStream);
+        }
+    }
+
+    private static GameMetadataInfo getGameMetadata(ZipFile zipFile) {
+        ZipEntry zipEntry = zipFile.getEntry("metadata.lua");
+        if (zipEntry == null) {
+            throw new InvalidMetadataException("metadata.lua not found");
+        }
+        InputStream metadataStream;
+        try {
+            metadataStream = zipFile.getInputStream(zipEntry);
+        } catch (IOException e) {
+            throw new InvalidMetadataException("Could not read metadata.lua");
+        }
+        try {
+            LuaTable metadataEnv = new LuaTable();
+            LuaContext.load(metadataStream, "metadata.lua", metadataEnv);
+            return MetadataLoader.parseGameMetadata(metadataEnv);
+        } finally {
+            StreamUtils.closeQuietly(metadataStream);
+        }
     }
 
     private static ZipEntryNode buildNodeTree(ZipFile zipFile) {

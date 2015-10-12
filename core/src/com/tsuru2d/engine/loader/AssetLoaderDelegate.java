@@ -31,7 +31,13 @@ import com.badlogic.gdx.assets.AssetManager;
     protected abstract AssetID getRawAssetID(AssetID assetID);
     protected abstract void onRawAssetLoaded(AssetID rawAssetID, TRaw value);
     protected abstract void onRawAssetInvalidated(AssetID baseRawAssetID);
-    protected abstract AssetLoaderParameters<TRaw> getParameters();
+
+    protected AssetLoaderParameters<TRaw> getParameters() {
+        // Sub-classes must override this method if they use a
+        // non-standard parameter type, or if they want to add
+        // additional parameters
+        return LoaderParamFactory.get(mRawType);
+    }
 
     protected AssetLoader getAssetLoader() {
         return mAssetLoader;

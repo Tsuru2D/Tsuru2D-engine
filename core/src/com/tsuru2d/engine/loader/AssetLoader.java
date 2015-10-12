@@ -6,7 +6,7 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Pool;
 import com.tsuru2d.engine.model.CharacterInfo;
-import com.tsuru2d.engine.model.MetadataInfo;
+import com.tsuru2d.engine.model.GameMetadataInfo;
 import com.tsuru2d.engine.model.SceneInfo;
 import com.tsuru2d.engine.model.ScreenInfo;
 
@@ -80,7 +80,7 @@ public class AssetLoader {
         return getAsset(id.checkType(AssetType.CHARACTER));
     }
 
-    public MetadataInfo getMetadata() {
+    public GameMetadataInfo getMetadata() {
         return mRawAssetLoader.getMetadata();
     }
 

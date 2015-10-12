@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.loader;
 
-import com.badlogic.gdx.assets.AssetLoaderParameters;
 import org.luaj.vm2.LuaTable;
 
 /* package */ class TextAssetLoaderDelegate extends MultiAssetLoaderDelegate<String, LuaTable> {
@@ -18,10 +17,5 @@ import org.luaj.vm2.LuaTable;
     @Override
     protected AssetID getRawAssetID(AssetID assetID) {
         return assetID.getParent();
-    }
-
-    @Override
-    protected AssetLoaderParameters<LuaTable> getParameters() {
-        return new LuaFileLoader.LuaFileParameter();
     }
 }
