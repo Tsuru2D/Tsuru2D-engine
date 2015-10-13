@@ -66,4 +66,5 @@ build/
 
 ## Game zip
 
-desktop/game.zip
+desktop/*.vngame
+desktop/*.vnlang

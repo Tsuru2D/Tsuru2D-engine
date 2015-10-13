@@ -16,11 +16,13 @@ import java.lang.reflect.Modifier;
     private static final Object[] EMPTY_PARAMS = new Object[0];
 
     private final Method mJavaMethod;
+    private final String mMethodName;
     private final Class<?>[] mParameterTypes;
     private final Object[] mParameters;
 
-    public ExposedJavaMethod(Method method) {
+    public ExposedJavaMethod(Method method, String methodName) {
         mJavaMethod = method;
+        mMethodName = methodName;
         mParameterTypes = method.getParameterTypes();
         if (mParameterTypes.length == 0) {
             mParameters = EMPTY_PARAMS;
@@ -39,8 +41,10 @@ import java.lang.reflect.Modifier;
         if (!Modifier.isStatic(mJavaMethod.getModifiers())) {
             LuaValue arg1 = args.arg1();
             if (!(arg1 instanceof ExposedJavaClass)) {
-                throw new LuaError("First argument is not a Java object, " +
-                    "did you mean :method() instead of .method()?");
+                String errMsg = String.format(
+                    "First argument is not a Java object, " +
+                    "did you mean :%1$s() instead of .%1$s()?", mMethodName);
+                throw new LuaError(errMsg);
             }
             thisObject = arg1.touserdata();
             srcIndex++;
