@@ -16,7 +16,8 @@ import org.luaj.vm2.lib.jse.JseMathLib;
 import java.io.InputStream;
 
 public final class LuaContext {
-    private static Globals sGlobals;
+    private static final Globals sGlobals;
+    private static final LuaTable sReadonlyMetatable;
     static {
         Globals globals = new Globals();
         globals.load(new JseBaseLib());
@@ -29,12 +30,24 @@ public final class LuaContext {
         LoadState.install(globals);
         LuaC.install(globals);
         sGlobals = globals;
+        LuaTable readonlyMetatable = new LuaTable();
+        readonlyMetatable.set(LuaValue.INDEX, sGlobals);
+        sReadonlyMetatable = readonlyMetatable;
     }
 
     private LuaContext() { }
 
     public static LuaValue load(InputStream luaScriptStream, String chunkName, LuaTable environment) {
-        return sGlobals.load(luaScriptStream, chunkName, "t", environment).call();
+        boolean setMetatable = false;
+        if (environment.getmetatable() == null) {
+            environment.setmetatable(sReadonlyMetatable);
+            setMetatable = true;
+        }
+        LuaValue retValue = sGlobals.load(luaScriptStream, chunkName, "t", environment).call();
+        if (setMetatable) {
+            environment.setmetatable(null);
+        }
+        return retValue;
     }
 
     public static LuaValue load(String luaScript, String chunkName, LuaTable environment) {

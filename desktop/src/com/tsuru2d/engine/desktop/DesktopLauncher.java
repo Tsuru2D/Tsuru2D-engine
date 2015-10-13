@@ -15,7 +15,7 @@ public class DesktopLauncher {
             System.out.println("No game file specified");
         }
         File gameZipFile = new File(args[0]);
-        final RawAssetLoader rawAssetLoader = new ZipRawAssetLoader(gameZipFile, null);
+        RawAssetLoader rawAssetLoader = new ZipRawAssetLoader(gameZipFile, null);
         PlatformApi api = new PlatformApi(null, null, rawAssetLoader);
         LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
         new LwjglApplication(new EngineMain(api), config);
