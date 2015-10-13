@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -22,7 +21,7 @@ public class TableLayoutFacade extends UIWrapper<Table> {
         mTable = new Table();
         mScreen = screen;
         mTable.setDebug(false);
-        mMap = new HashMap<>();
+        mMap = new HashMap<Integer, UIWrapper>();
         mClickHandler = new ClickHandler();
     }
 
@@ -31,7 +30,7 @@ public class TableLayoutFacade extends UIWrapper<Table> {
         mTable = new Table();
         mScreen = screen;
         mTable.setDebug(debug);
-        mMap = new HashMap<>();
+        mMap = new HashMap<Integer, UIWrapper>();
         mClickHandler = new ClickHandler();
     }
 
