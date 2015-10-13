@@ -1,4 +1,4 @@
-package com.tsuru2d.engine.loader;
+package com.tsuru2d.engine.loader.exception;
 
 public class InvalidMetadataException extends RuntimeException {
     public InvalidMetadataException() {

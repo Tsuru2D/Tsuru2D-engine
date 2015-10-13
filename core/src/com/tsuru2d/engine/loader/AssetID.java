@@ -1,6 +1,7 @@
 package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.utils.Array;
+import com.tsuru2d.engine.loader.exception.AssetTypeMismatchException;
 
 import java.lang.ref.WeakReference;
 import java.util.HashMap;

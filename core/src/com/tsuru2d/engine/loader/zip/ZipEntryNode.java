@@ -1,7 +1,6 @@
 package com.tsuru2d.engine.loader.zip;
 
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 
 /* package */ class ZipEntryNode {
     private final String mName;
@@ -26,18 +25,15 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
     }
 
     public String findByFileName(String nameWithoutExtension) {
+        int extensionIndex = nameWithoutExtension.length();
         for (int i = 0; i < mChildren.size; ++i) {
-            String sourceName = mChildren.get(i).mName;
-            String name = sourceName;
-            int extensionIndex = name.lastIndexOf('.');
-            if (extensionIndex >= 0) {
-                name = name.substring(0, extensionIndex);
-            }
-            if (name.equalsIgnoreCase(nameWithoutExtension)) {
-                return sourceName;
+            String name = mChildren.get(i).mName;
+            if (name.startsWith(nameWithoutExtension) &&
+                (name.length() == extensionIndex || name.charAt(extensionIndex) == '.')) {
+                return name;
             }
         }
-        throw new GdxRuntimeException("Cannot find file: " + nameWithoutExtension);
+        return null;
     }
 
     public ZipEntryNode put(String name, boolean isFile) {

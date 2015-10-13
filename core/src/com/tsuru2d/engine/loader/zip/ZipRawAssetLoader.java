@@ -7,6 +7,9 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.StreamUtils;
 import com.tsuru2d.engine.LuaContext;
 import com.tsuru2d.engine.loader.*;
+import com.tsuru2d.engine.loader.exception.AssetNotFoundException;
+import com.tsuru2d.engine.loader.exception.GameLoadException;
+import com.tsuru2d.engine.loader.exception.InvalidMetadataException;
 import com.tsuru2d.engine.model.GameMetadataInfo;
 import com.tsuru2d.engine.model.LangMetadataInfo;
 import com.tsuru2d.engine.util.Xlog;
@@ -23,19 +26,24 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
     private final ZipFile mMainZipFile;
     private final Map<String, ZipFile> mLanguagePackFiles;
     private final AssetManager mAssetManager;
-    private final Map<AssetID, String> mResolvePathCache;
     private final Map<AssetType, String> mAssetTypePathMap;
+    private final Map<AssetID, String> mResolvePathCache;
+    private final GameMetadataInfo mMetadataInfo;
     private String mLanguageCode;
-    private GameMetadataInfo mMetadataInfo;
     private ZipEntryNode mZipRootNode;
 
-    public ZipRawAssetLoader(ZipFile mainFile, ZipFile... languagePacks) {
-        mMainZipFile = mainFile;
+    public ZipRawAssetLoader(File gameZip, File languagePackDir) {
+        try {
+            mMainZipFile = new ZipFile(gameZip);
+        } catch (IOException e) {
+            throw new GameLoadException("Could not load game data", e);
+        }
         mLanguagePackFiles = null; // TODO: create map of language -> zipfile
+        mZipRootNode = buildNodeTree(mMainZipFile);
         mAssetManager = new AssetManager(this);
         mAssetManager.setLoader(LuaTable.class, new LuaFileLoader(this));
-        mZipRootNode = buildNodeTree(mainFile);
         mResolvePathCache = new HashMap<AssetID, String>();
+        mMetadataInfo = getGameMetadata(mMainZipFile);
         mAssetTypePathMap = mMetadataInfo.mAssetDirs;
     }
 
@@ -66,12 +74,6 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
 
     @Override
     public GameMetadataInfo getMetadata() {
-        if (mMetadataInfo != null) {
-            return mMetadataInfo;
-        }
-        mAssetManager.finishLoadingAsset("metadata.lua");
-        LuaTable metadataTable = mAssetManager.get("metadata.lua");
-        mMetadataInfo = MetadataLoader.parseGameMetadata(metadataTable);
         return mMetadataInfo;
     }
 
@@ -99,33 +101,43 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
         return new ZipFileHandle(mMainZipFile, fileName);
     }
 
-    private ZipEntryNode getParentDirNode(File parentDir) {
-        File parentParent = parentDir.getParentFile();
-        if (parentParent == null) {
-            return mZipRootNode.get(parentDir.getName());
-        }
-        ZipEntryNode node = getParentDirNode(parentParent);
-        node = node.get(parentDir.getName());
-        return node;
-    }
-
-    private String findFileName(File parentDir, String name) {
-        ZipEntryNode node = getParentDirNode(parentDir);
-        return node.findByFileName(name);
+    private void cannotFindAsset(AssetID rawAssetID) {
+        throw new AssetNotFoundException("Cannot find asset: " + rawAssetID);
     }
 
     private String findPath(AssetID rawAssetID) {
-        File path = getLocalizedRootPath(rawAssetID.getType());
-        String[] subPaths = rawAssetID.getPath();
-        for (int i = 0; i < subPaths.length - 1; ++i) {
-            path = new File(path, subPaths[i]);
+        // TODO: handle multiple zips
+        String rootPath = mAssetTypePathMap.get(rawAssetID.getType());
+        String[] splitRootPath = rootPath.replace('\\', '/').split("/");
+        String[] subPath = rawAssetID.getPath();
+        StringBuilder sb = new StringBuilder();
+        ZipEntryNode curr = mZipRootNode;
+        for (String path : splitRootPath) {
+            if (!path.isEmpty()) {
+                curr = curr.get(path);
+                if (curr == null) {
+                    cannotFindAsset(rawAssetID);
+                }
+                sb.append(path);
+                sb.append('/');
+            }
         }
-        path = new File(path, findFileName(path, subPaths[subPaths.length - 1]));
-        return path.getPath();
-    }
 
-    private File getLocalizedRootPath(AssetType type) {
-        return new File(getMetadata().mAssetDirs.get(type));
+        for (int i = 0; i < subPath.length - 1; i++) {
+            String path = subPath[i];
+            curr = curr.get(path);
+            if (curr == null) {
+                cannotFindAsset(rawAssetID);
+            }
+            sb.append(path);
+            sb.append('/');
+        }
+        String fileName = curr.findByFileName(subPath[subPath.length - 1]);
+        if (fileName == null) {
+            cannotFindAsset(rawAssetID);
+        }
+        sb.append(fileName);
+        return sb.toString();
     }
 
     private static LangMetadataInfo getLangMetadata(ZipFile zipFile) {
