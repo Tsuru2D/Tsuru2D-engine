@@ -3,6 +3,7 @@ package com.tsuru2d.engine.uiapi;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
+import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -16,10 +17,10 @@ public class TextFieldFacade extends UIWrapper<TextField> {
     private TextField.TextFieldStyle mTextFieldStyle;
     private final TextField mTextField;
 
-    public TextFieldFacade(LuaTable data) {
+    public TextFieldFacade(BaseScreen screen, LuaTable luaTable) {
+        super(screen, luaTable);
         mFont = new BitmapFont();
         mTextFieldStyle = new TextField.TextFieldStyle();
-        mLuaTable = data;
         mObserver = new TextObserver();
         mTextField = new TextField("", mTextFieldStyle);
     }

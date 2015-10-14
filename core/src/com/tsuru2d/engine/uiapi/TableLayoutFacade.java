@@ -12,26 +12,20 @@ import java.util.HashMap;
 
 public class TableLayoutFacade extends UIWrapper<Table> {
     private final Table mTable;
-    private LuaFunction mCallBack;
     private HashMap<Integer, UIWrapper> mMap;
-    private ClickHandler mClickHandler;
 
     public TableLayoutFacade(BaseScreen screen, LuaTable data) {
-        mLuaTable = data;
+        super(screen, data);
         mTable = new Table();
-        mScreen = screen;
         mTable.setDebug(false);
         mMap = new HashMap<Integer, UIWrapper>();
-        mClickHandler = new ClickHandler();
     }
 
     public TableLayoutFacade(BaseScreen screen, LuaTable data, boolean debug) {
-        mLuaTable = data;
+        super(screen, data);
         mTable = new Table();
-        mScreen = screen;
         mTable.setDebug(debug);
         mMap = new HashMap<Integer, UIWrapper>();
-        mClickHandler = new ClickHandler();
     }
 
     @ExposeToLua
@@ -60,16 +54,6 @@ public class TableLayoutFacade extends UIWrapper<Table> {
         mTable.setWidth(mScreen.getWidth() * ratio);
     }
 
-    @ExposeToLua
-    public void setOnClick(LuaFunction callBack) {
-        mCallBack = callBack;
-        if (mCallBack != null) {
-            mTable.addListener(mClickHandler);
-        } else {
-            mTable.removeListener(mClickHandler);
-        }
-    }
-
     @Override
     public void setPosition(float x, float y) {
         mTable.setPosition(x, y);
@@ -88,12 +72,4 @@ public class TableLayoutFacade extends UIWrapper<Table> {
         }
     }
 
-    private class ClickHandler extends ClickListener {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-            if(mCallBack != null) {
-                mCallBack.call();
-            }
-        }
-    }
 }

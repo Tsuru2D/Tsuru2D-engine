@@ -7,15 +7,16 @@ import org.luaj.vm2.LuaTable;
 
 public abstract class UIWrapper<T extends Actor> implements Disposable {
 
-    protected static BaseScreen mScreen;
+    protected BaseScreen mScreen;
     protected LuaTable mLuaTable;
 
     abstract T getActor();
 
-    public static void setScreen(BaseScreen screen) {
-        mScreen = screen;
-    }
-
     abstract void setPosition(float x, float y);
+
+    public UIWrapper(BaseScreen screen, LuaTable luaTable) {
+        mScreen = screen;
+        mLuaTable = luaTable;
+    }
 
 }

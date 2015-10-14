@@ -4,6 +4,7 @@ import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -21,9 +22,9 @@ public class ButtonFacade extends ButtonSuper {
     private BitmapFont mFont;
     private final TextButton mButton;
 
-    public ButtonFacade(LuaTable data) {
+    public ButtonFacade(BaseScreen screen, LuaTable luaTable) {
+        super(screen, luaTable);
         mFont = new BitmapFont();
-        mLuaTable = data;
         mObserver = new TextObserver();
         mTextButtonStyle = new TextButton.TextButtonStyle();
         mTextButtonStyle.font = mFont;

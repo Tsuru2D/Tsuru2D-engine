@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -21,11 +22,11 @@ public class LabelFacade extends UIWrapper<Label> {
     private BitmapFont mFont;
     private final Label mLabel;
 
-    public LabelFacade(LuaTable data) {
+    public LabelFacade(BaseScreen screen, LuaTable data) {
+        super(screen, data);
         mFont = new BitmapFont();
         mLabelStyle = new Label.LabelStyle();
         mLabelStyle.font = mFont;
-        mLuaTable = data;
         mObserver = new TextObserver();
         mLabel = new Label(null, new Skin());
         mClickHandler = new ClickHandler();

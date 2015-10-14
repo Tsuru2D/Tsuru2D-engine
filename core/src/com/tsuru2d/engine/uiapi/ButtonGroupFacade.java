@@ -1,15 +1,14 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
-import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import org.luaj.vm2.LuaTable;
 
-import java.util.HashMap;
+/*
+ * The Radio Buttons container. Controls how many total selection can make by the buttons in
+ * the container.
+ */
 
 public class ButtonGroupFacade<T extends ButtonSuper>{
-    private HashMap<Button, T> mMap;
     private final ButtonGroup mButtonGroup;
 
 
@@ -21,14 +20,6 @@ public class ButtonGroupFacade<T extends ButtonSuper>{
     public void add(T button) {
         if(button == null) throw new IllegalArgumentException("button cannot be null.");
         mButtonGroup.add(button.getActor());
-    }
-
-    @ExposeToLua
-    public void add(T... buttons) {
-        if(buttons == null) throw new IllegalArgumentException("button cannot be null.");
-        for(T button : buttons) {
-            add(button);
-        }
     }
 
     @ExposeToLua

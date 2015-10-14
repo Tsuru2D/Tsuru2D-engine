@@ -2,6 +2,7 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
+import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -15,11 +16,11 @@ public class CheckBoxFacade extends UIWrapper<CheckBox> {
     private CheckBox.CheckBoxStyle mCheckBoxStyle;
     private final CheckBox mCheckBox;
 
-    public CheckBoxFacade(LuaTable data) {
+    public CheckBoxFacade(BaseScreen screen, LuaTable data) {
+        super(screen, data);
         mFont = new BitmapFont();
         mCheckBoxStyle = new CheckBox.CheckBoxStyle();
         mCheckBoxStyle.font = mFont;
-        mLuaTable = data;
         mObserver = new TextObserver();
         mCheckBox = new CheckBox("", mCheckBoxStyle);
     }

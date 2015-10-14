@@ -10,8 +10,8 @@ public class SliderFacade extends UIWrapper<Slider> {
     private final Slider mSlider;
 
     public SliderFacade(BaseScreen screen, LuaTable data) {
+        super(screen, data);
         mSliderStyle = new Slider.SliderStyle();
-        mLuaTable = data;
         mSlider = new Slider(0.0f, 1.0f, 0.01f, false, mSliderStyle);
     }
 
