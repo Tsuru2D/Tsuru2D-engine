@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -16,9 +17,14 @@ public class LabelFacade extends UIWrapper<Label> {
     private TextObserver mObserver;
     private ClickHandler mClickHandler;
     private LuaFunction mCallBack;
+    private Label.LabelStyle mLabelStyle;
+    private BitmapFont mFont;
     private final Label mLabel;
 
     public LabelFacade(LuaTable data) {
+        mFont = new BitmapFont();
+        mLabelStyle = new Label.LabelStyle();
+        mLabelStyle.font = mFont;
         mLuaTable = data;
         mObserver = new TextObserver();
         mLabel = new Label(null, new Skin());
@@ -40,6 +46,12 @@ public class LabelFacade extends UIWrapper<Label> {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
+    }
+
+    @Override
+    @ExposeToLua
+    public void setPosition(float x, float y) {
+        mLabel.setPosition(x, y);
     }
 
     @Override

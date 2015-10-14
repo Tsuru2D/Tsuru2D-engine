@@ -1,9 +1,9 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.tsuru2d.engine.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -12,17 +12,22 @@ import org.luaj.vm2.LuaFunction;
 
 import org.luaj.vm2.LuaTable;
 
-public class ButtonFacade extends UIWrapper<TextButton> {
+public class ButtonFacade extends ButtonSuper {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private ClickHandler mClickHandler;
     private LuaFunction mCallBack;
+    private TextButton.TextButtonStyle mTextButtonStyle;
+    private BitmapFont mFont;
     private final TextButton mButton;
 
     public ButtonFacade(LuaTable data) {
+        mFont = new BitmapFont();
         mLuaTable = data;
         mObserver = new TextObserver();
-        mButton = new TextButton(null, new TextButton.TextButtonStyle());
+        mTextButtonStyle = new TextButton.TextButtonStyle();
+        mTextButtonStyle.font = mFont;
+        mButton = new TextButton(null, mTextButtonStyle);
         mClickHandler = new ClickHandler();
     }
 
@@ -45,6 +50,12 @@ public class ButtonFacade extends UIWrapper<TextButton> {
 
     }
 
+    @ExposeToLua
+    public void setSize(float width, float height) {
+        mButton.setSize(width, height);
+    }
+
+    @Override
     @ExposeToLua
     public void setPosition(float x, float y) {
         mButton.setPosition(x, y);

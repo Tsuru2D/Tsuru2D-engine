@@ -71,6 +71,11 @@ public class TableLayoutFacade extends UIWrapper<Table> {
     }
 
     @Override
+    public void setPosition(float x, float y) {
+        mTable.setPosition(x, y);
+    }
+
+    @Override
     public Table getActor() {
         return mTable;
     }

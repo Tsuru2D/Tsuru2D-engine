@@ -1,19 +1,18 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.tsuru2d.engine.BaseScreen;
-import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
 public class SliderFacade extends UIWrapper<Slider> {
+    private Slider.SliderStyle mSliderStyle;
     private final Slider mSlider;
-    private ManagedAsset<String> mText;
 
     public SliderFacade(BaseScreen screen, LuaTable data) {
+        mSliderStyle = new Slider.SliderStyle();
         mLuaTable = data;
-        mSlider = new Slider(0.0f, 1.0f, 0.01f, false, new Skin());
+        mSlider = new Slider(0.0f, 1.0f, 0.01f, false, mSliderStyle);
     }
 
     @ExposeToLua
@@ -29,6 +28,12 @@ public class SliderFacade extends UIWrapper<Slider> {
     @ExposeToLua
     public float getValue() {
         return mSlider.getValue();
+    }
+
+    @Override
+    @ExposeToLua
+    public void setPosition(float x, float y) {
+        mSlider.setPosition(x, y);
     }
 
     @Override

@@ -16,4 +16,6 @@ public abstract class UIWrapper<T extends Actor> implements Disposable {
         mScreen = screen;
     }
 
+    abstract void setPosition(float x, float y);
+
 }
