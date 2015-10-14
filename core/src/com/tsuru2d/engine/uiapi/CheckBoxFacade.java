@@ -2,35 +2,23 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
-<<<<<<< HEAD
-public class CheckBoxFacade extends ButtonSuper {
-    private BaseScreen mScreen;
+public class CheckBoxFacade extends UIWrapper<CheckBox> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private BitmapFont mFont;
     private CheckBox.CheckBoxStyle mCheckBoxStyle;
-    private final LuaTable mLuaTable;
-    private final CheckBox mCheckBox;
-
-    public CheckBoxFacade(BaseScreen screen, LuaTable data) {
-        mFont = new BitmapFont();
-        mCheckBoxStyle = new CheckBox.CheckBoxStyle();
-        mCheckBoxStyle.font = mFont;
-=======
-public class CheckBoxFacade extends UIWrapper<CheckBox> {
-    private ManagedAsset<String> mText;
-    private TextObserver mObserver;
     private final CheckBox mCheckBox;
 
     public CheckBoxFacade(LuaTable data) {
->>>>>>> d7bdac7fa7d30b6147cb80b93866aaf274199b41
+        mFont = new BitmapFont();
+        mCheckBoxStyle = new CheckBox.CheckBoxStyle();
+        mCheckBoxStyle.font = mFont;
         mLuaTable = data;
         mObserver = new TextObserver();
         mCheckBox = new CheckBox("", mCheckBoxStyle);
