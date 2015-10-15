@@ -69,12 +69,6 @@ public class TextFieldFacade extends UIWrapper<TextField> {
     }
 
     @Override
-    @ExposeToLua
-    public void setPosition(float x, float y) {
-        mTextField.setPosition(x, y);
-    }
-
-    @Override
     public TextField getActor() {
         return mTextField;
     }

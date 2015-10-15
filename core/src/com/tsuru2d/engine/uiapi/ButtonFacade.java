@@ -56,11 +56,6 @@ public class ButtonFacade extends ButtonSuper {
         mButton.setSize(width, height);
     }
 
-    @Override
-    @ExposeToLua
-    public void setPosition(float x, float y) {
-        mButton.setPosition(x, y);
-    }
 
     @Override
     public TextButton getActor() {
