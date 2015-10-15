@@ -34,7 +34,6 @@ public class DropDownFacade extends UIWrapper<SelectBox>{
         }else {
             mSelectBox.removeListener(mChangeHandler);
         }
-
     }
 
     @Override
@@ -67,8 +66,8 @@ public class DropDownFacade extends UIWrapper<SelectBox>{
 
     private class ChangeHandler extends ChangeListener {
         @Override
-        public void changed(ChangeListener.ChangeEvent event, Actor actor)  {
-            if(mCallBack != null) {
+        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
+            if (mCallBack != null) {
                 mCallBack.call();
             }
         }

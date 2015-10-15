@@ -43,7 +43,6 @@ public class ImageButtonFacade extends ButtonSuper {
         }else {
             mImageButton.removeListener(mClickHandler);
         }
-
     }
 
     @ExposeToLua
