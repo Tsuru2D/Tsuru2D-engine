@@ -19,29 +19,30 @@ public class ImageButtonFacade extends ButtonSuper {
     private TextButton.TextButtonStyle mTextButtonStyle;
     private BitmapFont mFont;
     private final ImageButton mImageButton;
-    public ImageButtonFacade(BaseScreen screen, LuaTable luaTable,ImageButton.ImageButtonStyle style){
+
+    public ImageButtonFacade(BaseScreen screen, LuaTable luaTable, ImageButton.ImageButtonStyle style) {
         super(screen, luaTable);
         mFont = new BitmapFont();
         mTextButtonStyle = new TextButton.TextButtonStyle();
         mTextButtonStyle.font = mFont;
         mClickHandler = new ClickHandler();
-        mImageButton=new ImageButton(style);
+        mImageButton = new ImageButton(style);
     }
 
     @Override
-    public void dispose(){
+    public void dispose() {
         if (mText != null) {
             mScreen.getAssetLoader().freeAsset(mText);
         }
     }
 
     @Override
-    public ImageButton getActor(){
+    public ImageButton getActor() {
         return mImageButton;
     }
 
-    public void setPosition(float x, float y){
-        mImageButton.setPosition(x,y);
+    public void setPosition(float x, float y) {
+        mImageButton.setPosition(x, y);
     }
 
     @ExposeToLua
@@ -53,9 +54,9 @@ public class ImageButtonFacade extends ButtonSuper {
     @ExposeToLua
     public void setOnClick(LuaFunction callBack) {
         mCallBack = callBack;
-        if(mCallBack != null) {
+        if (mCallBack != null) {
             mImageButton.addListener(mClickHandler);
-        }else {
+        } else {
             mImageButton.removeListener(mClickHandler);
         }
 
@@ -69,7 +70,7 @@ public class ImageButtonFacade extends ButtonSuper {
     private class ClickHandler extends ClickListener {
         @Override
         public void clicked(InputEvent event, float x, float y) {
-            if(mCallBack != null) {
+            if (mCallBack != null) {
                 mCallBack.call();
             }
         }

@@ -13,10 +13,6 @@ public class DropDownFacade<T> extends UIWrapper<SelectBox>{
         super(screen,luaTable);
         mSelectBox=new SelectBox<T>(style);
     }
-    @Override
-    void setPosition(float x, float y) {
-        mSelectBox.setPosition(x, y);
-    }
 
     @Override
     SelectBox getActor() {
