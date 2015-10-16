@@ -15,7 +15,7 @@ public class GameScene {
         mFrames = new LinkedHashMap<String, LuaFunction>();
     }
 
-    public static ExposedJavaClass getBuilder(String sceneId) {
+    public static Builder getBuilder(String sceneId) {
         return new Builder(sceneId);
     }
 
