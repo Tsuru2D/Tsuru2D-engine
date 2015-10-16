@@ -20,14 +20,20 @@ public class GameScene {
     }
 
     public static class Builder {
+        private GameScene mScene;
+
+        public Builder() {
+            mScene = new GameScene();
+        }
+
         @ExposeToLua
         public void setup(LuaFunction function) {
-
+            mScene.mSetupFunction = function;
         }
 
         @ExposeToLua
         public void frame(String id, LuaFunction function) {
-
+            mScene.mFrames.put(id, function);
         }
     }
 }
