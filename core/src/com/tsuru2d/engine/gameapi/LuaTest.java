@@ -5,7 +5,6 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaThread;
-import org.luaj.vm2.LuaUserdata;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.OneArgFunction;
 import org.luaj.vm2.lib.ZeroArgFunction;
@@ -18,7 +17,7 @@ public class LuaTest {
     private LuaValue gamethread;
     private LuaThread mThread;
 
-    private class Token {
+    private class Token extends ExposedJavaClass {
         private Globals mGlobals;
 
         public Token(Globals globals) {
@@ -42,10 +41,10 @@ public class LuaTest {
             public LuaValue call(LuaValue arg) {
                 System.out.println("text() called");
                 final Token token = new Token(globals);
-                final LuaUserdata userdata = new ExposedJavaClass(token);
+                // final LuaUserdata userdata = new ExposedJavaClass(token);
                 mToken = token;
                 inccounter = true;
-                return userdata;
+                return token;
             }
         });
 
