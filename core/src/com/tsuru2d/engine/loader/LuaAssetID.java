@@ -28,4 +28,9 @@ public class LuaAssetID extends LuaUserdata {
     public LuaAssetID(AssetID id) {
         super(id, ASSETID_METATABLE);
     }
+
+    @Override
+    public AssetID userdata() {
+        return (AssetID)m_instance;
+    }
 }

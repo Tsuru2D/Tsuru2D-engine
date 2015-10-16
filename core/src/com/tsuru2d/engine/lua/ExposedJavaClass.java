@@ -2,6 +2,7 @@ package com.tsuru2d.engine.lua;
 
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaUserdata;
+import org.luaj.vm2.LuaValue;
 
 import java.lang.reflect.Method;
 
@@ -41,7 +42,7 @@ public class ExposedJavaClass extends LuaUserdata {
             metatable.set(exposedName, luaFunction);
         }
 
-        metatable.set("__index", metatable);
+        metatable.set(LuaValue.INDEX, metatable);
         return metatable;
     }
 }
