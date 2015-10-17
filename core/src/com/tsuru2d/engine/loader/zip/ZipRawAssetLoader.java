@@ -103,6 +103,14 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
         return new ZipFileHandle(mMainZipFile, fileName);
     }
 
+    @Override
+    public void dispose() {
+        if (mAssetManager.getLoadedAssets() > 0) {
+            Xlog.e("Undisposed assets: " + mAssetManager.getAssetNames());
+        }
+        mAssetManager.dispose();
+    }
+
     private void cannotFindAsset(AssetID rawAssetID) {
         throw new AssetNotFoundException("Cannot find asset: " + rawAssetID);
     }

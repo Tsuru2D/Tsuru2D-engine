@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 import com.tsuru2d.engine.model.GameMetadataInfo;
 import org.luaj.vm2.LuaTable;
@@ -13,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AssetLoader {
+public class AssetLoader implements Disposable {
     private final RawAssetLoader mRawAssetLoader;
     private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
     private final Pool<ManagedAsset<?>> mAssetPool;
@@ -142,5 +143,10 @@ public class AssetLoader {
 
     public void update() {
         mRawAssetLoader.update();
+    }
+
+    @Override
+    public void dispose() {
+        mRawAssetLoader.dispose();
     }
 }
