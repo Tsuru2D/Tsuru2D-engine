@@ -9,12 +9,6 @@ function mainmenu:onCreate(screen)
             lolis = "cute"
         })
     end)
-    --[[self.table = screen:newTable()
-    self.startGameButton = screen:newButton()
-    self.startGameButton:setOnClick(function(button)
-        self.screen:setScreen(R.screen.game)
-    end)
-    self.table:addChild(self.startGameButton)--]]
 end
 
 function mainmenu:onResume(params)

@@ -2,77 +2,75 @@ package com.tsuru2d.engine.gameapi;
 
 import com.tsuru2d.engine.loader.LuaAssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaUserdata;
 
-public class FrameState {
+public class FrameApi extends ExposedJavaClass {
     private final Globals mGlobals;
     private final LuaTable mUIEnvironment;
 
-    public FrameState(Globals globals, LuaTable uiEnvironment) {
+    public FrameApi(Globals globals, LuaTable uiEnvironment) {
         mGlobals = globals;
         mUIEnvironment = uiEnvironment;
     }
 
     @ExposeToLua
-    private GameActor create(LuaAssetID id, LuaTable params) {
-        return null;
+    public GameActor create(LuaAssetID id, LuaTable params) {
+        return null; //return new GameActor(id, params);
     }
 
-    @ExposeToLua
-    private GameAction delay(double secs, LuaFunction function) {
+    /*@ExposeToLua
+    public GameAction delay(double secs, LuaFunction function) {
         return null;
-    }
+    }*/
 
     @ExposeToLua
-    private InstantGameAction character(LuaAssetID characterID) {
+    public InstantGameAction character(LuaAssetID characterID) {
         mUIEnvironment.get("onCharacter").call(characterID);
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private InstantGameAction music(LuaAssetID musicID) {
+    public InstantGameAction music(LuaAssetID musicID) {
         mUIEnvironment.get("onMusic").call(musicID);
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private InstantGameAction sound(LuaAssetID soundID) {
+    public InstantGameAction sound(LuaAssetID soundID) {
         mUIEnvironment.get("onSound").call(soundID);
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private InstantGameAction voice(LuaAssetID voiceID) {
+    public InstantGameAction voice(LuaAssetID voiceID) {
         mUIEnvironment.get("onVoice").call(voiceID);
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private InstantGameAction text(LuaAssetID textID) {
+    public InstantGameAction text(LuaAssetID textID) {
         mUIEnvironment.get("onVoice").call(textID);
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private InstantGameAction background(LuaAssetID imageID) {
+    public InstantGameAction background(LuaAssetID imageID) {
         mUIEnvironment.get("onBackground").call(imageID);
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private GameAction transform(GameActor obj, LuaTable args) {
-        AsyncGameAction token = new AsyncGameAction(mGlobals, null);
-        return null;
+    public GameAction transform(GameActor obj, LuaTable args) {
+        mUIEnvironment.get("onTransform").call(new LuaUserdata(obj), args);
+        return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    private GameAction camera(LuaTable params) {
-        return null;
-    }
-
-    public void update(float dt) {
-
+    public GameAction camera(LuaTable params) {
+        mUIEnvironment.get("onCamera").call(params);
+        return InstantGameAction.EMPTY;
     }
 }

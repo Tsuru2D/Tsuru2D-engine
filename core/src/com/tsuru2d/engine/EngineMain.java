@@ -10,6 +10,10 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.tsuru2d.engine.gameapi.BaseScreen;
+import com.tsuru2d.engine.gameapi.GameScreen;
+import com.tsuru2d.engine.gameapi.MenuScreen;
+import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.loader.*;
 import com.tsuru2d.engine.model.GameMetadataInfo;
 import org.luaj.vm2.LuaTable;
@@ -112,23 +116,39 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         }
     }
 
-    public void pushScreen(AssetID screenID, LuaValue params) {
-        LuaTable screenScript = mAssetLoader.getScreen(screenID);
-        BaseScreen screen;
-        if (screenID.equals(mAssetLoader.getMetadata().mGameScreen)) {
-            screen = new GameScreen(this, screenScript, null);
-        } else {
-            screen = new MenuScreen(this, screenScript);
-        }
-
-        if (mScreen != null) {
-            mScreen.hide();
-        }
-
-        mScreens.push(screen);
+    private void initScreen(BaseScreen screen, LuaValue params) {
         mScreen = screen;
         screen.show(params);
         screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    }
+
+    public void pushGameScreen(GameSaveData saveData, LuaValue params) {
+        LuaTable globals = saveData.mCustomState;
+        AssetID sceneID = AssetID.fromString(saveData.mSceneId);
+        String frameID = saveData.mFrameId;
+        LuaTable screenScript = mAssetLoader.getScreen(getMetadata().mGameScreen);
+        GameScreen screen = new GameScreen(this, screenScript, globals);
+        screen.setScene(sceneID);
+        if (frameID != null) {
+            screen.gotoFrame(frameID);
+        }
+        mScreens.push(screen);
+        initScreen(screen, params);
+    }
+
+    public void pushGameScreen(AssetID sceneID, LuaValue params) {
+        // TODO: lazy hack, rewrite this properly sometime
+        GameSaveData saveData = new GameSaveData();
+        saveData.mCustomState = new LuaTable();
+        saveData.mSceneId = sceneID.toString();
+        pushGameScreen(saveData, params);
+    }
+
+    public void pushScreen(AssetID screenID, LuaValue params) {
+        LuaTable screenScript = mAssetLoader.getScreen(screenID);
+        BaseScreen screen = new MenuScreen(this, screenScript);
+        mScreens.push(screen);
+        initScreen(screen, params);
     }
 
     public void setScreen(AssetID screenID, LuaValue params) {
@@ -148,9 +168,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         if (screen == null) {
             throw new GdxRuntimeException("Cannot pop the root screen");
         }
-        mScreen = screen;
-        screen.show(params);
-        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        initScreen(screen, params);
     }
 
     public void setLanguage(String languageCode) {

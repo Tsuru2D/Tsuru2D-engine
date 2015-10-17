@@ -1,4 +1,4 @@
-package com.tsuru2d.engine;
+package com.tsuru2d.engine.gameapi;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -128,6 +129,11 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     @ExposeToLua
     public void playMusic(AssetID musicID) {
         mGame.playMusic(musicID);
+    }
+
+    @ExposeToLua
+    public void playVoice(AssetID voiceID) {
+
     }
 
     @ExposeToLua

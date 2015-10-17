@@ -1,6 +1,7 @@
-package com.tsuru2d.engine;
+package com.tsuru2d.engine.gameapi;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.tsuru2d.engine.EngineMain;
 import org.luaj.vm2.LuaTable;
 
 /**

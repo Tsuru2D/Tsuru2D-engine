@@ -5,9 +5,8 @@ import java.lang.annotation.*;
 /**
  * Marks a Java method to be exposed to Lua. Only methods
  * marked with this annotation will be callable from
- * Lua code. This annotation ignores Java visibility -
- * all methods, even private ones, will be exposed to Lua
- * if marked with this annotation.
+ * Lua code. Only public methods will be exposed - this
+ * annotation has no effect on private methods.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

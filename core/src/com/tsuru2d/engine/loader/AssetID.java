@@ -16,14 +16,15 @@ import java.util.Map;
  * which will then be loaded by an instance of {@link RawAssetLoader}.
  */
 public abstract class AssetID {
-    public static final AssetID SOUND = new RootAssetID(AssetType.SOUND);
-    public static final AssetID MUSIC = new RootAssetID(AssetType.MUSIC);
-    public static final AssetID VOICE = new RootAssetID(AssetType.VOICE);
-    public static final AssetID IMAGE = new RootAssetID(AssetType.IMAGE);
-    public static final AssetID TEXT = new RootAssetID(AssetType.TEXT);
-    public static final AssetID SCREEN = new RootAssetID(AssetType.SCREEN);
-    public static final AssetID SCENE = new RootAssetID(AssetType.SCENE);
-    public static final AssetID CHARACTER = new RootAssetID(AssetType.CHARACTER);
+    private static HashMap<AssetType, AssetID> sIDMap;
+    static {
+        AssetType[] assetTypes = AssetType.values();
+        HashMap<AssetType, AssetID> idMap = new HashMap<AssetType, AssetID>(assetTypes.length);
+        for (AssetType assetType : assetTypes) {
+            idMap.put(assetType, new RootAssetID(assetType));
+        }
+        sIDMap = idMap;
+    }
 
     private static class RootAssetID extends AssetID {
         private final AssetType mType;
@@ -97,6 +98,23 @@ public abstract class AssetID {
     private Map<String, WeakReference<AssetID>> mChildren;
 
     private AssetID() { }
+
+    public static AssetID getRoot(AssetType assetType) {
+        return sIDMap.get(assetType);
+    }
+
+    public static AssetID fromString(String assetIDString) {
+        String[] idParts = assetIDString.split("\\.");
+        if (idParts.length <= 2 || !idParts[0].equals("R")) {
+            throw new IllegalArgumentException("Invalid asset ID: " + assetIDString);
+        }
+        AssetType type = AssetType.valueOf(idParts[1].toUpperCase());
+        AssetID id = getRoot(type);
+        for (int i = 2; i < idParts.length; ++i) {
+            id = id.getChild(idParts[i]);
+        }
+        return id;
+    }
 
     private void fillPath(Array<String> path) {
         AssetID parent = getParent();

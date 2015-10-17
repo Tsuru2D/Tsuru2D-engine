@@ -6,7 +6,9 @@ import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
+import com.tsuru2d.engine.gameapi.GameScene;
 import com.tsuru2d.engine.model.GameMetadataInfo;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -72,14 +74,22 @@ public class AssetLoader implements Disposable {
     }
 
     public LuaTable getScreen(AssetID id) {
-        return ((LuaValue)getAsset(id.checkType(AssetType.SCREEN)).get()).checktable();
+        ManagedAsset<LuaValue> screenWrapper = getAsset(id.checkType(AssetType.SCENE));
+        LuaTable screen = screenWrapper.get().checktable();
+        freeAsset(screenWrapper);
+        return screen;
     }
 
-    public LuaTable getScene(AssetID id) {
-        return ((LuaValue)getAsset(id.checkType(AssetType.SCENE)).get()).checktable();
+    public GameScene getScene(AssetID id) {
+        ManagedAsset<LuaValue> sceneFuncWrapper = getAsset(id.checkType(AssetType.SCENE));
+        LuaFunction sceneFunc = sceneFuncWrapper.get().checkfunction();
+        GameScene scene = GameScene.loadFunc(sceneFunc);
+        freeAsset(sceneFuncWrapper);
+        return scene;
     }
 
     public LuaTable getCharacter(AssetID id) {
+        // TODO: memory leak
         return ((LuaValue)getAsset(id.checkType(AssetType.CHARACTER)).get()).checktable();
     }
 

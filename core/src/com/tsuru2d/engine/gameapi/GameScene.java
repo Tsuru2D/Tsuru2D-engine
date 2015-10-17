@@ -1,38 +1,68 @@
 package com.tsuru2d.engine.gameapi;
 
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.tsuru2d.engine.loader.AssetID;
+import com.tsuru2d.engine.loader.LuaAssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.LuaFunction;
-
-import java.util.LinkedHashMap;
+import org.luaj.vm2.LuaTable;
 
 public class GameScene {
-    private String mSceneID;
+    private AssetID mNextSceneID;
     private LuaFunction mSetupFunction;
-    private LinkedHashMap<String, LuaFunction> mFrames;
+    private Array<GameFrame> mFrames;
+    private int mFrameIndex;
 
-    private GameScene(String sceneID) {
-        mSceneID = sceneID;
-        mFrames = new LinkedHashMap<String, LuaFunction>();
+    private GameScene() {
+        mFrames = new Array<GameFrame>();
+        mFrameIndex = 0;
     }
 
-    public String getSceneID() {
-        return mSceneID;
+    public AssetID getNextSceneID() {
+        return mNextSceneID;
     }
 
-    public LuaFunction getSetupFunction() {
-        return mSetupFunction;
+    public void runSetup(FrameApi frameApi, LuaTable locals, LuaTable globals) {
+        mSetupFunction.call(frameApi, locals, globals);
     }
 
-    public LinkedHashMap<String, LuaFunction> getFrames() {
-        return mFrames;
+    public GameFrame getFrame() {
+        return mFrames.get(mFrameIndex);
     }
 
-    public static class Builder extends ExposedJavaClass {
+    public GameFrame gotoFrame(String frameID) {
+        for (int i = 0; i < mFrames.size; ++i) {
+            GameFrame frame = mFrames.get(i);
+            if (frame.getFrameID().equals(frameID)) {
+                mFrameIndex = i;
+                return frame;
+            }
+        }
+        throw new GdxRuntimeException("Could not find frame with ID: " + frameID);
+    }
+
+    public GameFrame nextFrame() {
+        if (mFrameIndex == mFrames.size - 1) {
+            return null;
+        }
+        return mFrames.get(++mFrameIndex);
+    }
+
+    public static GameScene loadFunc(LuaFunction sceneFunc) {
+        Builder sceneBuilder = new Builder();
+        LuaAssetID nextSceneID = (LuaAssetID)sceneFunc.call(sceneBuilder);
+        GameScene scene = sceneBuilder.build();
+        scene.mNextSceneID = nextSceneID.userdata();
+        return scene;
+    }
+
+    private static class Builder extends ExposedJavaClass {
         private GameScene mScene;
 
-        public Builder(String sceneID) {
-            mScene = new GameScene(sceneID);
+        public Builder() {
+            mScene = new GameScene();
         }
 
         @ExposeToLua
@@ -42,7 +72,7 @@ public class GameScene {
 
         @ExposeToLua
         public void frame(String id, LuaFunction function) {
-            mScene.mFrames.put(id, function);
+            mScene.mFrames.add(new GameFrame(id, function));
         }
 
         public GameScene build() {

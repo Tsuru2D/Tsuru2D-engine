@@ -69,7 +69,7 @@
 -- interactive() will always block until it is finished.
 ---
 
-scene("scene1", function(scene)
+return function(scene)
     scene:setup(function(frame, state)
         state.alice = frame:create(R.character.alice, {
             x = 1.5,
@@ -177,11 +177,10 @@ scene("scene1", function(scene)
         end):wait()
         frame:delay(0.5):wait()
         if globals.next_location1 == "school" then
-            frame:gotoframe(R.scene.chapter1.school)
+            frame:gotoscene(R.scene.scene2, "school")
         else
-            frame:gotoframe(R.scene.chapter1.home)
+            frame:gotoscene(R.scene.scene2, "home")
         end
     end)
-end)
-
-splash(R.image.splash.generic)
+    return R.scene.scene2
+end
