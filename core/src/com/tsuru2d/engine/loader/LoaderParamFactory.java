@@ -8,6 +8,7 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public final class LoaderParamFactory {
     private LoaderParamFactory() { }
@@ -21,7 +22,9 @@ public final class LoaderParamFactory {
         } else if (rawAssetType.equals(Texture.class)) {
             return (AssetLoaderParameters<T>)new TextureLoader.TextureParameter();
         } else if (rawAssetType.equals(LuaTable.class)) {
-            return (AssetLoaderParameters<T>)new LuaFileLoader.LuaFileParameter();
+            return (AssetLoaderParameters<T>)new LuaTableLoader.LuaTableParameter();
+        } else if (rawAssetType.equals(LuaValue.class)) {
+            return (AssetLoaderParameters<T>)new LuaValueLoader.LuaValueParameter();
         } else {
             throw new IllegalArgumentException("Unknown class type: " + rawAssetType.getName());
         }

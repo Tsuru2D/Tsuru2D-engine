@@ -5,10 +5,9 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.utils.Pool;
-import com.tsuru2d.engine.model.CharacterInfo;
 import com.tsuru2d.engine.model.GameMetadataInfo;
-import com.tsuru2d.engine.model.SceneInfo;
-import com.tsuru2d.engine.model.ScreenInfo;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,9 @@ public class AssetLoader {
         mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
         mLoaderDelegates.put(AssetType.IMAGE, new SingleAssetLoaderDelegate<Texture>(this, Texture.class));
         mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this));
+        mLoaderDelegates.put(AssetType.SCREEN, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
+        mLoaderDelegates.put(AssetType.SCENE, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
+        mLoaderDelegates.put(AssetType.CHARACTER, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         // TODO: Add other types
         mAssetPool = new Pool<ManagedAsset<?>>() {
             @Override
@@ -49,11 +51,11 @@ public class AssetLoader {
     }
 
     public ManagedAsset<Sound> getSound(AssetID id) {
-        return getAsset(id.checkType(AssetType.MUSIC));
+        return getAsset(id.checkType(AssetType.SOUND));
     }
 
     public ManagedAsset<Music> getMusic(AssetID id) {
-        return getAsset(id.checkType(AssetType.SOUND));
+        return getAsset(id.checkType(AssetType.MUSIC));
     }
 
     public ManagedAsset<Sound> getVoice(AssetID id) {
@@ -68,16 +70,16 @@ public class AssetLoader {
         return getAsset(id.checkType(AssetType.TEXT));
     }
 
-    public ManagedAsset<ScreenInfo> getScreen(AssetID id) {
-        return getAsset(id.checkType(AssetType.SCREEN));
+    public LuaTable getScreen(AssetID id) {
+        return ((LuaValue)getAsset(id.checkType(AssetType.SCREEN)).get()).checktable();
     }
 
-    public ManagedAsset<SceneInfo> getScene(AssetID id) {
-        return getAsset(id.checkType(AssetType.SCENE));
+    public LuaTable getScene(AssetID id) {
+        return ((LuaValue)getAsset(id.checkType(AssetType.SCENE)).get()).checktable();
     }
 
-    public ManagedAsset<CharacterInfo> getCharacter(AssetID id) {
-        return getAsset(id.checkType(AssetType.CHARACTER));
+    public LuaTable getCharacter(AssetID id) {
+        return ((LuaValue)getAsset(id.checkType(AssetType.CHARACTER)).get()).checktable();
     }
 
     public GameMetadataInfo getMetadata() {

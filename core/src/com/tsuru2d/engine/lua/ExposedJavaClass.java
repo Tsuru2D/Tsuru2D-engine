@@ -63,4 +63,9 @@ public class ExposedJavaClass extends LuaUserdata {
         metatable.set(LuaValue.INDEX, metatable);
         return metatable;
     }
+
+    @Override
+    public String toString() {
+        return "ExposedJavaClass{" + userdata().getClass().getSimpleName() + "}";
+    }
 }

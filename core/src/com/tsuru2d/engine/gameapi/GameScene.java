@@ -11,20 +11,28 @@ public class GameScene {
     private LuaFunction mSetupFunction;
     private LinkedHashMap<String, LuaFunction> mFrames;
 
-    private GameScene() {
+    private GameScene(String sceneID) {
+        mSceneID = sceneID;
         mFrames = new LinkedHashMap<String, LuaFunction>();
     }
 
-    public static Builder getBuilder(String sceneId) {
-        return new Builder(sceneId);
+    public String getSceneID() {
+        return mSceneID;
     }
 
-    public static class Builder extends ExposedJavaClass{
+    public LuaFunction getSetupFunction() {
+        return mSetupFunction;
+    }
+
+    public LinkedHashMap<String, LuaFunction> getFrames() {
+        return mFrames;
+    }
+
+    public static class Builder extends ExposedJavaClass {
         private GameScene mScene;
 
-        public Builder(String sceneId) {
-            mScene = new GameScene();
-            mScene.mSceneID=sceneId;
+        public Builder(String sceneID) {
+            mScene = new GameScene(sceneID);
         }
 
         @ExposeToLua
@@ -37,7 +45,7 @@ public class GameScene {
             mScene.mFrames.put(id, function);
         }
 
-        public GameScene build(){
+        public GameScene build() {
             return mScene;
         }
     }

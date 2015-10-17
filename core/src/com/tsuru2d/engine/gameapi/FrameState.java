@@ -63,11 +63,16 @@ public class FrameState {
 
     @ExposeToLua
     private GameAction transform(GameActor obj, LuaTable args) {
+        AsyncGameAction token = new AsyncGameAction(mGlobals, null);
         return null;
     }
 
     @ExposeToLua
     private GameAction camera(LuaTable params) {
         return null;
+    }
+
+    public void update(float dt) {
+
     }
 }

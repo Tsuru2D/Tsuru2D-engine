@@ -1,22 +1,24 @@
 package com.tsuru2d.engine.gameapi;
 
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 
 public class InstantGameAction extends GameAction {
-    public static final InstantGameAction EMPTY = new InstantGameAction();
+    public static final InstantGameAction EMPTY = new InstantGameAction(LuaValue.NIL);
 
-    private final LuaValue mValue;
+    private final Varargs mValue;
 
-    private InstantGameAction() {
-        this(LuaValue.NIL);
-    }
-
-    public InstantGameAction(LuaValue value) {
-        mValue = value;
+    public InstantGameAction(Varargs args) {
+        mValue = args;
     }
 
     @Override
-    public LuaValue luaWait() {
+    public void luaFinish(Varargs args) {
+        throw new UnsupportedOperationException("Cannot finish() an instant action");
+    }
+
+    @Override
+    public Varargs luaWait() {
         return mValue;
     }
 }

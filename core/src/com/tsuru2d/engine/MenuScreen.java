@@ -3,9 +3,6 @@ package com.tsuru2d.engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.tsuru2d.engine.loader.AssetID;
-import com.tsuru2d.engine.lua.ExposeToLua;
-import com.tsuru2d.engine.model.ScreenInfo;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -15,37 +12,17 @@ import org.luaj.vm2.LuaValue;
  * features to Lua.
  */
 public class MenuScreen extends BaseScreen {
-    public MenuScreen(EngineMain game, ScreenInfo screenInfo) {
+    private LuaTable mScreenScript;
+
+    public MenuScreen(EngineMain game, LuaTable screenScript) {
         super(game);
-    }
-
-    @ExposeToLua
-    private void setScreen(AssetID id, LuaTable data) {
-        MenuScreen screen = null; // TODO: load by ID
-        mGame.setScreen(screen, null);
-    }
-
-    @ExposeToLua
-    private void pushScreen(LuaTable data) {
-
-    }
-
-    @ExposeToLua
-    private void popScreen() {
-
+        mScreenScript = screenScript;
     }
 
     @Override
     public void show() {
-        LuaValue function = mLuaEnvironment.get("onShow");
-        if (!function.isnil()) {
-            LuaTable data = null; // getData();
-            if (data != null) {
-                function.checkfunction().call(data);
-            } else {
-                function.checkfunction().call();
-            }
-        }
+        super.show();
+        mScreenScript.invokemethod("onCreate", this);
     }
 
     @Override

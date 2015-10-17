@@ -9,48 +9,48 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.tsuru2d.engine.LuaContext;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 /**
  * An asset loader for Lua scripts. Will execute the script
  * in the given environment, and return the return value
  * of the script itself.
  */
-public class LuaFileLoader extends AsynchronousAssetLoader<LuaTable, LuaFileLoader.LuaFileParameter> {
-    public static class LuaFileParameter extends AssetLoaderParameters<LuaTable> {
+public class LuaValueLoader extends AsynchronousAssetLoader<LuaValue, LuaValueLoader.LuaValueParameter> {
+    public static class LuaValueParameter extends AssetLoaderParameters<LuaValue> {
         public LuaTable mEnvironment;
 
-        public LuaFileParameter() {
+        public LuaValueParameter() {
             this(null);
         }
 
-        public LuaFileParameter(LuaTable environment) {
+        public LuaValueParameter(LuaTable environment) {
             mEnvironment = environment;
         }
     }
 
     private String mLuaFileContents;
 
-    public LuaFileLoader(FileHandleResolver resolver) {
+    public LuaValueLoader(FileHandleResolver resolver) {
         super(resolver);
     }
 
     @Override
-    public void loadAsync(AssetManager manager, String fileName, FileHandle file, LuaFileParameter parameter) {
+    public void loadAsync(AssetManager manager, String fileName, FileHandle file, LuaValueParameter parameter) {
         mLuaFileContents = file.readString();
     }
 
     @Override
-    public LuaTable loadSync(AssetManager manager, String fileName, FileHandle file, LuaFileParameter parameter) {
+    public LuaValue loadSync(AssetManager manager, String fileName, FileHandle file, LuaValueParameter parameter) {
         LuaTable environment = parameter.mEnvironment;
         if (environment == null) {
             environment = new LuaTable();
         }
-        LuaContext.load(mLuaFileContents, fileName, environment);
-        return environment;
+        return LuaContext.load(mLuaFileContents, fileName, environment);
     }
 
     @Override
-    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, LuaFileParameter parameter) {
+    public Array<AssetDescriptor> getDependencies(String fileName, FileHandle file, LuaValueParameter parameter) {
         return null;
     }
 }

@@ -45,12 +45,21 @@ public final class LuaContext {
         }
         LuaValue retValue = sGlobals.load(luaScriptStream, chunkName, "t", environment).call();
         if (setMetatable) {
-            environment.setmetatable(null);
+            //environment.setmetatable(null);
         }
         return retValue;
     }
 
     public static LuaValue load(String luaScript, String chunkName, LuaTable environment) {
-        return sGlobals.load(luaScript, chunkName, environment).call();
+        boolean setMetatable = false;
+        if (environment.getmetatable() == null) {
+            environment.setmetatable(sReadonlyMetatable);
+            setMetatable = true;
+        }
+        LuaValue retValue = sGlobals.load(luaScript, chunkName, environment).call();
+        if (setMetatable) {
+            //environment.setmetatable(null);
+        }
+        return retValue;
     }
 }

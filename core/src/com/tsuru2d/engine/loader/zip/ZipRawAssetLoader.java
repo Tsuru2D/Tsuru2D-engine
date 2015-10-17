@@ -14,6 +14,7 @@ import com.tsuru2d.engine.model.GameMetadataInfo;
 import com.tsuru2d.engine.model.LangMetadataInfo;
 import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 import java.io.File;
 import java.io.IOException;
@@ -41,7 +42,8 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
         mLanguagePackFiles = null; // TODO: create map of language -> zipfile
         mZipRootNode = buildNodeTree(mMainZipFile);
         mAssetManager = new AssetManager(this);
-        mAssetManager.setLoader(LuaTable.class, new LuaFileLoader(this));
+        mAssetManager.setLoader(LuaTable.class, new LuaTableLoader(this));
+        mAssetManager.setLoader(LuaValue.class, new LuaValueLoader(this));
         mResolvePathCache = new HashMap<AssetID, String>();
         mMetadataInfo = getGameMetadata(mMainZipFile);
         mAssetTypePathMap = mMetadataInfo.mAssetDirs;

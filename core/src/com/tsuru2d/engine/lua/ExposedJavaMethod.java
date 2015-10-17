@@ -54,8 +54,18 @@ import java.lang.reflect.Modifier;
         // Convert arguments to native Java objects
         while (destIndex < argCount && destIndex < mParameters.length) {
             Class<?> expectedType = mParameterTypes[destIndex];
-            mParameters[destIndex++] = LuaUtils.bridgeLuaToJava(
-                args.arg(srcIndex++), expectedType);
+            // Allow the usage of varargs, if and only if the Java method
+            // has Varargs as its last argument
+            if (expectedType.equals(Varargs.class)) {
+                if (destIndex == mParameters.length - 1) {
+                    mParameters[destIndex++] = args.subargs(destIndex);
+                } else {
+                    throw new LuaError("Varargs must be the last argument in target Java method");
+                }
+            } else {
+                mParameters[destIndex++] = LuaUtils.bridgeLuaToJava(
+                    args.arg(srcIndex++), expectedType);
+            }
         }
 
         if (argCount != mParameters.length) {

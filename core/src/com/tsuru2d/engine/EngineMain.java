@@ -4,16 +4,17 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.scenes.scene2d.Action;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.tsuru2d.engine.loader.AssetLoader;
-import com.tsuru2d.engine.loader.AssetObserver;
-import com.tsuru2d.engine.loader.ManagedAsset;
-import com.tsuru2d.engine.loader.MetadataLoader;
+import com.tsuru2d.engine.loader.*;
 import com.tsuru2d.engine.model.GameMetadataInfo;
+import org.luaj.vm2.LuaTable;
+
+import java.util.ArrayDeque;
 
 /**
  * Similar to a {@link Game}, but allows custom transitions between
@@ -26,6 +27,8 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private Viewport mViewport;
     private SpriteBatch mSpriteBatch;
     private ManagedAsset<String> mTitle;
+    private ManagedAsset<Music> mMusic;
+    private ArrayDeque<BaseScreen> mScreens;
 
     public EngineMain(PlatformApi platformApi) {
         mPlatformApi = platformApi;
@@ -44,6 +47,9 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
             MetadataLoader.Resolution resolution = getMetadata().mResolution;
             Gdx.graphics.setDisplayMode(resolution.getWidth(), resolution.getHeight(), false);
         }
+
+        mScreens = new ArrayDeque<BaseScreen>();
+        pushScreen(mAssetLoader.getMetadata().mMainScreen);
     }
 
     @Override
@@ -89,6 +95,60 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         mAssetLoader.freeAsset(mTitle);
     }
 
+    public void playMusic(AssetID musicID) {
+        if (mMusic != null) {
+            mMusic.get().stop();
+            mAssetLoader.freeAsset(mMusic);
+        }
+        if (musicID != null) {
+            mMusic = mAssetLoader.getMusic(musicID);
+            mMusic.get().play();
+        }
+    }
+
+    public void pushScreen(AssetID screenID) {
+        LuaTable screenScript = mAssetLoader.getScreen(screenID);
+        BaseScreen screen;
+        if (screenID.equals(mAssetLoader.getMetadata().mGameScreen)) {
+            screen = new GameScreen(this);
+        } else {
+            screen = new MenuScreen(this, screenScript);
+        }
+
+        if (mScreen != null) {
+            mScreen.hide();
+        }
+
+        mScreens.push(screen);
+        mScreen = screen;
+        screen.show();
+        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    }
+
+    public void setScreen(AssetID screenID) {
+        popScreenHelper();
+        pushScreen(screenID);
+    }
+
+    private BaseScreen popScreenHelper() {
+        BaseScreen screen = mScreens.pop();
+        screen.hide();
+        return mScreens.peek();
+    }
+
+    public void popScreen() {
+        BaseScreen screen = popScreenHelper();
+        if (screen == null) {
+            throw new GdxRuntimeException("Cannot pop the root screen");
+        }
+        mScreen = screen;
+        screen.show();
+    }
+
+    public void setLanguage(String languageCode) {
+        mAssetLoader.setLanguage(languageCode);
+    }
+
     public SpriteBatch getSpriteBatch() {
         return mSpriteBatch;
     }
@@ -99,18 +159,6 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     public AssetLoader getAssetLoader() {
         return mAssetLoader;
-    }
-
-    public void setScreen(BaseScreen screen, Action action) {
-        if (mScreen != null) {
-            mScreen.hide();
-        }
-
-        mScreen = screen;
-        if (mScreen != null) {
-            mScreen.show();
-            mScreen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        }
     }
 
     public GameMetadataInfo getMetadata() {
