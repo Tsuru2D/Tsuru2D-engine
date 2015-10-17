@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tsuru2d.engine.loader.*;
 import com.tsuru2d.engine.model.GameMetadataInfo;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 import java.util.ArrayDeque;
 
@@ -49,7 +50,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         }
 
         mScreens = new ArrayDeque<BaseScreen>();
-        pushScreen(mAssetLoader.getMetadata().mMainScreen);
+        pushScreen(mAssetLoader.getMetadata().mMainScreen, LuaValue.NIL);
     }
 
     @Override
@@ -91,8 +92,13 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     @Override
     public void dispose() {
+        if (mMusic != null) {
+            mMusic.get().stop();
+            mAssetLoader.freeAsset(mMusic);
+        }
         mTitle.removeObserver(this);
         mAssetLoader.freeAsset(mTitle);
+        mAssetLoader.dispose();
     }
 
     public void playMusic(AssetID musicID) {
@@ -106,11 +112,11 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         }
     }
 
-    public void pushScreen(AssetID screenID) {
+    public void pushScreen(AssetID screenID, LuaValue params) {
         LuaTable screenScript = mAssetLoader.getScreen(screenID);
         BaseScreen screen;
         if (screenID.equals(mAssetLoader.getMetadata().mGameScreen)) {
-            screen = new GameScreen(this);
+            screen = new GameScreen(this, screenScript, null);
         } else {
             screen = new MenuScreen(this, screenScript);
         }
@@ -121,28 +127,30 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
         mScreens.push(screen);
         mScreen = screen;
-        screen.show();
+        screen.show(params);
         screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
-    public void setScreen(AssetID screenID) {
+    public void setScreen(AssetID screenID, LuaValue params) {
         popScreenHelper();
-        pushScreen(screenID);
+        pushScreen(screenID, params);
     }
 
     private BaseScreen popScreenHelper() {
         BaseScreen screen = mScreens.pop();
         screen.hide();
+        screen.dispose();
         return mScreens.peek();
     }
 
-    public void popScreen() {
+    public void popScreen(LuaValue params) {
         BaseScreen screen = popScreenHelper();
         if (screen == null) {
             throw new GdxRuntimeException("Cannot pop the root screen");
         }
         mScreen = screen;
-        screen.show();
+        screen.show(params);
+        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
     }
 
     public void setLanguage(String languageCode) {

@@ -1,2 +1,2 @@
-title = "My Visual Novel Lolis are cute"
+title = "My Visual Novel"
 author = "Oxycode"

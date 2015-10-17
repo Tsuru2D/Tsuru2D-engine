@@ -1,45 +1,23 @@
 package com.tsuru2d.engine.gameapi;
 
-import com.tsuru2d.engine.loader.LuaAssetIDLib;
-import com.tsuru2d.engine.lua.ExposeToLua;
-import com.tsuru2d.engine.lua.ExposedJavaClass;
-import org.luaj.vm2.Globals;
 import org.luaj.vm2.LuaThread;
 import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.lib.OneArgFunction;
-import org.luaj.vm2.lib.ZeroArgFunction;
-import org.luaj.vm2.lib.jse.JsePlatform;
 
 public class LuaTest {
     private boolean inccounter = false;
     private int counter = 0;
-    private Token mToken;
+
     private LuaValue gamethread;
     private LuaThread mThread;
 
-    private class Token extends ExposedJavaClass {
-        private Globals mGlobals;
-
-        public Token(Globals globals) {
-            mGlobals = globals;
-        }
-
-        @ExposeToLua(name = "wait")
-        public LuaValue myWait() {
-            // coroutine.yield()
-            System.out.println("wait() called");
-            LuaValue value = mGlobals.get("coroutine").get("yield").call();
-            return value;
-        }
-    }
-
-    private synchronized void run() {
+   /* private synchronized void run() {
         final Globals globals = JsePlatform.standardGlobals();
         globals.load(new LuaAssetIDLib());
         globals.set("text", new OneArgFunction() {
             @Override
             public LuaValue call(LuaValue arg) {
                 System.out.println("text() called");
+                GameAction token = new AsyncGameAction()
                 final Token token = new Token(globals);
                 // final LuaUserdata userdata = new ExposedJavaClass(token);
                 mToken = token;
@@ -83,5 +61,5 @@ public class LuaTest {
 
     public static void main(String[] args) {
         new LuaTest().run();
-    }
+    }*/
 }
