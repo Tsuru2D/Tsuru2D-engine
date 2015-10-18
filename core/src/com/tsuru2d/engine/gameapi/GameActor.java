@@ -1,12 +1,11 @@
 package com.tsuru2d.engine.gameapi;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.actions.AlphaAction;
-import com.badlogic.gdx.scenes.scene2d.actions.MoveToAction;
+import com.badlogic.gdx.scenes.scene2d.actions.*;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import com.tsuru2d.engine.lua.LuaMapIterator;
 import org.luaj.vm2.LuaTable;
@@ -19,117 +18,70 @@ import java.util.Iterator;
 public class GameActor extends ExposedJavaClass {
     private Texture mTexture;
     private Actor mActor;
-    private static HashMap<String, Interpolation> interpolationMap;
-    static{
-        interpolationMap=new HashMap<String, Interpolation>();
-        interpolationMap.put("pow2",Interpolation.pow2);
-        interpolationMap.put("pow2In",Interpolation.pow2In);
-        interpolationMap.put("pow2Out",Interpolation.pow2Out);
-        interpolationMap.put("pow3",Interpolation.pow3);
-        interpolationMap.put("pow3In",Interpolation.pow3In);
-        interpolationMap.put("pow3Out",Interpolation.pow3Out);
-        interpolationMap.put("pow4",Interpolation.pow4);
-        interpolationMap.put("pow4In",Interpolation.pow4In);
-        interpolationMap.put("pow4Out",Interpolation.pow4Out);
-        interpolationMap.put("pow5",Interpolation.pow3);
-        interpolationMap.put("pow5In",Interpolation.pow5In);
-        interpolationMap.put("pow5Out",Interpolation.pow5Out);
-        interpolationMap.put("exp10",Interpolation.exp10);
-        interpolationMap.put("exp10In",Interpolation.exp10In);
-        interpolationMap.put("exp10Out",Interpolation.exp10Out);
-        interpolationMap.put("exp5",Interpolation.exp5);
-        interpolationMap.put("exp5In",Interpolation.exp5In);
-        interpolationMap.put("exp5Out",Interpolation.exp5Out);
-        interpolationMap.put("elastic",Interpolation.elastic);
-        interpolationMap.put("elasticIn",Interpolation.elasticIn);
-        interpolationMap.put("elasticOut",Interpolation.elasticOut);
-        interpolationMap.put("swing",Interpolation.swing);
-        interpolationMap.put("swingIn",Interpolation.swingIn);
-        interpolationMap.put("swingOut",Interpolation.swingOut);
-        interpolationMap.put("bounce",Interpolation.bounce);
-        interpolationMap.put("bounceIn",Interpolation.bounceIn);
-        interpolationMap.put("bounceOut",Interpolation.bounceOut);
-        interpolationMap.put("sine",Interpolation.sine);
-        interpolationMap.put("sineIn",Interpolation.sineIn);
-        interpolationMap.put("sineOut",Interpolation.sineOut);
-        interpolationMap.put("circle",Interpolation.circle);
-        interpolationMap.put("circleIn",Interpolation.circleIn);
-        interpolationMap.put("circleOut",Interpolation.circleOut);
+    private static final HashMap<String, Interpolation> sInterpolationMap;
+
+    static {
+        sInterpolationMap = new HashMap<String, Interpolation>();
+        sInterpolationMap.put("pow2", Interpolation.pow2);
+        sInterpolationMap.put("pow2In", Interpolation.pow2In);
+        sInterpolationMap.put("pow2Out", Interpolation.pow2Out);
+        sInterpolationMap.put("pow3", Interpolation.pow3);
+        sInterpolationMap.put("pow3In", Interpolation.pow3In);
+        sInterpolationMap.put("pow3Out", Interpolation.pow3Out);
+        sInterpolationMap.put("pow4", Interpolation.pow4);
+        sInterpolationMap.put("pow4In", Interpolation.pow4In);
+        sInterpolationMap.put("pow4Out", Interpolation.pow4Out);
+        sInterpolationMap.put("pow5", Interpolation.pow3);
+        sInterpolationMap.put("pow5In", Interpolation.pow5In);
+        sInterpolationMap.put("pow5Out", Interpolation.pow5Out);
+        sInterpolationMap.put("exp10", Interpolation.exp10);
+        sInterpolationMap.put("exp10In", Interpolation.exp10In);
+        sInterpolationMap.put("exp10Out", Interpolation.exp10Out);
+        sInterpolationMap.put("exp5", Interpolation.exp5);
+        sInterpolationMap.put("exp5In", Interpolation.exp5In);
+        sInterpolationMap.put("exp5Out", Interpolation.exp5Out);
+        sInterpolationMap.put("elastic", Interpolation.elastic);
+        sInterpolationMap.put("elasticIn", Interpolation.elasticIn);
+        sInterpolationMap.put("elasticOut", Interpolation.elasticOut);
+        sInterpolationMap.put("swing", Interpolation.swing);
+        sInterpolationMap.put("swingIn", Interpolation.swingIn);
+        sInterpolationMap.put("swingOut", Interpolation.swingOut);
+        sInterpolationMap.put("bounce", Interpolation.bounce);
+        sInterpolationMap.put("bounceIn", Interpolation.bounceIn);
+        sInterpolationMap.put("bounceOut", Interpolation.bounceOut);
+        sInterpolationMap.put("sine", Interpolation.sine);
+        sInterpolationMap.put("sineIn", Interpolation.sineIn);
+        sInterpolationMap.put("sineOut", Interpolation.sineOut);
+        sInterpolationMap.put("circle", Interpolation.circle);
+        sInterpolationMap.put("circleIn", Interpolation.circleIn);
+        sInterpolationMap.put("circleOut", Interpolation.circleOut);
     }
+
     public void setTexture(Texture texture) {
         mTexture = texture;
     }
 
-    //transformation can have three values {x,y,alpha}, each having three properties {value,interpolation,duration}
+    //transformation can have three values {x,y,alpha,rotate,scale,color}, each having three properties {value(or {values}),interpolation,duration}
 
     public void transform(LuaTable transformation) {
         Iterator<Varargs> it = new LuaMapIterator(transformation);
         while (it.hasNext()) {
             Varargs transformKvp = it.next();
-
             String key = transformKvp.arg(1).checkjstring();
             LuaValue rawValue = transformKvp.arg(2);
 
-            if (key.equals("x")) {  //x={value=..., interpolation=..., duration=...} or x=...
-                MoveToAction action = Actions.action(MoveToAction.class);
-                if(rawValue.istable()){  //x={value=..., interpolation=..., duration=...}
-                    Iterator<Varargs> table=new LuaMapIterator((LuaTable)rawValue);
-                    while(table.hasNext()){
-                        Varargs tableKvp= table.next();
-                        String tableKey=tableKvp.arg(1).checkjstring();
-                        LuaValue tableValue=tableKvp.arg(2);
-                        if(tableKey.equals("value")){
-                            action.setX((float)tableValue.checkdouble());
-                        }else if(tableKey.equals("interpolation")){
-                            action.setInterpolation(interpolationMap.get(tableValue.checkjstring()));
-                        }else if(tableKey.equals("duration")){
-                            action.setDuration((float)tableValue.checkdouble());
-                        }
-                    }
-                }else{  //x=...
-                    action.setX((float)rawValue.checkdouble());
-                }
-                mActor.addAction(action);
-            } else if (key.equals("y")) {  //y={value=..., interpolation=..., duration=...} or y=...
-                MoveToAction action = Actions.action(MoveToAction.class);
-                if(rawValue.istable()){  //y={value=..., interpolation=..., duration=...}
-                    Iterator<Varargs> table=new LuaMapIterator((LuaTable)rawValue);
-                    while(table.hasNext()){
-                        Varargs tableKvp= table.next();
-                        String tableKey=tableKvp.arg(1).checkjstring();
-                        LuaValue tableValue=tableKvp.arg(2);
-                        if(tableKey.equals("value")){
-                            action.setY((float)tableValue.checkdouble());
-                        }else if(tableKey.equals("interpolation")){
-                            action.setInterpolation(interpolationMap.get(tableValue.checkjstring()));
-                        }else if(tableKey.equals("duration")){
-                            action.setDuration((float)tableValue.checkdouble());
-                        }
-                    }
-                }else{  //y=...
-                    action.setY((float)rawValue.checkdouble());
-                }
-                mActor.addAction(action);
-            } else if (key.equals("alpha")){  //alpha={value=..., interpolation=..., duration=...} or alpha=...
-                AlphaAction action = Actions.action(AlphaAction.class);
-                if(rawValue.istable()){
-                    Iterator<Varargs> table=new LuaMapIterator((LuaTable)rawValue);
-                    while(table.hasNext()){  //alpha={value=..., interpolation=..., duration=...}
-                        Varargs tableKvp= table.next();
-                        String tableKey=tableKvp.arg(1).checkjstring();
-                        LuaValue tableValue=tableKvp.arg(2);
-                        if(tableKey.equals("value")) {
-                            action.setAlpha((float)tableValue.checkdouble());
-                        }else if(tableKey.equals("interpolation")){
-                                action.setInterpolation(interpolationMap.get(tableValue.checkjstring()));
-                        }else if(tableKey.equals("duration")){
-                            action.setDuration((float)tableValue.checkdouble());
-                        }
-                    }
-                }else{  //alpha=...
-                    action.setAlpha((float)rawValue.checkdouble());
-                }
-                mActor.addAction(action);
+            if (key.equals("x")) {              //x={value=..., interpolation=..., duration=...} or x=...
+                moveToActionX(rawValue);
+            } else if (key.equals("y")) {       //y={value=..., interpolation=..., duration=...} or y=...
+                moveToActionY(rawValue);
+            } else if (key.equals("alpha")) {   //alpha={value=..., interpolation=..., duration=...} or alpha=...
+                alphaAction(rawValue);
+            } else if (key.equals("rotate")) {   //rotate={value=..., interpolation=.., duration=..} or rotate=...
+                rotateToAction(rawValue);
+            } else if (key.equals("scale")) {     //scale={0.5,0.6} or scale=0.5 or scale={{0.5,0.6}[,interpolation=[, duration=]} or scale={0.5,[,0.6[,interpolation=[, duration=]]]}
+                scaleToAction(rawValue);
+            } else if (key.equals("color")) {     //color={r,g,b,a[,interpolation=..[,duration=..]]} or color={r,g,b,a}
+                colorAction(rawValue);
             }
         }
     }
@@ -152,5 +104,111 @@ public class GameActor extends ExposedJavaClass {
             mTexture.getHeight(),
             false,
             false);
+    }
+
+
+    private void moveToActionX(LuaValue rawValue) {
+        MoveToAction action = Actions.action(MoveToAction.class);
+        if (rawValue.istable()) {  //x={value=..., interpolation=..., duration=...}
+            LuaTable table = rawValue.checktable();
+            action.setX((float)table.get("value").checkdouble());
+            parseTable(action, table);
+        } else {  //x=...
+            action.setX((float)rawValue.checkdouble());
+        }
+        mActor.addAction(action);
+    }
+
+    private void moveToActionY(LuaValue rawValue) {
+        MoveToAction action = Actions.action(MoveToAction.class);
+        if (rawValue.istable()) {  //y={value=...[, interpolation=...[, duration=...]]}
+            LuaTable table = rawValue.checktable();
+            action.setY((float)table.get("value").checkdouble());
+            parseTable(action, table);
+        } else {  //y=...
+            action.setY((float)rawValue.checkdouble());
+        }
+        mActor.addAction(action);
+    }
+
+    private void alphaAction(LuaValue rawValue) {
+        AlphaAction action = Actions.action(AlphaAction.class);
+        if (rawValue.istable()) {   //alpha={value=..[,interpolation=..[,duration=..]]}
+            LuaTable table = rawValue.checktable();
+            action.setAlpha((float)table.get("value").checkdouble());
+            parseTable(action, table);
+        } else {  //alpha=...
+            action.setAlpha((float)rawValue.checkdouble());
+        }
+        mActor.addAction(action);
+    }
+
+    private void rotateToAction(LuaValue rawValue) {
+        RotateToAction action = Actions.action(RotateToAction.class);
+        if (rawValue.istable()) {       //rotate={value[,interpolation=..[,duration=..]]}
+            LuaTable table = rawValue.checktable();
+            action.setRotation((float)table.get("value").checkdouble());
+            parseTable(action, table);
+        } else {                          //rotate=..
+            action.setRotation((float)rawValue.checkdouble());
+        }
+        mActor.addAction(action);
+    }
+
+    private void scaleToAction(LuaValue rawValue) {
+        ScaleToAction action = Actions.action(ScaleToAction.class);
+        if (rawValue.istable()) {
+            LuaTable table = rawValue.checktable();
+            if (table.get(1).istable()) {       //scale={{0.5,0.6}[,interpolation=..[,time=..]]}
+                LuaTable xyTable = table.get(1).checktable();
+                float x = mActor.getWidth() * (float)xyTable.get(1).checkdouble();
+                float y = mActor.getHeight() * (float)xyTable.get(2).checkdouble();
+                action.setScale(x, y);
+            } else if (table.get(2).isnil()) {     //scale={0.5[,interpolation=..[,time=..]]}
+                float x = mActor.getWidth() * (float)table.get(1).checkdouble();
+                float y = mActor.getWidth() * (float)table.get(1).checkdouble();
+                action.setScale(x, y);
+            } else {                              //scale={0.5,0.6[,interpolation=..[,time=..]]}
+                float x = mActor.getWidth() * (float)table.get(1).checkdouble();
+                float y = mActor.getWidth() * (float)table.get(2).checkdouble();
+                action.setScale(x, y);
+            }
+            parseTable(action, table);
+        } else {                                  //scale=0.5
+            float x = mActor.getWidth() * (float)rawValue.checkdouble();
+            float y = mActor.getWidth() * (float)rawValue.checkdouble();
+            action.setScale(x, y);
+        }
+        mActor.addAction(action);
+    }
+
+    private void colorAction(LuaValue rawValue) {
+        ColorAction action = Actions.action(ColorAction.class);
+        LuaTable table = rawValue.checktable();
+        if (table.get(1).istable()) {     //color={{r,g,b[,a]},interpolation=..,duration=..}
+            LuaTable colorTable = table.get(1).checktable();
+            float r = (float)colorTable.get(1).checkdouble();
+            float g = (float)colorTable.get(2).checkdouble();
+            float b = (float)colorTable.get(3).checkdouble();
+            float a = (float)(colorTable.get(4).isnil() ? 1 : colorTable.get(4).checkdouble());
+            Color color = new Color(r, g, b, a);
+            action.setColor(color);
+            parseTable(action, table);
+        } else {                         //color={r,g,b[,a]}
+            float r = (float)table.get(1).checkdouble();
+            float g = (float)table.get(2).checkdouble();
+            float b = (float)table.get(3).checkdouble();
+            float a = (float)(table.get(4).isnil() ? 1 : table.get(4).checkdouble());
+            Color color = new Color(r, g, b, a);
+            action.setColor(color);
+        }
+        mActor.addAction(action);
+    }
+
+    private void parseTable(TemporalAction action, LuaTable table) {
+        if (!table.get("interpolation").isnil())
+            action.setInterpolation(sInterpolationMap.get(table.get("interpolation").checkjstring()));
+        if (!table.get("duration").isnil())
+            action.setDuration((float)table.get("duration").checkdouble());
     }
 }
