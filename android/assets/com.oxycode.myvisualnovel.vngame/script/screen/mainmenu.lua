@@ -5,17 +5,12 @@ function mainmenu:onCreate(screen)
     self.screen = screen
     screen:playMusic(R.music.bg1)
     screen:newButton("game", function()
-        screen:pushScreen(R.screen.game, {
-            lolis = "cute"
-        })
+        screen:pushGameScreenNew(R.scene.scene1)
     end)
 end
 
 function mainmenu:onResume(params)
     print("mainmenu::onResume()")
-    if params ~= nil then
-        print(params.oxygen)
-    end
 end
 
 function mainmenu:onPause()

@@ -1,13 +1,12 @@
 package com.tsuru2d.engine.gameapi;
 
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.LuaMapIterator;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
+import org.luaj.vm2.*;
 
 import java.util.Iterator;
 
@@ -17,6 +16,7 @@ public class GameScreen extends BaseScreen {
     private LuaTable mLocals;
     private final LuaTable mGlobalsTable;
     private FrameApi mFrameApi;
+    private LuaFunction mOnClickHandler;
 
     public GameScreen(EngineMain game, LuaTable screenScript, LuaTable globalsTable) {
         super(game, screenScript);
@@ -46,6 +46,10 @@ public class GameScreen extends BaseScreen {
         } else {
             frame = scene.getFrame();
         }
+        runFrame(frame);
+    }
+
+    private void runFrame(GameFrame frame) {
         frame.run(mFrameApi, mLocals, mGlobalsTable);
     }
 
@@ -55,9 +59,20 @@ public class GameScreen extends BaseScreen {
     }
 
     @ExposeToLua
+    public void setOnClickHandler(LuaFunction callback) {
+        mOnClickHandler = callback;
+        mStage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                mOnClickHandler.call();
+            }
+        });
+    }
+
+    @ExposeToLua
     public void gotoFrame(String frameID) {
         GameFrame frame = mScene.gotoFrame(frameID);
-        frame.run(mFrameApi, mLocals, mGlobalsTable);
+        runFrame(frame);
     }
 
     @ExposeToLua
@@ -67,6 +82,7 @@ public class GameScreen extends BaseScreen {
             nextScene();
             return false;
         }
+        runFrame(frame);
         return true;
     }
 }

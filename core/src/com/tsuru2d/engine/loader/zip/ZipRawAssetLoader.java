@@ -88,7 +88,7 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
     public List<AssetID> setLanguage(String languageCode) {
         mLanguageCode = languageCode;
         return new ArrayList<AssetID>() {{ // TODO
-            add(AssetID.TEXT);
+            add(AssetID.getRoot(AssetType.TEXT));
         }};
     }
 

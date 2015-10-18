@@ -132,11 +132,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     }
 
     @ExposeToLua
-    public void playVoice(AssetID voiceID) {
-
-    }
-
-    @ExposeToLua
     public void setLanguage(String languageCode) {
         mGame.setLanguage(languageCode);
     }

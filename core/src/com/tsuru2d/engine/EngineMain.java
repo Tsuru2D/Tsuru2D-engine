@@ -128,10 +128,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         String frameID = saveData.mFrameId;
         LuaTable screenScript = mAssetLoader.getScreen(getMetadata().mGameScreen);
         GameScreen screen = new GameScreen(this, screenScript, globals);
-        screen.setScene(sceneID);
-        if (frameID != null) {
-            screen.gotoFrame(frameID);
-        }
+        screen.setScene(sceneID, frameID);
         mScreens.push(screen);
         initScreen(screen, params);
     }
