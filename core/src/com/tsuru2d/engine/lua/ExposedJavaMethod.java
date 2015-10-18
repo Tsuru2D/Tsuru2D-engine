@@ -1,7 +1,10 @@
 package com.tsuru2d.engine.lua;
 
 import com.tsuru2d.engine.util.Xlog;
-import org.luaj.vm2.*;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 import org.luaj.vm2.lib.VarArgFunction;
 
 import java.lang.reflect.InvocationTargetException;
@@ -58,7 +61,7 @@ import java.lang.reflect.Modifier;
             // has Varargs as its last argument
             if (expectedType.equals(Varargs.class)) {
                 if (destIndex == mParameters.length - 1) {
-                    mParameters[destIndex++] = args.subargs(destIndex);
+                    mParameters[destIndex++] = args.subargs(srcIndex++);
                 } else {
                     throw new LuaError("Varargs must be the last argument in target Java method");
                 }

@@ -74,7 +74,7 @@ public class AssetLoader implements Disposable {
     }
 
     public LuaTable getScreen(AssetID id) {
-        ManagedAsset<LuaValue> screenWrapper = getAsset(id.checkType(AssetType.SCENE));
+        ManagedAsset<LuaValue> screenWrapper = getAsset(id.checkType(AssetType.SCREEN));
         LuaTable screen = screenWrapper.get().checktable();
         freeAsset(screenWrapper);
         return screen;
