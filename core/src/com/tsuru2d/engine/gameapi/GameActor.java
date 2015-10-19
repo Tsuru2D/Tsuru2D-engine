@@ -61,7 +61,7 @@ public class GameActor extends ExposedJavaClass {
         mTexture = texture;
     }
 
-    //transformation can have three values {x,y,alpha,rotate,scale,color}, each having three properties {value(or {values}),interpolation,duration}
+    //transformation can have three values {x,y,alpha,rotation,scale,color}, each having three properties {value(or {values}),interpolation,duration}
 
     public void transform(LuaTable transformation) {
         Iterator<Varargs> it = new LuaMapIterator(transformation);
@@ -76,7 +76,7 @@ public class GameActor extends ExposedJavaClass {
                 moveToActionY(rawValue);
             } else if (key.equals("alpha")) {   //alpha={value=..., interpolation=..., duration=...} or alpha=...
                 alphaAction(rawValue);
-            } else if (key.equals("rotate")) {   //rotate={value=..., interpolation=.., duration=..} or rotate=...
+            } else if (key.equals("rotation")) {   //rotation={value=..., interpolation=.., duration=..} or rotation=...
                 rotateToAction(rawValue);
             } else if (key.equals("scale")) {     //scale={0.5,0.6} or scale=0.5 or scale={{0.5,0.6}[,interpolation=[, duration=]} or scale={0.5,[,0.6[,interpolation=[, duration=]]]}
                 scaleToAction(rawValue);
@@ -145,11 +145,11 @@ public class GameActor extends ExposedJavaClass {
 
     private void rotateToAction(LuaValue rawValue) {
         RotateToAction action = Actions.action(RotateToAction.class);
-        if (rawValue.istable()) {       //rotate={value[,interpolation=..[,duration=..]]}
+        if (rawValue.istable()) {       //rotation={value[,interpolation=..[,duration=..]]}
             LuaTable table = rawValue.checktable();
             action.setRotation((float)table.get("value").checkdouble());
             parseTable(action, table);
-        } else {                          //rotate=..
+        } else {                          //rotation=..
             action.setRotation((float)rawValue.checkdouble());
         }
         mActor.addAction(action);
@@ -159,25 +159,19 @@ public class GameActor extends ExposedJavaClass {
         ScaleToAction action = Actions.action(ScaleToAction.class);
         if (rawValue.istable()) {
             LuaTable table = rawValue.checktable();
-            if (table.get(1).istable()) {       //scale={{0.5,0.6}[,interpolation=..[,time=..]]}
-                LuaTable xyTable = table.get(1).checktable();
-                float x = mActor.getWidth() * (float)xyTable.get(1).checkdouble();
-                float y = mActor.getHeight() * (float)xyTable.get(2).checkdouble();
-                action.setScale(x, y);
-            } else if (table.get(2).isnil()) {     //scale={0.5[,interpolation=..[,time=..]]}
-                float x = mActor.getWidth() * (float)table.get(1).checkdouble();
-                float y = mActor.getWidth() * (float)table.get(1).checkdouble();
-                action.setScale(x, y);
-            } else {                              //scale={0.5,0.6[,interpolation=..[,time=..]]}
-                float x = mActor.getWidth() * (float)table.get(1).checkdouble();
-                float y = mActor.getWidth() * (float)table.get(2).checkdouble();
-                action.setScale(x, y);
+            if (table.get("value").istable()) {             //scale={value={0.5,0.6}[,interpolation=..[,duration=..]]}
+                LuaTable xyTable = table.get("value").checktable();
+                action.setX((float)xyTable.get(1).checkdouble());
+                action.setY((float)xyTable.get(2).checkdouble());
+            } else if (table.get("value").isnumber()) {     //scale={value=0.5[,interpolation=..[,duration=..]]}
+                action.setScale((float)table.get("value").checkdouble());
+            } else {                                        //scale={0.5,0.6[,interpolation=..[,duration=..]]} normally people do not have interpolation or duration append in this syntax
+                action.setX((float)table.get(1).checkdouble());
+                action.setY((float)table.get(2).checkdouble());
             }
             parseTable(action, table);
-        } else {                                  //scale=0.5
-            float x = mActor.getWidth() * (float)rawValue.checkdouble();
-            float y = mActor.getWidth() * (float)rawValue.checkdouble();
-            action.setScale(x, y);
+        } else {                                            //scale=0.5
+            action.setScale((float)rawValue.checkdouble());
         }
         mActor.addAction(action);
     }
@@ -185,8 +179,8 @@ public class GameActor extends ExposedJavaClass {
     private void colorAction(LuaValue rawValue) {
         ColorAction action = Actions.action(ColorAction.class);
         LuaTable table = rawValue.checktable();
-        if (table.get(1).istable()) {     //color={{r,g,b[,a]},interpolation=..,duration=..}
-            LuaTable colorTable = table.get(1).checktable();
+        if (table.get("value").istable()) {     //color={value={r,g,b[,a]},interpolation=..,duration=..}
+            LuaTable colorTable = table.get("value").checktable();
             float r = (float)colorTable.get(1).checkdouble();
             float g = (float)colorTable.get(2).checkdouble();
             float b = (float)colorTable.get(3).checkdouble();
@@ -206,8 +200,11 @@ public class GameActor extends ExposedJavaClass {
     }
 
     private void parseTable(TemporalAction action, LuaTable table) {
-        if (!table.get("interpolation").isnil())
-            action.setInterpolation(sInterpolationMap.get(table.get("interpolation").checkjstring()));
+        if (!table.get("interpolation").isnil()) {
+            String strInterpolation = table.get("interpolation").checkjstring();
+            Interpolation interpolation=sInterpolationMap.get(strInterpolation);
+            action.setInterpolation(interpolation);
+        }
         if (!table.get("duration").isnil())
             action.setDuration((float)table.get("duration").checkdouble());
     }
