@@ -78,7 +78,7 @@ public class GameActor extends ExposedJavaClass {
                 alphaAction(rawValue);
             } else if (key.equals("rotation")) {   //rotation={value=..., interpolation=.., duration=..} or rotation=...
                 rotateToAction(rawValue);
-            } else if (key.equals("scale")) {     //scale={0.5,0.6} or scale=0.5 or scale={{0.5,0.6}[,interpolation=[, duration=]} or scale={0.5,[,0.6[,interpolation=[, duration=]]]}
+            } else if (key.equals("scale")) {     //scale={0.5,0.6} or scale=0.5 or scale={value={0.5,0.6}[,interpolation=[, duration=]} or scale={value=0.5,[,interpolation=[, duration=]]}
                 scaleToAction(rawValue);
             } else if (key.equals("color")) {     //color={r,g,b,a[,interpolation=..[,duration=..]]} or color={r,g,b,a}
                 colorAction(rawValue);
@@ -163,13 +163,14 @@ public class GameActor extends ExposedJavaClass {
                 LuaTable xyTable = table.get("value").checktable();
                 action.setX((float)xyTable.get(1).checkdouble());
                 action.setY((float)xyTable.get(2).checkdouble());
+                parseTable(action, table);
             } else if (table.get("value").isnumber()) {     //scale={value=0.5[,interpolation=..[,duration=..]]}
                 action.setScale((float)table.get("value").checkdouble());
-            } else {                                        //scale={0.5,0.6[,interpolation=..[,duration=..]]} normally people do not have interpolation or duration append in this syntax
+                parseTable(action, table);
+            } else {                                        //scale={0.5,0.6}
                 action.setX((float)table.get(1).checkdouble());
                 action.setY((float)table.get(2).checkdouble());
             }
-            parseTable(action, table);
         } else {                                            //scale=0.5
             action.setScale((float)rawValue.checkdouble());
         }
@@ -179,7 +180,7 @@ public class GameActor extends ExposedJavaClass {
     private void colorAction(LuaValue rawValue) {
         ColorAction action = Actions.action(ColorAction.class);
         LuaTable table = rawValue.checktable();
-        if (table.get("value").istable()) {     //color={value={r,g,b[,a]},interpolation=..,duration=..}
+        if (table.get("value").istable()) {     //color={value={r,g,b[,a]}[,interpolation=..[,duration=..]]}
             LuaTable colorTable = table.get("value").checktable();
             float r = (float)colorTable.get(1).checkdouble();
             float g = (float)colorTable.get(2).checkdouble();
