@@ -1,35 +1,59 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.tsuru2d.engine.BaseScreen;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.util.DrawableLoader;
 import org.luaj.vm2.LuaFunction;
 
-import org.luaj.vm2.LuaTable;
-
-public class ButtonFacade extends ButtonSuper {
+public class ButtonFacade extends UIWrapper<Button> {
     private ManagedAsset<String> mText;
-    private TextObserver mObserver;
-    private ClickHandler mClickHandler;
+    private TextObserver mObserver ;
+    private ChangeHandler mClickHandler;
     private LuaFunction mCallBack;
     private TextButton.TextButtonStyle mTextButtonStyle;
     private BitmapFont mFont;
     private final TextButton mButton;
 
-    public ButtonFacade(BaseScreen screen, LuaTable luaTable) {
-        super(screen, luaTable);
+    public ButtonFacade(BaseScreen screen) {
+        super(screen);
         mFont = new BitmapFont();
         mObserver = new TextObserver();
         mTextButtonStyle = new TextButton.TextButtonStyle();
         mTextButtonStyle.font = mFont;
         mButton = new TextButton(null, mTextButtonStyle);
-        mClickHandler = new ClickHandler();
+        mClickHandler = new ChangeHandler();
+    }
+
+    @ExposeToLua
+    public void setFontColor(int rgba) {
+        Color color = new Color(rgba);
+        mTextButtonStyle.fontColor = color;
+    }
+
+    @ExposeToLua
+    public void setButtonDownImage(AssetID innerPath) {
+        Drawable drawable =
+                mDrawableLoader.getDrawable(mScreen.getAssetLoader().getText(innerPath).get());
+        mTextButtonStyle.down = drawable;
+    }
+
+    @ExposeToLua
+    public void setButtonUpImage(AssetID innerPath) {
+        Drawable drawable =
+                mDrawableLoader.getDrawable(mScreen.getAssetLoader().getText(innerPath).get());
+        mTextButtonStyle.up = drawable;
     }
 
     @ExposeToLua
@@ -37,7 +61,7 @@ public class ButtonFacade extends ButtonSuper {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
-
+        mButton.setText(mText.get());
     }
 
     @ExposeToLua
@@ -56,7 +80,6 @@ public class ButtonFacade extends ButtonSuper {
         mButton.setSize(width, height);
     }
 
-
     @Override
     public TextButton getActor() {
         return mButton;
@@ -70,9 +93,9 @@ public class ButtonFacade extends ButtonSuper {
         }
     }
 
-    private class ClickHandler extends ClickListener {
+    private class ChangeHandler extends ChangeListener {
         @Override
-        public void clicked(InputEvent event, float x, float y) {
+        public void changed(ChangeEvent event, Actor actor) {
             if(mCallBack != null) {
                 mCallBack.call();
             }

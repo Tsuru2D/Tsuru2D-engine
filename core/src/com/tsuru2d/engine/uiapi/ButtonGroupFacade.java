@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ButtonGroup;
 import com.tsuru2d.engine.lua.ExposeToLua;
 
@@ -8,7 +9,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
  * the container.
  */
 
-public class ButtonGroupFacade<T extends ButtonSuper>{
+public class ButtonGroupFacade<T extends UIWrapper<Button>>{
     private final ButtonGroup mButtonGroup;
 
 

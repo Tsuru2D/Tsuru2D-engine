@@ -1,45 +1,30 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.tsuru2d.engine.BaseScreen;
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
 
 public class LabelFacade extends UIWrapper<Label> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
-    private ClickHandler mClickHandler;
-    private LuaFunction mCallBack;
     private Label.LabelStyle mLabelStyle;
-    private BitmapFont mFont;
     private final Label mLabel;
 
-    public LabelFacade(BaseScreen screen, LuaTable data) {
-        super(screen, data);
-        mFont = new BitmapFont();
+    public LabelFacade(BaseScreen screen) {
+        super(screen);
         mLabelStyle = new Label.LabelStyle();
-        mLabelStyle.font = mFont;
+        mLabelStyle.font = new BitmapFont();
         mObserver = new TextObserver();
         mLabel = new Label(null, new Skin());
-        mClickHandler = new ClickHandler();
-    }
-
-    @ExposeToLua
-    public void setOnClick(LuaFunction callback) {
-        mCallBack = callback;
-        if (callback != null) {
-            mLabel.addListener(mClickHandler);
-        } else {
-            mLabel.removeListener(mClickHandler);
-        }
     }
 
     @ExposeToLua
@@ -47,6 +32,11 @@ public class LabelFacade extends UIWrapper<Label> {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
+    }
+
+    @ExposeToLua
+    public void setFontColor(int rgba) {
+        mLabelStyle.fontColor =new Color(rgba);
     }
 
     @Override
@@ -65,15 +55,6 @@ public class LabelFacade extends UIWrapper<Label> {
         if (mText != null && mObserver != null) {
             mText.removeObserver(mObserver);
             mScreen.getAssetLoader().freeAsset(mText);
-        }
-    }
-
-    private class ClickHandler extends ClickListener {
-        @Override
-        public void clicked(InputEvent event, float x, float y) {
-            if(mCallBack != null) {
-                mCallBack.call();
-            }
         }
     }
 

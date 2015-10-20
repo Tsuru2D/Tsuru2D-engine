@@ -2,11 +2,13 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
-import com.tsuru2d.engine.BaseScreen;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.util.DrawableLoader;
 import org.luaj.vm2.LuaTable;
 
 public class CheckBoxFacade extends UIWrapper<CheckBox> {
@@ -16,13 +18,27 @@ public class CheckBoxFacade extends UIWrapper<CheckBox> {
     private CheckBox.CheckBoxStyle mCheckBoxStyle;
     private final CheckBox mCheckBox;
 
-    public CheckBoxFacade(BaseScreen screen, LuaTable data) {
-        super(screen, data);
+    public CheckBoxFacade(BaseScreen screen) {
+        super(screen);
         mFont = new BitmapFont();
         mCheckBoxStyle = new CheckBox.CheckBoxStyle();
         mCheckBoxStyle.font = mFont;
         mObserver = new TextObserver();
         mCheckBox = new CheckBox("", mCheckBoxStyle);
+    }
+
+    @ExposeToLua
+    public void setUncheckedImage(AssetID innerPath) {
+        Drawable drawable =
+                mDrawableLoader.getDrawable(mScreen.getAssetLoader().getText(innerPath).get());
+        mCheckBoxStyle.checkboxOff = drawable;
+    }
+
+    @ExposeToLua
+    public void setCheckedImage(AssetID innerPath) {
+        Drawable drawable =
+                mDrawableLoader.getDrawable(mScreen.getAssetLoader().getText(innerPath).get());
+        mCheckBoxStyle.checkboxOn = drawable;
     }
 
     @ExposeToLua

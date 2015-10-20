@@ -1,32 +1,49 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
-import com.tsuru2d.engine.BaseScreen;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
 public class TextFieldFacade extends UIWrapper<TextField> {
     private ManagedAsset<String> mText;
     private TextObserver mObserver;
     private BitmapFont mFont;
+    private LuaFunction mCallBack;
+    private ChangeHandler mChangeHandler;
     private TextField.TextFieldStyle mTextFieldStyle;
     private final TextField mTextField;
 
-    public TextFieldFacade(BaseScreen screen, LuaTable luaTable) {
-        super(screen, luaTable);
+    public TextFieldFacade(BaseScreen screen) {
+        super(screen);
         mFont = new BitmapFont();
         mTextFieldStyle = new TextField.TextFieldStyle();
+        mTextFieldStyle.font = mFont;
         mObserver = new TextObserver();
         mTextField = new TextField("", mTextFieldStyle);
+        mChangeHandler = new ChangeHandler();
     }
 
     @ExposeToLua
-    public void setMessage(AssetID text) {
+    public void setOnClick(LuaFunction callBack) {
+        mCallBack = callBack;
+        if(mCallBack != null) {
+            mTextField.addListener(mChangeHandler);
+        }else {
+            mTextField.removeListener(mChangeHandler);
+        }
+    }
+
+    @ExposeToLua
+    public void setHint(AssetID text) {
         dispose();
         mText = mScreen.getAssetLoader().getText(text);
         mText.addObserver(mObserver);
@@ -39,13 +56,8 @@ public class TextFieldFacade extends UIWrapper<TextField> {
     }
 
     @ExposeToLua
-    public void Disable() {
-        mTextField.setDisabled(true);
-    }
-
-    @ExposeToLua
-    public void Enable() {
-        mTextField.setDisabled(false);
+    public void setDisabled(boolean disabled) {
+        mTextField.setDisabled(disabled);
     }
 
     @ExposeToLua
@@ -81,7 +93,14 @@ public class TextFieldFacade extends UIWrapper<TextField> {
         }
     }
 
-
+    private class ChangeHandler extends ChangeListener {
+        @Override
+        public void changed(ChangeEvent event, Actor actor) {
+            if(mCallBack != null) {
+                mCallBack.call();
+            }
+        }
+    }
 
     private class TextObserver implements AssetObserver<String> {
 

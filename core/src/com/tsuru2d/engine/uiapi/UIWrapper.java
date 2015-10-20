@@ -2,14 +2,14 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.utils.Disposable;
-import com.tsuru2d.engine.BaseScreen;
+import com.tsuru2d.engine.gameapi.BaseScreen;
+import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import org.luaj.vm2.LuaTable;
+import com.tsuru2d.engine.util.DrawableLoader;
 
 public abstract class UIWrapper<T extends Actor> implements Disposable {
-
-    protected LuaTable mLuaTable;
     protected final BaseScreen mScreen;
+    protected DrawableLoader mDrawableLoader;
 
     abstract T getActor();
 
@@ -18,9 +18,18 @@ public abstract class UIWrapper<T extends Actor> implements Disposable {
         getActor().setPosition(x, y);
     }
 
-    public UIWrapper(BaseScreen screen, LuaTable luaTable) {
+    @ExposeToLua
+    public void setZipPath(AssetID zipPath) {
+        try {
+            mDrawableLoader =
+                    DrawableLoader.getDrawableLoader(mScreen.getAssetLoader().getText(zipPath).get());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public UIWrapper(BaseScreen screen) {
         mScreen = screen;
-        mLuaTable = luaTable;
     }
 
 }

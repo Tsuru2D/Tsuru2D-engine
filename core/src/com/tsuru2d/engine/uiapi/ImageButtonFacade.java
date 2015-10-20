@@ -1,6 +1,7 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.tsuru2d.engine.BaseScreen;
@@ -8,7 +9,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class ImageButtonFacade extends ButtonSuper {
+public class ImageButtonFacade extends UIWrapper<Button> {
     private ClickHandler mClickHandler;
     private LuaFunction mCallBack;
     private final ImageButton mImageButton;
