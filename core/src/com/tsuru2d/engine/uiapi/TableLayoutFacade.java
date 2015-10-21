@@ -1,48 +1,49 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.tsuru2d.engine.BaseScreen;
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import org.luaj.vm2.LuaFunction;
+import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.LuaTable;
-
-import java.util.HashMap;
+import org.luaj.vm2.LuaValue;
 
 public class TableLayoutFacade extends UIWrapper<Table> {
     private final Table mTable;
-    private HashMap<Integer, UIWrapper> mMap;
 
-    public TableLayoutFacade(BaseScreen screen, LuaTable data) {
-        super(screen, data);
+
+    public TableLayoutFacade(BaseScreen screen) {
+        super(screen);
         mTable = new Table();
         mTable.setDebug(false);
-        mMap = new HashMap<Integer, UIWrapper>();
+
     }
 
     public TableLayoutFacade(BaseScreen screen, LuaTable data, boolean debug) {
-        super(screen, data);
+        super(screen);
         mTable = new Table();
         mTable.setDebug(debug);
-        mMap = new HashMap<Integer, UIWrapper>();
+
     }
 
     @ExposeToLua
-    public void add(UIWrapper<?> wrapper) {
-        mMap.put(wrapper.hashCode(), wrapper);
-        mTable.add(wrapper.getActor());
+    public LuaValue add(Object wrapper) {
+        UIWrapper uiWrapper = (UIWrapper)wrapper;
+        Cell cell = mTable.add(uiWrapper.getActor());
+        return new ExposedJavaClass(new CellWrapper(cell));
     }
 
     @ExposeToLua
-    public boolean remove(UIWrapper wrapper) {
-        mMap.remove(wrapper.hashCode());
-        return mTable.removeActor(wrapper.getActor());
+    public boolean remove(Object wrapper) {     //do I need to wrap the boolean as a LuaValue?
+        Actor actor = ((UIWrapper)wrapper).getActor();
+        return mTable.removeActor(actor);
     }
 
     @ExposeToLua
-    public void row() {
-        mTable.row();
+    public LuaValue row() {
+        Cell cell = mTable.row();
+        return new ExposedJavaClass(new CellWrapper(cell));
     }
 
     /*
@@ -66,10 +67,19 @@ public class TableLayoutFacade extends UIWrapper<Table> {
 
     @Override
     public void dispose() {
-        Object keys[] = mMap.keySet().toArray();
-        for(int i = 0; i < keys.length; i++) {
-            mMap.get(keys[i]).dispose();
-        }
+        //I don't know what should dispose() do
     }
 
+    private class CellWrapper {   //Does it work? if it works, I can then add features to it.
+        Cell mCell;
+
+        private CellWrapper(Cell cell) {
+            mCell = cell;
+        }
+
+        @ExposeToLua
+        private LuaValue fillX() {
+            return new ExposedJavaClass(this);
+        }
+    }
 }
