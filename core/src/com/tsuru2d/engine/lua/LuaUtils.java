@@ -2,6 +2,8 @@ package com.tsuru2d.engine.lua;
 
 import org.luaj.vm2.*;
 
+import java.lang.reflect.Array;
+
 public final class LuaUtils {
     private LuaUtils() { }
 
@@ -27,6 +29,8 @@ public final class LuaUtils {
     public static LuaValue bridgeJavaToLuaIn(Object javaValue) {
         if (javaValue == null) {
             return LuaValue.NIL;
+        } else if (javaValue instanceof LuaValue) {
+            return (LuaValue)javaValue;
         } else if (javaValue instanceof String) {
             return LuaString.valueOf((String)javaValue);
         } else if (javaValue instanceof Integer) {
@@ -45,8 +49,6 @@ public final class LuaUtils {
             return LuaInteger.valueOf((Byte)javaValue);
         } else if (javaValue instanceof Character) {
             return LuaInteger.valueOf((Character)javaValue);
-        } else if (javaValue instanceof LuaValue) {
-            return (LuaValue)javaValue;
         } else {
             return new LuaUserdata(javaValue);
         }
@@ -114,6 +116,8 @@ public final class LuaUtils {
                     " to " + expectedType.getName());
             }
             return luaValue;
+        } else if (expectedType.isArray()) {
+            return toArray(luaValue.checktable(), expectedType.getComponentType());
         } else {
             return luaValue.checkuserdata(expectedType);
         }
@@ -167,5 +171,21 @@ public final class LuaUtils {
             }
         }
         return true;
+    }
+
+    /**
+     * Converts the specified table to a Java array, converting
+     * {@link LuaValue} objects to their corresponding Java
+     * equivalents using {@link #bridgeLuaToJava(LuaValue, Class)}.
+     */
+    public static Object toArray(LuaTable table, Class<?> expectedType) {
+        Object array = Array.newInstance(expectedType, table.length());
+        int i = 0;
+        LuaArrayIterator iterator = new LuaArrayIterator(table);
+        while (iterator.hasNext()) {
+            LuaValue value = iterator.next().arg(2);
+            Array.set(array, i++, bridgeLuaToJava(value, expectedType));
+        }
+        return array;
     }
 }
