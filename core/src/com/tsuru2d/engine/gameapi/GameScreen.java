@@ -23,6 +23,14 @@ public class GameScreen extends BaseScreen {
         mGameState = new Globals();
         mGlobalsTable = globalsTable;
         mFrameApi = new FrameApi(mGameState, screenScript);
+        mStage.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (mOnClickHandler != null) {
+                    mOnClickHandler.call();
+                }
+            }
+        });
     }
 
     public void setScene(AssetID sceneID, String frameID) {
@@ -61,12 +69,6 @@ public class GameScreen extends BaseScreen {
     @ExposeToLua
     public void setOnClick(LuaFunction callback) {
         mOnClickHandler = callback;
-        mStage.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                mOnClickHandler.call();
-            }
-        });
     }
 
     @ExposeToLua

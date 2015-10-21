@@ -23,8 +23,15 @@ public class TextButtonFacade extends ActorFacade<TextButton> {
 
     @ExposeToLua
     public void setText(AssetID text) {
-        dispose();
+        ManagedAsset<String> oldText = mText;
         mText = mScreen.getAssetLoader().getText(text);
+        if (oldText != null) {
+            // In the case that oldText == newText, this won't be
+            // a problem since the reference count will be at least
+            // 2 anyways, and we just remove then re-add the observer
+            oldText.removeObserver(mAssetUpdatedObserver);
+            mScreen.getAssetLoader().freeAsset(oldText);
+        }
         mText.addObserver(mAssetUpdatedObserver);
         mActor.setText(mText.get());
     }
