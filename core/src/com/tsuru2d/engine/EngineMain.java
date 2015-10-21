@@ -42,18 +42,16 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     @Override
     public void create() {
         mAssetLoader = new AssetLoader(mPlatformApi.getRawAssetLoader());
-        mViewport = new FitViewport(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        mSpriteBatch = new SpriteBatch();
-
-        mTitle = mAssetLoader.getText(getMetadata().mTitle);
-        mTitle.addObserver(this);
-
+        MetadataLoader.Resolution resolution = getMetadata().mResolution;
         if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
-            MetadataLoader.Resolution resolution = getMetadata().mResolution;
             Gdx.graphics.setDisplayMode(resolution.getWidth(), resolution.getHeight(), false);
         }
 
+        mViewport = new FitViewport(resolution.getWidth(), resolution.getHeight());
+        mSpriteBatch = new SpriteBatch();
         mScreens = new ArrayDeque<BaseScreen>();
+        mTitle = mAssetLoader.getText(getMetadata().mTitle);
+        mTitle.addObserver(this);
         pushScreen(mAssetLoader.getMetadata().mMainScreen, LuaValue.NIL);
     }
 
