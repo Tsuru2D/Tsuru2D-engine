@@ -5,7 +5,6 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaUserdata;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
-import org.luaj.vm2.lib.ZeroArgFunction;
 
 import java.lang.reflect.Method;
 
@@ -16,19 +15,6 @@ import java.lang.reflect.Method;
  * while instance methods should be called using {@code obj:method()}.
  */
 public class ExposedJavaClass extends LuaUserdata {
-    private static class FuncNotFound extends ZeroArgFunction {
-        private final String mMethodName;
-
-        public FuncNotFound(String methodName) {
-            mMethodName = methodName;
-        }
-
-        @Override
-        public LuaValue call() {
-            throw new LuaError("Exposed method not found: " + mMethodName);
-        }
-    }
-
     /**
      * Creates a Java object wrapper class from {@code this}. This
      * constructor should be used if you subclass this class. This
@@ -88,7 +74,7 @@ public class ExposedJavaClass extends LuaUserdata {
             public LuaValue call(LuaValue object, LuaValue key) {
                 LuaValue value = methodTable.rawget(key);
                 if (value.isnil()) {
-                    return new FuncNotFound(key.checkjstring());
+                    throw new LuaError("Exposed method not found: " + key);
                 }
                 return value;
             }

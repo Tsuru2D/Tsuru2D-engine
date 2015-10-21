@@ -57,6 +57,10 @@ public class GameActor extends ExposedJavaClass {
         sInterpolationMap.put("circleOut", Interpolation.circleOut);
     }
 
+    public GameActor(GameScreen screen) {
+        mActor = new Actor();
+    }
+
     public void setTexture(Texture texture) {
         mTexture = texture;
     }

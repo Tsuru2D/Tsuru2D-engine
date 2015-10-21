@@ -59,7 +59,7 @@ public class GameScreen extends BaseScreen {
     }
 
     @ExposeToLua
-    public void setOnClickHandler(LuaFunction callback) {
+    public void setOnClick(LuaFunction callback) {
         mOnClickHandler = callback;
         mStage.addListener(new ClickListener() {
             @Override

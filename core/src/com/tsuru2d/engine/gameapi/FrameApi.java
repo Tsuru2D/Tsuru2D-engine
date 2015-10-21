@@ -16,13 +16,9 @@ public class FrameApi extends ExposedJavaClass {
 
     @ExposeToLua
     public GameActor create(LuaAssetID id, LuaTable params) {
-        return null; //return new GameActor(id, params);
+        // TODO
+        return new GameActor(null);
     }
-
-    /*@ExposeToLua
-    public GameAction delay(double secs, LuaFunction function) {
-        return null;
-    }*/
 
     @ExposeToLua
     public InstantGameAction alpha(float alpha) {
@@ -36,6 +32,13 @@ public class FrameApi extends ExposedJavaClass {
         if (callback != null) {
             callback.call();
         }
+        return InstantGameAction.EMPTY;
+    }
+
+    @ExposeToLua
+    public InstantGameAction interactive(LuaValue params) {
+        // TODO
+        mUIEnvironment.invokemethod("onInteractive", params);
         return InstantGameAction.EMPTY;
     }
 

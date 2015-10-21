@@ -8,5 +8,5 @@ public enum AssetType {
     TEXT,
     SCREEN,
     SCENE,
-    CHARACTER
+    OBJECT
 }

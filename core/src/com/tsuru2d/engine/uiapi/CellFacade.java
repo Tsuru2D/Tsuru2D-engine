@@ -23,4 +23,16 @@ public class CellFacade extends ExposedJavaClass {
         mCell.fillY();
         return this;
     }
+
+    @ExposeToLua
+    public CellFacade expand() {
+        mCell.expand();
+        return this;
+    }
+
+    @ExposeToLua
+    public CellFacade bottom() {
+        mCell.bottom();
+        return this;
+    }
 }

@@ -79,7 +79,7 @@ public final class MetadataLoader {
         output.put(AssetType.TEXT, table.get("text").checkjstring());
         output.put(AssetType.SCREEN, table.get("screen").checkjstring());
         output.put(AssetType.SCENE, table.get("scene").checkjstring());
-        output.put(AssetType.CHARACTER, table.get("character").checkjstring());
+        output.put(AssetType.OBJECT, table.get("character").checkjstring());
         return output;
     }
 }

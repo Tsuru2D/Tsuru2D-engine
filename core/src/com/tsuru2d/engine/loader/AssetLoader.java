@@ -31,7 +31,7 @@ public class AssetLoader implements Disposable {
         mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this));
         mLoaderDelegates.put(AssetType.SCREEN, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         mLoaderDelegates.put(AssetType.SCENE, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
-        mLoaderDelegates.put(AssetType.CHARACTER, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
+        mLoaderDelegates.put(AssetType.OBJECT, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         // TODO: Add other types
         mAssetPool = new Pool<ManagedAsset<?>>() {
             @Override
@@ -90,7 +90,7 @@ public class AssetLoader implements Disposable {
 
     public LuaTable getCharacter(AssetID id) {
         // TODO: memory leak
-        return ((LuaValue)getAsset(id.checkType(AssetType.CHARACTER)).get()).checktable();
+        return ((LuaValue)getAsset(id.checkType(AssetType.OBJECT)).get()).checktable();
     }
 
     public GameMetadataInfo getMetadata() {

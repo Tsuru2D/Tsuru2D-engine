@@ -3,6 +3,13 @@ local game = {}
 function game:onCreate(screen)
     print("game::onCreate()")
     self.screen = screen
+    screen:setOnClick(function()
+        screen:nextFrame()
+    end)
+    local label = screen:newLabel()
+    -- label:setText(R.text.common.title)
+    self.label = label
+    screen:add(label):bottom():expand()
 end
 
 function game:onResume(params)
@@ -20,11 +27,12 @@ end
 --[[ Game functions ]]--
 
 function game:onEnterFrame()
-
+    print("game::onEnterFrame()")
 end
 
-function game:onText()
+function game:onText(textID)
     print("game::onText()")
+    self.label:setText(textID)
 end
 
 function game:onSound()
@@ -55,8 +63,12 @@ function game:onBackground()
     print("game::onBackground()")
 end
 
-function game:onLeaveFrame()
+function game:onInteractive()
+    print("game::onInteractive()")
+end
 
+function game:onLeaveFrame()
+    print("game::onLeaveFrame()")
 end
 
 return game
