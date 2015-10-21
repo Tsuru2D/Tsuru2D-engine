@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.lua;
 
-import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaValue;
@@ -19,13 +18,13 @@ import java.lang.reflect.Modifier;
     private static final Object[] EMPTY_PARAMS = new Object[0];
 
     private final Method mJavaMethod;
-    private final String mMethodName;
+    private final ExposeToLua mAnnotation;
     private final Class<?>[] mParameterTypes;
     private final Object[] mParameters;
 
-    public ExposedJavaMethod(Method method, String methodName) {
+    public ExposedJavaMethod(Method method, ExposeToLua annotation) {
         mJavaMethod = method;
-        mMethodName = methodName;
+        mAnnotation = annotation;
         mParameterTypes = method.getParameterTypes();
         if (mParameterTypes.length == 0) {
             mParameters = EMPTY_PARAMS;
@@ -46,7 +45,7 @@ import java.lang.reflect.Modifier;
             if (!(arg1 instanceof ExposedJavaClass)) {
                 String errMsg = String.format(
                     "First argument is not a Java object, " +
-                    "did you mean :%1$s() instead of .%1$s()?", mMethodName);
+                    "did you mean :%1$s() instead of .%1$s()?", mAnnotation.name());
                 throw new LuaError(errMsg);
             }
             thisObject = arg1.touserdata();
@@ -71,9 +70,11 @@ import java.lang.reflect.Modifier;
             }
         }
 
-        if (argCount != mParameters.length) {
-            Xlog.d("Lua->Java parameter count mismatch (expected %d, got %d)",
+        if (argCount != mParameters.length && mAnnotation.strictArgs()) {
+            String errMsg = String.format(
+                "Argument count mismatch (expected %d, got %d)",
                 mParameters.length, argCount);
+            throw new LuaError(errMsg);
         }
 
         // Invoke the method using reflection

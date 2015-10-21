@@ -18,4 +18,13 @@ public @interface ExposeToLua {
      * will be used.
      */
     String name() default "";
+
+    /**
+     * Whether an error will be thrown if the incorrect
+     * number of arguments are passed from Lua. If false,
+     * all missing object arguments will be passed as
+     * {@code null}, and any extra arguments will be
+     * ignored.
+     */
+    boolean strictArgs() default false;
 }

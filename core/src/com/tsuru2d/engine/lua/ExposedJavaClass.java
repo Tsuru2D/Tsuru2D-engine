@@ -56,7 +56,7 @@ public class ExposedJavaClass extends LuaUserdata {
             method.setAccessible(true);
 
             // Add our wrapped function into the metatable
-            ExposedJavaMethod luaFunction = new ExposedJavaMethod(method, exposedName);
+            ExposedJavaMethod luaFunction = new ExposedJavaMethod(method, annotation);
             metatable.set(exposedName, luaFunction);
         }
 
