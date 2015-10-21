@@ -59,8 +59,9 @@ function game:onMusic()
     print("game::onMusic()")
 end
 
-function game:onBackground()
+function game:onBackground(imageID)
     print("game::onBackground()")
+    self.screen:setBackground(imageID)
 end
 
 function game:onInteractive()

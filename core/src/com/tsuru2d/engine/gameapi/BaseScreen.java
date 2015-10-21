@@ -6,8 +6,10 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetLoader;
@@ -27,6 +29,8 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     private final LuaTable mScreenScript;
     private final Table mTable;
     private final Skin mSkin;
+    private TextureRegionDrawable mBackgroundDrawable;
+    private ManagedAsset<Texture> mBackgroundTexture;
     private final List<ManagedAsset<?>> mLoadedAssets;
 
     public BaseScreen(EngineMain game, LuaTable screenScript) {
@@ -59,6 +63,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mStage.addActor(table);
         mTable = table;
         mScreenScript.invokemethod("onCreate", this);
+        mBackgroundDrawable = new TextureRegionDrawable(new TextureRegion());
     }
 
     public void show(LuaValue params) {
@@ -134,6 +139,18 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     @ExposeToLua
     public LabelFacade newLabel() {
         return new LabelFacade(this);
+    }
+
+    @ExposeToLua
+    public void setBackground(AssetID imageID) {
+        ManagedAsset<Texture> texture = mGame.getAssetLoader().getImage(imageID);
+        if (mBackgroundTexture != null) {
+            // TODO: background asset update handler
+            mGame.getAssetLoader().freeAsset(mBackgroundTexture);
+        }
+        mBackgroundTexture = texture;
+        mBackgroundDrawable.getRegion().setRegion(texture.get());
+        mTable.background(mBackgroundDrawable);
     }
 
     @ExposeToLua

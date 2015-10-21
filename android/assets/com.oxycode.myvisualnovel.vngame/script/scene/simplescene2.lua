@@ -5,7 +5,7 @@ return function(scene)
             y = 0.5,
             z = 1,
         })
-        frame:background(R.image.bg.school)
+        frame:background(R.image.bg2)
     end)
     scene:frame("f1", function(frame, state, globals)
         frame:character(R.object.bob)
