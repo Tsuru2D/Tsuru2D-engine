@@ -58,7 +58,7 @@ public final class MetadataLoader {
 
     private static Resolution parseResolution(LuaValue value) {
         String resolution = value.checkjstring();
-        Pattern pattern = Pattern.compile("(\\d+)x(\\d+)");
+        Pattern pattern = Pattern.compile("^(\\d+)x(\\d+)$");
         Matcher matcher = pattern.matcher(resolution);
         if (matcher.matches()) {
             int width = Integer.parseInt(matcher.group(1));
@@ -79,7 +79,7 @@ public final class MetadataLoader {
         output.put(AssetType.TEXT, table.get("text").checkjstring());
         output.put(AssetType.SCREEN, table.get("screen").checkjstring());
         output.put(AssetType.SCENE, table.get("scene").checkjstring());
-        output.put(AssetType.OBJECT, table.get("character").checkjstring());
+        output.put(AssetType.OBJECT, table.get("object").checkjstring());
         return output;
     }
 }

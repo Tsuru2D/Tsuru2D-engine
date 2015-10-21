@@ -11,7 +11,7 @@ assetPaths = {
     video = "audio/video",
     text = "text",
     image = "image",
-    character = "script/character",
+    object = "script/object",
     screen = "script/screen",
     scene = "script/scene"
 }

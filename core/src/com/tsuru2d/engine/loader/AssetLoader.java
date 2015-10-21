@@ -88,7 +88,7 @@ public class AssetLoader implements Disposable {
         return scene;
     }
 
-    public LuaTable getCharacter(AssetID id) {
+    public LuaTable getObject(AssetID id) {
         // TODO: memory leak
         return ((LuaValue)getAsset(id.checkType(AssetType.OBJECT)).get()).checktable();
     }
