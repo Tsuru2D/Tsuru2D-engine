@@ -6,19 +6,18 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
-import org.luaj.vm2.LuaFunction;
+import com.tsuru2d.engine.uiapi.*;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -105,25 +104,35 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mScreenScript.invokemethod("onDestroy");
     }
 
-    public float getWidth() {
-        return mStage.getWidth();
-    }
-
     public AssetLoader getAssetLoader() {
         return mGame.getAssetLoader();
     }
 
+    @Deprecated
+    public Skin getSkin() {
+        // This method is for TESTING ONLY!
+        return mSkin;
+    }
+
     @ExposeToLua
-    public void newButton(String text, final LuaFunction clickCallback) {
-        TextButton button = new TextButton(text, mSkin);
-        button.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-                clickCallback.call();
-            }
-        });
-        mTable.add(button);
-        mTable.row();
+    public CellFacade add(ActorFacade<?> actor) {
+        Cell<?> cell = mTable.add(actor.getActor());
+        return new CellFacade(cell);
+    }
+
+    @ExposeToLua
+    public TableFacade newTable() {
+        return new TableFacade(this);
+    }
+
+    @ExposeToLua
+    public TextButtonFacade newButton() {
+        return new TextButtonFacade(this);
+    }
+
+    @ExposeToLua
+    public LabelFacade newLabel() {
+        return new LabelFacade(this);
     }
 
     @ExposeToLua

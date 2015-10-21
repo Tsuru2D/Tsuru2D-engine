@@ -10,7 +10,6 @@ import java.lang.annotation.*;
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)
-@Inherited
 public @interface ExposeToLua {
     /**
      * The name of the method when imported into Lua.

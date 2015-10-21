@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.gameapi;
 
+import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.Varargs;
 
@@ -18,6 +19,7 @@ public class InstantGameAction extends GameAction {
     }
 
     @Override
+    @ExposeToLua(name = "wait")
     public Varargs luaWait() {
         return mValue;
     }

@@ -3,12 +3,6 @@ local game = {}
 function game:onCreate(screen)
     print("game::onCreate()")
     self.screen = screen
-    screen:newButton("back to main menu", function()
-        screen:popScreen()
-    end)
-    screen:setOnClickHandler(function()
-        screen:nextFrame()
-    end)
 end
 
 function game:onResume(params)
@@ -55,6 +49,10 @@ end
 
 function game:onMusic()
     print("game::onMusic()")
+end
+
+function game:onBackground()
+    print("game::onBackground()")
 end
 
 function game:onLeaveFrame()

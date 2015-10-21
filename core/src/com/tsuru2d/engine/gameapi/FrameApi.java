@@ -25,6 +25,27 @@ public class FrameApi extends ExposedJavaClass {
     }*/
 
     @ExposeToLua
+    public InstantGameAction alpha(float alpha) {
+        // TODO
+        return InstantGameAction.EMPTY;
+    }
+
+    @ExposeToLua
+    public InstantGameAction delay(float secs, LuaFunction callback) {
+        // TODO
+        if (callback != null) {
+            callback.call();
+        }
+        return InstantGameAction.EMPTY;
+    }
+
+    @ExposeToLua
+    public InstantGameAction background(LuaAssetID imageID) {
+        mUIEnvironment.invokemethod("onBackground", imageID);
+        return InstantGameAction.EMPTY;
+    }
+
+    @ExposeToLua
     public InstantGameAction character(LuaAssetID characterID) {
         mUIEnvironment.invokemethod("onCharacter", characterID);
         return InstantGameAction.EMPTY;
@@ -55,19 +76,13 @@ public class FrameApi extends ExposedJavaClass {
     }
 
     @ExposeToLua
-    public InstantGameAction background(LuaAssetID imageID) {
-        mUIEnvironment.invokemethod("onBackground", imageID);
-        return InstantGameAction.EMPTY;
-    }
-
-    @ExposeToLua
     public GameAction transform(GameActor obj, LuaTable args) {
         mUIEnvironment.invokemethod("onTransform", LuaValue.varargsOf(new LuaUserdata(obj), args));
         return InstantGameAction.EMPTY;
     }
 
     @ExposeToLua
-    public GameAction camera(LuaTable params) {
+    public GameAction camera(LuaValue params) {
         mUIEnvironment.invokemethod("onCamera", params);
         return InstantGameAction.EMPTY;
     }
