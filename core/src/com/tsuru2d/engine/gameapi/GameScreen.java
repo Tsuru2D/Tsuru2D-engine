@@ -1,7 +1,7 @@
 package com.tsuru2d.engine.gameapi;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
@@ -23,9 +23,14 @@ public class GameScreen extends BaseScreen {
         mGameState = new Globals();
         mGlobalsTable = globalsTable;
         mFrameApi = new FrameApi(mGameState, screenScript);
-        mStage.addListener(new ClickListener() {
+        mStage.addListener(new InputListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
                 if (mOnClickHandler != null) {
                     mOnClickHandler.call();
                 }
