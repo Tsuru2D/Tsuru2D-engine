@@ -3,21 +3,25 @@ package com.tsuru2d.engine.gameapi;
 import com.tsuru2d.engine.loader.LuaAssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
-import org.luaj.vm2.*;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public class FrameApi extends ExposedJavaClass {
+    private final GameScreen mScreen;
     private final Globals mGlobals;
     private final LuaTable mUIEnvironment;
 
-    public FrameApi(Globals globals, LuaTable uiEnvironment) {
+    public FrameApi(GameScreen screen, Globals globals, LuaTable uiEnvironment) {
+        mScreen = screen;
         mGlobals = globals;
         mUIEnvironment = uiEnvironment;
     }
 
     @ExposeToLua
     public GameActor create(LuaAssetID id, LuaTable params) {
-        // TODO
-        return new GameActor(null);
+        return mScreen.createActor(id, params);
     }
 
     @ExposeToLua
@@ -80,7 +84,7 @@ public class FrameApi extends ExposedJavaClass {
 
     @ExposeToLua
     public GameAction transform(GameActor obj, LuaTable args) {
-        mUIEnvironment.invokemethod("onTransform", LuaValue.varargsOf(new LuaUserdata(obj), args));
+        mUIEnvironment.invokemethod("onTransform", LuaValue.varargsOf(obj, args));
         return InstantGameAction.EMPTY;
     }
 

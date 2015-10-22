@@ -36,6 +36,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mBackgroundDrawable = new TextureRegionDrawable(new TextureRegion());
         mSkin = createSkin();
         Table table = new Table();
+        table.setDebug(true);
         table.setFillParent(true);
         mStage.addActor(table);
         mTable = table;

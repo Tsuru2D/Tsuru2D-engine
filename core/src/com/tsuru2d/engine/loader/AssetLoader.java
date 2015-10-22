@@ -89,8 +89,10 @@ public class AssetLoader implements Disposable {
     }
 
     public LuaTable getObject(AssetID id) {
-        // TODO: memory leak
-        return ((LuaValue)getAsset(id.checkType(AssetType.OBJECT)).get()).checktable();
+        ManagedAsset<LuaValue> objectWrapper = getAsset(id.checkType(AssetType.OBJECT));
+        LuaTable object = objectWrapper.get().checktable();
+        freeAsset(objectWrapper);
+        return object;
     }
 
     public GameMetadataInfo getMetadata() {

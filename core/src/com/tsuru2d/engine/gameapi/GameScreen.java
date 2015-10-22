@@ -1,14 +1,16 @@
 package com.tsuru2d.engine.gameapi;
 
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.utils.Array;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
+import com.tsuru2d.engine.loader.LuaAssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import com.tsuru2d.engine.lua.LuaMapIterator;
-import org.luaj.vm2.*;
-
-import java.util.Iterator;
+import org.luaj.vm2.Globals;
+import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaTable;
 
 public class GameScreen extends BaseScreen {
     private final Globals mGameState;
@@ -17,12 +19,14 @@ public class GameScreen extends BaseScreen {
     private final LuaTable mGlobalsTable;
     private FrameApi mFrameApi;
     private LuaFunction mOnClickHandler;
+    private Array<GameActor> mActors;
 
     public GameScreen(EngineMain game, LuaTable screenScript, LuaTable globalsTable) {
         super(game, screenScript);
         mGameState = new Globals();
         mGlobalsTable = globalsTable;
-        mFrameApi = new FrameApi(mGameState, screenScript);
+        mActors = new Array<GameActor>();
+        mFrameApi = new FrameApi(this, mGameState, screenScript);
         mStage.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -39,19 +43,17 @@ public class GameScreen extends BaseScreen {
     }
 
     public void setScene(AssetID sceneID, String frameID) {
-        if (mLocals != null) {
-            Iterator<Varargs> it = new LuaMapIterator(mLocals);
-            while (it.hasNext()) {
-                Varargs localKvp = it.next();
-                LuaValue value = localKvp.arg(2);
-                if (value instanceof GameActor) {
-                    // TODO: dispose old actor
-                }
-            }
+        for (GameActor actor : mActors) {
+            Actor actor1 = actor.getActor();
+            actor1.clearActions();
+            actor1.remove();
+            actor.dispose();
         }
+
+        mActors.clear();
+        mLocals = new LuaTable();
         GameScene scene = mGame.getAssetLoader().getScene(sceneID);
         mScene = scene;
-        mLocals = new LuaTable();
         scene.runSetup(mFrameApi, mLocals, mGlobalsTable);
         GameFrame frame;
         if (frameID != null) {
@@ -60,6 +62,15 @@ public class GameScreen extends BaseScreen {
             frame = scene.getFrame();
         }
         runFrame(frame);
+    }
+
+    public GameActor createActor(LuaAssetID id, LuaTable params) {
+        LuaTable actorScript = mGame.getAssetLoader().getObject(id.userdata());
+        GameActor actor = new GameActor(this, actorScript);
+        mStage.addActor(actor.getActor());
+        actor.transform(params);
+        mActors.add(actor);
+        return actor;
     }
 
     private void runFrame(GameFrame frame) {
@@ -91,5 +102,10 @@ public class GameScreen extends BaseScreen {
         }
         runFrame(frame);
         return true;
+    }
+
+    @ExposeToLua
+    public void transform(GameActor actor, LuaTable params) {
+        actor.transform(params);
     }
 }

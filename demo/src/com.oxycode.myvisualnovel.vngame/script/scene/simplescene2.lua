@@ -1,22 +1,31 @@
 return function(scene)
     scene:setup(function(frame, state)
+        state.alice = frame:create(R.object.alice, {
+            x = 1500,
+            y = 50
+        })
         state.bob = frame:create(R.object.bob, {
-            x = 1.5,
-            y = 0.5,
-            z = 1,
+            x = -400,
+            y = 50
         })
         frame:background(R.image.bg2)
     end)
-    scene:frame("f1", function(frame, state, globals)
+    scene:frame("f1", function(frame, state)
         frame:character(R.object.bob)
-        frame:transform(state.bob, {x = 0.7})
+        frame:transform(state.bob, {
+            x = {value = 200, duration = 1, interpolation = "pow2"}
+        })
+        frame:transform(state.alice, {
+            x = {value = 800, duration = 1, interpolation = "pow2"}
+        })
         frame:text(R.text.simplescene1.next_scene)
-        print("This should be pomf: " .. globals.my_var)
     end)
     scene:frame("f2", function(frame, state)
         frame:character(R.object.bob)
+        frame:transform(state.bob, {
+            x = {value = 400, duration = 0.5, interpolation = "pow2"}
+        })
         frame:text(R.text.simplescene1.isnt_that_cool)
-        frame:voice(R.voice.chapter1.scene1.alice_what_was_that)
     end)
-    return R.scene.simplescene3
+    return R.scene.simplescene1
 end

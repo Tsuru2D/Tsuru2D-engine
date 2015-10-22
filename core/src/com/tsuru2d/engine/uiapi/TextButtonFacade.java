@@ -25,11 +25,11 @@ public class TextButtonFacade extends ActorFacade<TextButton> {
     public void setText(AssetID textID) {
         // Load the new asset before disposing the old one, to make sure
         // that the raw asset is not unloaded and then immediately reloaded
-        ManagedAsset<String> asset = mScreen.getAssetLoader().getText(textID);
+        ManagedAsset<String> newText = mScreen.getAssetLoader().getText(textID);
         dispose();
-        mText = asset;
-        asset.addObserver(mAssetUpdatedObserver);
-        mActor.setText(asset.get());
+        mText = newText;
+        newText.addObserver(mAssetUpdatedObserver);
+        mActor.setText(newText.get());
     }
 
     @ExposeToLua

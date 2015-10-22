@@ -50,8 +50,9 @@ function game:onVoice()
     print("game::onVoice()")
 end
 
-function game:onTransform()
+function game:onTransform(actor, params)
     print("game::onTransform()")
+    self.screen:transform(actor, params)
 end
 
 function game:onCharacter()
