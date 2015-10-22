@@ -202,16 +202,16 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         if (table.get("value").istable()) {
             LuaTable colorTable = table.get("value").checktable();
             float r = getfloat(colorTable, 1);
-            float g = getfloat(colorTable, 1);
-            float b = getfloat(colorTable, 1);
+            float g = getfloat(colorTable, 2);
+            float b = getfloat(colorTable, 3);
             float a = getActor().getColor().a;
             Color color = new Color(r, g, b, a);
             action.setColor(color);
             consumeFullParams(action, table);
         } else {
             float r = getfloat(table, 1);
-            float g = getfloat(table, 1);
-            float b = getfloat(table, 1);
+            float g = getfloat(table, 2);
+            float b = getfloat(table, 3);
             float a = getActor().getColor().a;
             Color color = new Color(r, g, b, a);
             action.setColor(color);
