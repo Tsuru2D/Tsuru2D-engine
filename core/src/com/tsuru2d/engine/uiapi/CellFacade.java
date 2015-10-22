@@ -4,6 +4,8 @@ package com.tsuru2d.engine.uiapi;
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
+import org.luaj.vm2.LuaError;
+import org.luaj.vm2.Varargs;
 
 public class CellFacade extends ExposedJavaClass {
     private final Cell<?> mCell;
@@ -11,8 +13,6 @@ public class CellFacade extends ExposedJavaClass {
     public CellFacade(Cell<?> cell) {
         mCell = cell;
     }
-
-    /*********************************************** alignment ***************************************************/
 
     @ExposeToLua
     public CellFacade fill() {
@@ -73,142 +73,146 @@ public class CellFacade extends ExposedJavaClass {
         mCell.left();
         return this;
     }
-    /*********************************************** size ***************************************************/
 
     @ExposeToLua
-    public CellFacade size(double size) {
-        mCell.size((float)size);
-        return this;
-    }
-
-
-    @ExposeToLua
-    public CellFacade size(double width,double height) {
-        mCell.size((float)width,(float)height);
-        return this;
-    }
-
-    @ExposeToLua
-    public CellFacade height(double height) {
-        mCell.height((float)height);
+    public CellFacade size(Varargs args) {
+        if (args.narg() == 1) {
+            mCell.size((float)args.arg1().checkdouble());
+        } else if (args.narg() == 2) {
+            mCell.size(
+                (float)args.arg(1).checkdouble(),
+                (float)args.arg(2).checkdouble());
+        } else {
+            throw new LuaError("Invalid argument count passed to size()");
+        }
         return this;
     }
 
     @ExposeToLua
-    public CellFacade minHeight(double height) {
-        mCell.minHeight((float)height);
+    public CellFacade height(float height) {
+        mCell.height(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade maxHeight(double height) {
-        mCell.maxHeight((float)height);
+    public CellFacade minHeight(float height) {
+        mCell.minHeight(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade prefHeight(double height) {
-        mCell.prefHeight((float)height);
+    public CellFacade maxHeight(float height) {
+        mCell.maxHeight(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade width(double height) {
-        mCell.width((float)height);
+    public CellFacade prefHeight(float height) {
+        mCell.prefHeight(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade minWidth(double height) {
-        mCell.minHeight((float)height);
+    public CellFacade width(float height) {
+        mCell.width(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade maxWidth(double height) {
-        mCell.maxHeight((float)height);
+    public CellFacade minWidth(float height) {
+        mCell.minHeight(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade prefWidth(double height) {
-        mCell.prefWidth((float)height);
-        return this;
-    }
-
-    /*********************************************** padding *************************************************/
-
-    @ExposeToLua
-    public CellFacade pad(double pad) {
-        mCell.pad((float)pad);
+    public CellFacade maxWidth(float height) {
+        mCell.maxHeight(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade pad (double top, double left, double bottom, double right) {
-        mCell.pad((float) top, (float) left, (float) bottom, (float) right);
+    public CellFacade prefWidth(float height) {
+        mCell.prefWidth(height);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade padTop(double pad) {
-        mCell.padTop((float)pad);
+    public CellFacade pad(Varargs args) {
+        if (args.narg() == 1) {
+            mCell.pad((float)args.arg1().checkdouble());
+        } else if (args.narg() == 4) {
+            mCell.pad(
+                (float)args.arg(1).checkdouble(),
+                (float)args.arg(2).checkdouble(),
+                (float)args.arg(3).checkdouble(),
+                (float)args.arg(4).checkdouble());
+        } else {
+            throw new LuaError("Invalid argument count passed to pad()");
+        }
         return this;
     }
 
     @ExposeToLua
-    public CellFacade padBottom(double pad) {
-        mCell.padBottom((float)pad);
+    public CellFacade padTop(float pad) {
+        mCell.padTop(pad);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade padLeft(double pad) {
-        mCell.padLeft((float)pad);
+    public CellFacade padBottom(float pad) {
+        mCell.padBottom(pad);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade padRight(double pad) {
-        mCell.padRight((float)pad);
-        return this;
-    }
-
-    /*********************************************** space *************************************************/
-
-    @ExposeToLua
-    public CellFacade space(double space) {
-        mCell.space((float)space);
+    public CellFacade padLeft(float pad) {
+        mCell.padLeft(pad);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade space (double top, double left, double bottom, double right) {
-        mCell.space((float)top, (float)left, (float)bottom, (float)right);
+    public CellFacade padRight(float pad) {
+        mCell.padRight(pad);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade spaceTop(double space) {
-        mCell.spaceTop((float)space);
+    public CellFacade space(Varargs args) {
+        if (args.narg() == 1) {
+            mCell.space((float)args.arg1().checkdouble());
+        } else if (args.narg() == 4) {
+            mCell.space(
+                (float)args.arg(1).checkdouble(),
+                (float)args.arg(2).checkdouble(),
+                (float)args.arg(3).checkdouble(),
+                (float)args.arg(4).checkdouble());
+        } else {
+            throw new LuaError("Invalid argument count passed to space()");
+        }
         return this;
     }
 
     @ExposeToLua
-    public CellFacade spaceBottom(double space) {
-        mCell.spaceBottom((float)space);
+    public CellFacade spaceTop(float space) {
+        mCell.spaceTop(space);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade spaceLeft(double space) {
-        mCell.spaceLeft((float)space);
+    public CellFacade spaceBottom(float space) {
+        mCell.spaceBottom(space);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade spaceRight(double space) {
-        mCell.spaceRight((float)space);
+    public CellFacade spaceLeft(float space) {
+        mCell.spaceLeft(space);
+        return this;
+    }
+
+    @ExposeToLua
+    public CellFacade spaceRight(float space) {
+        mCell.spaceRight(space);
         return this;
     }
 
