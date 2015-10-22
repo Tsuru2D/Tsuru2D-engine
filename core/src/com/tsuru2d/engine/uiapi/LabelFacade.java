@@ -17,8 +17,8 @@ public class LabelFacade extends ActorFacade<Label> {
     }
 
     @ExposeToLua
-    public void setText(AssetID text) {
-        ManagedAsset<String> asset = mScreen.getAssetLoader().getText(text);
+    public void setText(AssetID textID) {
+        ManagedAsset<String> asset = mScreen.getAssetLoader().getText(textID);
         dispose();
         mText = asset;
         asset.addObserver(mAssetUpdatedObserver);
@@ -30,6 +30,7 @@ public class LabelFacade extends ActorFacade<Label> {
         if (mText != null) {
             mText.removeObserver(mAssetUpdatedObserver);
             mScreen.getAssetLoader().freeAsset(mText);
+            mText = null;
         }
     }
 

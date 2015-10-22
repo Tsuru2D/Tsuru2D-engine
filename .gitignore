@@ -65,6 +65,4 @@ build/
 
 
 ## Game zip
-
-desktop/*.vngame
-desktop/*.vnlang
+demo/out/

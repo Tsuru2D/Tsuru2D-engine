@@ -101,6 +101,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         disposeAllScreens();
         mTitle.removeObserver(this);
         mAssetLoader.freeAsset(mTitle);
+        mTitle = null;
         mAssetLoader.dispose();
     }
 
@@ -108,6 +109,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         if (mMusic != null) {
             mMusic.get().stop();
             mAssetLoader.freeAsset(mMusic);
+            mMusic = null;
         }
         if (musicID != null) {
             mMusic = mAssetLoader.getMusic(musicID);

@@ -107,6 +107,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mScreenScript.invokemethod("onDestroy");
         if (mBackgroundTexture != null) {
             mGame.getAssetLoader().freeAsset(mBackgroundTexture);
+            mBackgroundTexture = null;
         }
     }
 
