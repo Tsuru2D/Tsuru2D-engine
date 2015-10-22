@@ -61,35 +61,4 @@ public class ZipFileHandle extends FileHandleStream {
             throw new GdxRuntimeException("Error reading zip file entry: " + mZipEntry.getName(), ex);
         }
     }
-/*
-    @Override
-    public ZipFileHandle child(String name) {
-        name = name.replace('\\', '/');
-        if (file.getPath().length() == 0) {
-            return new ZipFileHandle(mZipFile, name + '/' + );
-        }
-        return new ZipFileHandle(mZipFile, new File(file, name));
-    }
-
-    @Override
-    public ZipFileHandle sibling(String name) {
-        name = name.replace('\\', '/');
-        if (file.getPath().length() == 0) {
-            throw new GdxRuntimeException("Cannot get the sibling of the root.");
-        }
-        return new ZipFileHandle(mZipFile, new File(file.getParent(), name));
-    }
-
-    @Override
-    public ZipFileHandle parent() {
-        File parent = file.getParentFile();
-        if (parent == null) {
-            if (type == Files.FileType.Absolute) {
-                parent = new File("/");
-            } else {
-                parent = new File("");
-            }
-        }
-        return new ZipFileHandle(mZipFile, parent);
-    }*/
 }
