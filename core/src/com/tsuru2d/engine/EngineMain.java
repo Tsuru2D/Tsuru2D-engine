@@ -52,7 +52,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         mScreens = new ArrayDeque<BaseScreen>();
         mTitle = mAssetLoader.getText(getMetadata().mTitle);
         mTitle.addObserver(this);
-        pushScreen(mAssetLoader.getMetadata().mMainScreen, LuaValue.NIL);
+        pushMenuScreen(mAssetLoader.getMetadata().mMainScreen, LuaValue.NIL);
     }
 
     @Override
@@ -98,6 +98,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
             mMusic.get().stop();
             mAssetLoader.freeAsset(mMusic);
         }
+        disposeAllScreens();
         mTitle.removeObserver(this);
         mAssetLoader.freeAsset(mTitle);
         mAssetLoader.dispose();
@@ -114,56 +115,70 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         }
     }
 
-    private void initScreen(BaseScreen screen, LuaValue params) {
-        mScreen = screen;
-        screen.show(params);
-        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-    }
-
-    public void pushGameScreen(GameSaveData saveData, LuaValue params) {
+    public void setGameScreen(GameSaveData saveData, LuaValue params) {
         LuaTable globals = saveData.mCustomState;
         AssetID sceneID = AssetID.fromString(saveData.mSceneId);
         String frameID = saveData.mFrameId;
         LuaTable screenScript = mAssetLoader.getScreen(getMetadata().mGameScreen);
         GameScreen screen = new GameScreen(this, screenScript, globals);
         screen.setScene(sceneID, frameID);
-        mScreens.push(screen);
-        initScreen(screen, params);
+        setScreen(screen, params);
     }
 
-    public void pushGameScreen(AssetID sceneID, LuaValue params) {
+    public void setGameScreen(AssetID sceneID, LuaValue params) {
         // TODO: lazy hack, rewrite this properly sometime
         GameSaveData saveData = new GameSaveData();
         saveData.mCustomState = new LuaTable();
         saveData.mSceneId = sceneID.toString();
-        pushGameScreen(saveData, params);
+        setGameScreen(saveData, params);
     }
 
-    public void pushScreen(AssetID screenID, LuaValue params) {
+    public void pushMenuScreen(AssetID screenID, LuaValue params) {
         LuaTable screenScript = mAssetLoader.getScreen(screenID);
-        BaseScreen screen = new MenuScreen(this, screenScript);
-        mScreens.push(screen);
-        initScreen(screen, params);
+        MenuScreen screen = new MenuScreen(this, screenScript);
+        pushScreen(screen, params);
     }
 
-    public void setScreen(AssetID screenID, LuaValue params) {
-        popScreenHelper();
-        pushScreen(screenID, params);
-    }
-
-    private BaseScreen popScreenHelper() {
-        BaseScreen screen = mScreens.pop();
-        screen.hide();
-        screen.dispose();
-        return mScreens.peek();
+    public void setMenuScreen(AssetID screenID, LuaValue params) {
+        LuaTable screenScript = mAssetLoader.getScreen(screenID);
+        MenuScreen screen = new MenuScreen(this, screenScript);
+        setScreen(screen, params);
     }
 
     public void popScreen(LuaValue params) {
-        BaseScreen screen = popScreenHelper();
-        if (screen == null) {
+        BaseScreen screen = mScreens.pop();
+        screen.hide();
+        screen.dispose();
+        BaseScreen newScreen = mScreens.peek();
+        if (newScreen == null) {
             throw new GdxRuntimeException("Cannot pop the root screen");
         }
-        initScreen(screen, params);
+        showScreen(newScreen, params);
+    }
+
+    private void showScreen(BaseScreen screen, LuaValue params) {
+        mScreen = screen;
+        screen.show(params);
+        screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+    }
+
+    private void pushScreen(BaseScreen screen, LuaValue params) {
+        mScreens.push(screen);
+        showScreen(screen, params);
+    }
+
+    private void disposeAllScreens() {
+        if (mScreen != null) {
+            mScreen.hide();
+            while (!mScreens.isEmpty()) {
+                mScreens.pop().dispose();
+            }
+        }
+    }
+
+    private void setScreen(BaseScreen screen, LuaValue params) {
+        disposeAllScreens();
+        pushScreen(screen, params);
     }
 
     public void setLanguage(String languageCode) {

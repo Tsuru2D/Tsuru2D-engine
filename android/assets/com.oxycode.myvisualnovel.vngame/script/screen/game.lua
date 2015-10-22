@@ -7,9 +7,16 @@ function game:onCreate(screen)
         screen:nextFrame()
     end)
     local label = screen:newLabel()
-    -- label:setText(R.text.common.title)
     self.label = label
     screen:add(label):bottom():expand()
+
+    local button = screen:newButton()
+    button:setText(R.text.common.back_to_menu)
+    button:setOnClick(function()
+        screen:setMenuScreen(R.screen.mainmenu)
+    end)
+    self.button = button
+    screen:add(button):top():right()
 end
 
 function game:onResume(params)

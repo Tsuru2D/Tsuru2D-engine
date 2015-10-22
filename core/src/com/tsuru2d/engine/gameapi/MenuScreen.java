@@ -21,17 +21,12 @@ public class MenuScreen extends BaseScreen {
     // TODO: better naming
 
     @ExposeToLua
-    public void pushGameScreenNew(AssetID id, LuaValue params) {
-        mGame.pushGameScreen(id, params);
+    public void setGameScreenNew(AssetID id, LuaValue params) {
+        mGame.setGameScreen(id, params);
     }
 
     @ExposeToLua
-    public GameSaveData getSaveGame() {
-        return new GameSaveData(); // todo
-    }
-
-    @ExposeToLua
-    public void pushGameScreenResume(GameSaveData saveData, LuaValue params) {
-        mGame.pushGameScreen(saveData, params);
+    public void setGameScreenResume(GameSaveData saveData, LuaValue params) {
+        mGame.setGameScreen(saveData, params);
     }
 }

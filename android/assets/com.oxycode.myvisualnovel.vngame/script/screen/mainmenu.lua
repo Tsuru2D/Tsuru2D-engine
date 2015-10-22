@@ -7,7 +7,7 @@ function mainmenu:onCreate(screen)
     local startGameButton = screen:newButton()
     startGameButton:setText(R.text.common.start_game)
     startGameButton:setOnClick(function()
-        screen:pushGameScreenNew(R.scene.simplescene1, {})
+        screen:setGameScreenNew(R.scene.simplescene1, {})
     end)
     screen:add(startGameButton):fillX()
 end

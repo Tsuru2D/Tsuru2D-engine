@@ -20,25 +20,29 @@ import com.tsuru2d.engine.uiapi.*;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final EngineMain mGame;
+    protected final LuaTable mScreenScript;
     protected final Stage mStage;
-    private final LuaTable mScreenScript;
-    private final Table mTable;
     private final Skin mSkin;
-    private TextureRegionDrawable mBackgroundDrawable;
+    private final Table mTable;
+    private final TextureRegionDrawable mBackgroundDrawable;
     private ManagedAsset<Texture> mBackgroundTexture;
-    private final List<ManagedAsset<?>> mLoadedAssets;
 
     public BaseScreen(EngineMain game, LuaTable screenScript) {
         mGame = game;
-        mStage = new Stage(game.getViewport(), game.getSpriteBatch());
         mScreenScript = screenScript;
-        mLoadedAssets = new ArrayList<ManagedAsset<?>>();
+        mStage = new Stage(game.getViewport(), game.getSpriteBatch());
+        mBackgroundDrawable = new TextureRegionDrawable(new TextureRegion());
+        mSkin = createSkin();
+        Table table = new Table();
+        table.setFillParent(true);
+        mStage.addActor(table);
+        mTable = table;
+        mScreenScript.invokemethod("onCreate", this);
+    }
 
+    private static Skin createSkin() {
         Skin skin = new Skin();
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(Color.WHITE);
@@ -56,14 +60,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         labelStyle.background = skin.newDrawable("white", Color.DARK_GRAY);
         labelStyle.font = skin.getFont("default");
         skin.add("default", labelStyle);
-        mSkin = skin;
-
-        Table table = new Table();
-        table.setFillParent(true);
-        mStage.addActor(table);
-        mTable = table;
-        mScreenScript.invokemethod("onCreate", this);
-        mBackgroundDrawable = new TextureRegionDrawable(new TextureRegion());
+        return skin;
     }
 
     public void show(LuaValue params) {
@@ -108,6 +105,9 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     @Override
     public void dispose() {
         mScreenScript.invokemethod("onDestroy");
+        if (mBackgroundTexture != null) {
+            mGame.getAssetLoader().freeAsset(mBackgroundTexture);
+        }
     }
 
     public AssetLoader getAssetLoader() {
@@ -164,13 +164,13 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     }
 
     @ExposeToLua
-    public void setScreen(AssetID id, LuaValue params) {
-        mGame.setScreen(id, params);
+    public void setMenuScreen(AssetID id, LuaValue params) {
+        mGame.setMenuScreen(id, params);
     }
 
     @ExposeToLua
-    public void pushScreen(AssetID id, LuaValue params) {
-        mGame.pushScreen(id, params);
+    public void pushMenuScreen(AssetID id, LuaValue params) {
+        mGame.pushMenuScreen(id, params);
     }
 
     @ExposeToLua
