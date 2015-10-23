@@ -10,8 +10,8 @@ return function(scene)
         frame:background(R.image.bg1)
     end)
     scene:frame("f1", function(frame, state)
+        frame:music(R.music.bg1)
         frame:character(R.object.bob)
-        frame:music(R.music.bgm1)
         frame:transform(state.bob, {
             scale = {value = 1.1, duration = 0.5, interpolation = "swing"},
             x = {value = 300, duration = 1, interpolation = "pow2"}

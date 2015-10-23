@@ -63,8 +63,9 @@ function game:onCamera()
     print("game::onCamera()")
 end
 
-function game:onMusic()
+function game:onMusic(musicID)
     print("game::onMusic()")
+    self.screen:playMusic(musicID)
 end
 
 function game:onBackground(imageID)
