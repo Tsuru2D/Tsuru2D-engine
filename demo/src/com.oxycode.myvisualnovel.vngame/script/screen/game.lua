@@ -10,7 +10,7 @@ function game:onCreate(screen)
     self.label = label
     screen:add(label):bottom():expand()
 
-    local button = screen:newButton()
+    local button = screen:newTextButton()
     button:setText(R.text.common.back_to_menu)
     button:setOnClick(function()
         screen:setMenuScreen(R.screen.mainmenu)

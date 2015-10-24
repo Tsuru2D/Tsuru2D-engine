@@ -1,24 +1,39 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
+
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import org.luaj.vm2.LuaFunction;
 
-public class TextButtonFacade extends ActorFacade<TextButton> {
+public class TextButtonFacade extends ButtonFacade {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<String> mText;
-    private LuaFunction mOnClickCallback;
 
     public TextButtonFacade(BaseScreen screen) {
-        super(screen, new TextButton(null, screen.getSkin()));
-        mActor.addListener(new OnClickHandler());
+        super(screen);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
+    }
+
+    @Override
+    protected Button createActor() {
+        return new TextButton(null, (TextButton.TextButtonStyle)createAndPopulateStyle());
+    }
+
+    @Override
+    protected Button.ButtonStyle createStyle() {
+        return new TextButton.TextButtonStyle();
+    }
+
+    @Override
+    protected Button.ButtonStyle createAndPopulateStyle() {
+        Button.ButtonStyle style = super.createAndPopulateStyle();
+        ((TextButton.TextButtonStyle)style).font = new BitmapFont();
+        return style;
     }
 
     @ExposeToLua
@@ -29,12 +44,7 @@ public class TextButtonFacade extends ActorFacade<TextButton> {
         dispose();
         mText = newText;
         newText.addObserver(mAssetUpdatedObserver);
-        mActor.setText(newText.get());
-    }
-
-    @ExposeToLua
-    public void setOnClick(LuaFunction callback) {
-        mOnClickCallback = callback;
+        ((TextButton)mActor).setText(newText.get());
     }
 
     @Override
@@ -46,19 +56,10 @@ public class TextButtonFacade extends ActorFacade<TextButton> {
         }
     }
 
-    private class OnClickHandler extends ChangeListener {
-        @Override
-        public void changed(ChangeEvent event, Actor actor) {
-            if (mOnClickCallback != null) {
-                mOnClickCallback.call();
-            }
-        }
-    }
-
     private class AssetUpdatedObserver implements AssetObserver<String> {
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            mActor.setText(asset.get());
+            ((TextButton)mActor).setText(asset.get());
         }
     }
 }

@@ -134,8 +134,13 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     }
 
     @ExposeToLua
-    public TextButtonFacade newButton() {
+    public TextButtonFacade newTextButton() {
         return new TextButtonFacade(this);
+    }
+
+    @ExposeToLua
+    public ButtonFacade newButton() {
+        return new ButtonFacade(this);
     }
 
     @ExposeToLua

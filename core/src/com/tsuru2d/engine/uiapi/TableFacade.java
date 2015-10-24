@@ -8,7 +8,8 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 
 public class TableFacade extends ActorFacade<Table> {
     public TableFacade(BaseScreen screen) {
-        super(screen, new Table());
+        super(screen);
+        setActor(new Table());
     }
 
     @ExposeToLua
