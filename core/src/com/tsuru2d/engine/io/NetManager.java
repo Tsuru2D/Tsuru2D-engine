@@ -8,11 +8,27 @@ public interface NetManager {
     }
 
     enum Result {
+        // Common
         SUCCESS("success"),
         ERROR_CONNECTION_FAILED("connection_failed"),
         ERROR_NOT_AUTHENTICATED("not_authenticated"),
-        ERROR_INVALID_SLOT("invalid_slot"),
-        ERROR_SLOT_IN_USE("slot_in_use");
+        ERROR_INVALID_GAME_PACKAGE("invalid_game_package"),
+
+        // Account creation
+        ERROR_INVALID_EMAIL("invalid_email"),
+        ERROR_INVALID_PASSWORD("invalid_password"),
+        ERROR_USER_ALREADY_EXISTS("user_already_exists"),
+
+        // Account login
+        ERROR_USER_NOT_FOUND("user_not_found"),
+        ERROR_INCORRECT_PASSWORD("incorrect_password"),
+
+        // Write save
+        ERROR_SAVE_DATA_ALREADY_EXISTS("save_data_already_exists"),
+
+        // Delete save
+        ERROR_INVALID_SAVE_ID("invalid_save_id"),
+        ERROR_DELETE_FAILED("delete_failed");
 
         private final String mStrValue;
 

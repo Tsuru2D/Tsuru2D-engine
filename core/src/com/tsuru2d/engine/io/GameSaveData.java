@@ -39,27 +39,15 @@ public class GameSaveData implements Json.Serializable {
     public long mCreationTime;
 
     /**
-     * The ID of the scene that the player was in for this
-     * save file.
+     * The ID of the scene that the player was on.
      */
     public String mSceneId;
 
     /**
-     * The base ID of the frame that the player was on.
-     * Since not all frames have IDs, the actual frame
-     * will be determined by this value and the value
-     * of {@link #mFrameOffset}.
+     * The ID of the frame that the player was on. This ID
+     * is only unique within a scene.
      */
     public String mFrameId;
-
-    /**
-     * An offset from {@link #mFrameId} that determines the
-     * exact frame that the player was on. For example, if
-     * this value is 0, the player will start on the frame
-     * with ID {@link #mFrameId}. If this value is 2, the
-     * player will start two frames after that frame, and so on.
-     */
-    public int mFrameOffset;
 
     /**
      * Game-defined save data. Make sure that all non-array
@@ -74,10 +62,9 @@ public class GameSaveData implements Json.Serializable {
         json.writeValue("index", mIndex);
         json.writeValue("version", mVersion);
         json.writeValue("time", mCreationTime);
-        json.writeValue("scene", mSceneId);
-        json.writeValue("frame", mFrameId);
-        json.writeValue("frameOffset", mFrameOffset);
-        json.writeValue("state", mCustomState);
+        json.writeValue("scene_id", mSceneId);
+        json.writeValue("frame_id", mFrameId);
+        json.writeValue("custom_state", mCustomState);
     }
 
     @Override
@@ -86,9 +73,8 @@ public class GameSaveData implements Json.Serializable {
         mIndex = json.readValue("index", int.class, jsonData);
         mVersion = json.readValue("version", int.class, jsonData);
         mCreationTime = json.readValue("time", long.class, jsonData);
-        mSceneId = json.readValue("scene", String.class, jsonData);
-        mFrameId = json.readValue("frame", String.class, jsonData);
-        mFrameOffset = json.readValue("frameOffset", int.class, jsonData);
-        mCustomState = json.readValue("state", LuaTable.class, jsonData);
+        mSceneId = json.readValue("scene_id", String.class, jsonData);
+        mFrameId = json.readValue("frame_id", String.class, jsonData);
+        mCustomState = json.readValue("custom_state", LuaTable.class, jsonData);
     }
 }
