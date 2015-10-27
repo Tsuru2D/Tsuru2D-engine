@@ -8,7 +8,7 @@ import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 
-public class ImageButtonFacade extends UIWrapper<Button> {
+public class ImageButtonFacade extends ActorFacade<Button> {
     private ClickHandler mClickHandler;
     private LuaFunction mCallBack;
     private final ImageButton mImageButton;

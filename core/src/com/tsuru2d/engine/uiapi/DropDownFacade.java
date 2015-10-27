@@ -10,17 +10,16 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
 import com.tsuru2d.engine.gameapi.BaseScreen;
+import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
-import com.tsuru2d.engine.util.DrawableLoader;
 import org.luaj.vm2.LuaFunction;
 
-import java.io.FileNotFoundException;
-
-public class DropDownFacade extends UIWrapper<SelectBox>{
+public class DropDownFacade extends ActorFacade<SelectBox>{
     private final SelectBox mSelectBox;
     private SelectBox.SelectBoxStyle mSelectBoxStyle;
     private LuaFunction mCallBack;
     private ChangeHandler mChangeHandler;
+    private ManagedAsset<String> atLeastSomething;
 
     public DropDownFacade(BaseScreen screen,String ZipfileLocation,String pathInZip){
         super(screen);
@@ -30,15 +29,16 @@ public class DropDownFacade extends UIWrapper<SelectBox>{
         BitmapFont font = new BitmapFont();
         Drawable selection;
         try{
-            selection=DrawableLoader.getDrawableLoader(ZipfileLocation).getDrawable(pathInZip);
+            selection=null;
             List.ListStyle mListStyle= new List.ListStyle(font, Color.BLUE, Color.RED, selection);
             mSelectBoxStyle = new SelectBox.SelectBoxStyle(new BitmapFont(), Color.BLUE,selection, new ScrollPane.ScrollPaneStyle(), mListStyle);
-        } catch (FileNotFoundException e){
+        } catch (Exception e){
             e.printStackTrace();
         }
         mSelectBox=new SelectBox(mSelectBoxStyle);
     }
-    @Override
+
+    @ExposeToLua
     public void setPosition(float x, float y) {
         mSelectBox.setPosition(x, y);
     }
@@ -53,10 +53,6 @@ public class DropDownFacade extends UIWrapper<SelectBox>{
         }
     }
 
-    @Override
-    SelectBox getActor() {
-        return mSelectBox;
-    }
 
     @Override
     public void dispose() {
