@@ -1,8 +1,11 @@
 local mainmenu = {}
 
 function mainmenu:onCreate(screen)
+
     print("mainmenu::onCreate()")
     self.screen = screen
+    screen:login("Hertin","password",function() end)
+    screen:enumerateSaveGames(1,100,function(data)  end)
     -- screen:playMusic(R.music.bg1)
     local startGameButton = screen:newButton()
     -- startGameButton:setText(R.text.common.start_game)
@@ -26,7 +29,7 @@ function mainmenu:onCreate(screen)
     --     print("hi")
     -- end)
     -- screen:add(b2):fillX()
-    
+
 end
 
 function mainmenu:onResume(params)

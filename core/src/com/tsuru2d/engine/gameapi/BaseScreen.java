@@ -11,14 +11,20 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
+import com.tsuru2d.engine.io.GameSaveData;
+import com.tsuru2d.engine.io.NetManager;
+import com.tsuru2d.engine.io.NetManagerImpl;
+import com.tsuru2d.engine.io.NetResult;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import com.tsuru2d.engine.uiapi.*;
+import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.Varargs;
 
 public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final EngineMain mGame;
@@ -28,6 +34,8 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     private final Table mTable;
     private final TextureRegionDrawable mBackgroundDrawable;
     private ManagedAsset<Texture> mBackgroundTexture;
+
+    private NetManager net=new NetManagerImpl("com.game");//TODO delete this
 
     public BaseScreen(EngineMain game, LuaTable screenScript) {
         mGame = game;
@@ -41,6 +49,9 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mStage.addActor(table);
         mTable = table;
         mScreenScript.invokemethod("onCreate", this);
+
+
+
     }
 
     private static Skin createSkin() {
@@ -120,6 +131,39 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     public Skin getSkin() {
         // This method is for TESTING ONLY!
         return mSkin;
+    }
+
+    @ExposeToLua
+    public void login(String email, String password, final LuaFunction callback){
+        System.out.println("login");//TODO delete this
+        net.login(email, password, new NetManager.Callback() {
+            @Override
+            public void onResult(NetResult result) {
+                System.out.println("logged in!");
+            }
+        });
+    }
+
+    @ExposeToLua
+    public void enumerateSaveGames(Varargs varargs){
+        System.out.println("enumsavegames");//TODO delete this
+        int startIndex=0;
+        int endIndex=0;
+        final LuaFunction callback;
+        if (varargs.narg()==3){
+            startIndex=varargs.arg(1).checkint();
+            endIndex=varargs.arg(2).checkint();
+            callback=varargs.arg(3).checkfunction();
+        }else{
+            callback=varargs.arg1().checkfunction();
+        }
+        net.enumerateSaves(startIndex, endIndex, new NetManager.Callback() {
+            @Override
+            public void onResult(NetResult result) {
+                GameSaveData[] data = (GameSaveData[])result.mData;
+                System.out.println("ok");
+            }
+        });
     }
 
     @ExposeToLua
