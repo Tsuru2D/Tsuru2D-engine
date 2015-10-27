@@ -49,6 +49,8 @@ public final class LuaUtils {
             return LuaInteger.valueOf((Byte)javaValue);
         } else if (javaValue instanceof Character) {
             return LuaInteger.valueOf((Character)javaValue);
+        } else if (javaValue.getClass().isArray()) {
+            return toTable(javaValue);
         } else {
             return new LuaUserdata(javaValue);
         }
@@ -187,5 +189,21 @@ public final class LuaUtils {
             Array.set(array, i++, bridgeLuaToJava(value, expectedType));
         }
         return array;
+    }
+
+    /**
+     * Converts the specified Java array to a Lua table, converting
+     * Java objects to their corresponding Lua equivalents using
+     * {@link #bridgeJavaToLuaIn(Object)}.
+     */
+    public static LuaTable toTable(Object array) {
+        int length = Array.getLength(array);
+        LuaTable table = new LuaTable(length, 0);
+        int i = 0;
+        while (i < length) {
+            LuaValue value = bridgeJavaToLuaIn(Array.get(array, i));
+            table.set(++i, value);
+        }
+        return table;
     }
 }
