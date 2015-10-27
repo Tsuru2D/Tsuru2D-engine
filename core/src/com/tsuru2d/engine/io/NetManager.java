@@ -7,6 +7,27 @@ public interface NetManager {
         void onResult(Result result, Object data);
     }
 
+    enum URL {
+        CREATE("create_user"),
+        LOGIN("login"),
+        LOGOUT("logout"),
+        CREATEGAME("create_game"),
+        WRITESAVE("write_save"),
+        DELETESAVE("delete_save"),
+        ENUMERATESAVE("enumerate_saves");
+        private final String mUrl;
+        private static final String Url = "http://127.0.0.1:8080/apiv1/";
+
+        URL(String uri) {
+            mUrl = Url + uri;
+        }
+
+        public String getUrl() {
+            return mUrl;
+        }
+
+    }
+
     enum Result {
         // Common
         SUCCESS("success"),
@@ -42,10 +63,16 @@ public interface NetManager {
     }
 
     boolean isLoggedIn();
+
     void login(String username, String password, Callback callback);
+
     void logout();
+
     void enumerateSaveGames(int startIndex, int endIndex, Callback callback);
+
     void writeSaveGame(GameSaveData data, boolean forceOverwrite, Callback callback);
+
     void getConfig(Callback callback);
+
     void writeConfig(LuaTable data, Callback callback);
 }
