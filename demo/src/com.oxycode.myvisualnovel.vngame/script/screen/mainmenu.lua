@@ -28,7 +28,7 @@ function mainmenu:onCreate(screen)
     startGameButton:setOnClick(function()
         screen:setGameScreenNew(R.scene.simplescene1, {})
     end)
-    screen:add(startGameButton):fillX()
+    ui:add(startGameButton):fillX()
 end
 
 function mainmenu:onResume(params)

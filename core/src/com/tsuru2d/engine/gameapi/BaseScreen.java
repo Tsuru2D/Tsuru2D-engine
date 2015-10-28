@@ -8,7 +8,10 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.io.LuaNetManager;
@@ -18,7 +21,6 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import com.tsuru2d.engine.uiapi.LuaUIManager;
-import com.tsuru2d.engine.uiapi.*;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -26,6 +28,8 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final EngineMain mGame;
     protected final LuaTable mScreenScript;
     protected final Stage mStage;
+    private final LuaNetManager mNetManager;
+    private final LuaUIManager mUIManager;
     private final Skin mSkin;
     private final Table mTable;
     private final TextureRegionDrawable mBackgroundDrawable;
@@ -40,8 +44,10 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         Table table = new Table();
         table.setDebug(true);
         table.setFillParent(true);
-        mStage.addActor(table);
         mTable = table;
+        mStage.addActor(table);
+        mNetManager = new LuaNetManager(game.getNetManager());
+        mUIManager = new LuaUIManager(this, table);
         mScreenScript.invokemethod("onCreate", this);
     }
 
@@ -109,9 +115,10 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     public void dispose() {
         mScreenScript.invokemethod("onDestroy");
         if (mBackgroundTexture != null) {
-            mGame.getAssetLoader().freeAsset(mBackgroundTexture);
+            getAssetLoader().freeAsset(mBackgroundTexture);
             mBackgroundTexture = null;
         }
+        mUIManager.dispose();
     }
 
     public AssetLoader getAssetLoader() {
@@ -126,26 +133,20 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
 
     @ExposeToLua
     public LuaNetManager getNetManager() {
-        return new LuaNetManager(mGame.getNetManager());
+        return mNetManager;
     }
 
     @ExposeToLua
     public LuaUIManager getUIManager() {
-        return new LuaUIManager(this);
-    }
-
-    @ExposeToLua
-    public CellFacade add(ActorFacade<?> actor) {
-        Cell<?> cell = mTable.add(actor.getActor());
-        return new CellFacade(cell);
+        return mUIManager;
     }
 
     @ExposeToLua
     public void setBackground(AssetID imageID) {
-        ManagedAsset<Texture> texture = mGame.getAssetLoader().getImage(imageID);
+        ManagedAsset<Texture> texture = getAssetLoader().getImage(imageID);
         if (mBackgroundTexture != null) {
             // TODO: background asset update handler
-            mGame.getAssetLoader().freeAsset(mBackgroundTexture);
+            getAssetLoader().freeAsset(mBackgroundTexture);
         }
         mBackgroundTexture = texture;
         mBackgroundDrawable.getRegion().setRegion(texture.get());
