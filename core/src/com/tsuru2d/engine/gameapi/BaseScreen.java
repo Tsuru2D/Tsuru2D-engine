@@ -11,17 +11,16 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
-import com.tsuru2d.engine.io.GameSaveData;
-import com.tsuru2d.engine.io.NetManager;
-import com.tsuru2d.engine.io.NetManagerImpl;
-import com.tsuru2d.engine.io.NetResult;
+import com.tsuru2d.engine.io.LuaNetManager;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
+import com.tsuru2d.engine.lua.LuaUIManager;
 import com.tsuru2d.engine.uiapi.*;
-import org.luaj.vm2.*;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final EngineMain mGame;
@@ -31,8 +30,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     private final Table mTable;
     private final TextureRegionDrawable mBackgroundDrawable;
     private ManagedAsset<Texture> mBackgroundTexture;
-
-    private NetManager net=new NetManagerImpl("com.test.game");//TODO delete this
 
     public BaseScreen(EngineMain game, LuaTable screenScript) {
         mGame = game;
@@ -46,9 +43,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mStage.addActor(table);
         mTable = table;
         mScreenScript.invokemethod("onCreate", this);
-
-
-
     }
 
     private static Skin createSkin() {
@@ -131,95 +125,19 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     }
 
     @ExposeToLua
-    public void register(String email, String password, final LuaFunction callback) {
-        net.register(email, password, new NetManager.Callback() {
-            @Override
-            public void onResult(NetResult result) {
-                callback.call(
-                    LuaValue.valueOf(result.mSuccess),
-                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
-                    LuaValue.NIL);
-            }
-        });
+    public LuaNetManager getNetManager() {
+        return new LuaNetManager(mGame.getNetManager());
     }
 
     @ExposeToLua
-    public void login(String email, String password, final LuaFunction callback) {
-        net.login(email, password, new NetManager.Callback() {
-            @Override
-            public void onResult(NetResult result) {
-                callback.call(
-                    LuaValue.valueOf(result.mSuccess),
-                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
-                    LuaValue.NIL);
-            }
-        });
-    }
-
-    @ExposeToLua
-    public void enumerateSaves(int startIndex, int endIndex, final LuaFunction callback) {
-        net.enumerateSaves(startIndex, endIndex, new NetManager.Callback() {
-            @Override
-            public void onResult(NetResult result) {
-                GameSaveData[] data = (GameSaveData[])result.mData;
-                callback.call(
-                    LuaValue.valueOf(result.mSuccess),
-                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
-                    LuaValue.NIL);
-            }
-        });
-    }
-
-    @ExposeToLua
-    public void readGameSettings(final LuaFunction callback) {
-        net.readGameSettings(new NetManager.Callback() {
-            @Override
-            public void onResult(NetResult result) {
-                callback.call(
-                    LuaValue.valueOf(result.mSuccess),
-                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
-                    result.mData == null ? LuaValue.NIL : (LuaTable)result.mData);
-            }
-        });
-    }
-
-    @ExposeToLua
-    public void writeGameSettings(LuaTable settings, final LuaFunction callback) {
-        net.writeGameSettings(settings, new NetManager.Callback() {
-            @Override
-            public void onResult(NetResult result) {
-                callback.call(
-                    LuaValue.valueOf(result.mSuccess),
-                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
-                    LuaValue.NIL);
-            }
-        });
+    public LuaUIManager getUIManager() {
+        return new LuaUIManager(this);
     }
 
     @ExposeToLua
     public CellFacade add(ActorFacade<?> actor) {
         Cell<?> cell = mTable.add(actor.getActor());
         return new CellFacade(cell);
-    }
-
-    @ExposeToLua
-    public TableFacade newTable() {
-        return new TableFacade(this);
-    }
-
-    @ExposeToLua
-    public TextButtonFacade newTextButton() {
-        return new TextButtonFacade(this);
-    }
-
-    @ExposeToLua
-    public ButtonFacade newButton() {
-        return new ButtonFacade(this);
-    }
-
-    @ExposeToLua
-    public LabelFacade newLabel() {
-        return new LabelFacade(this);
     }
 
     @ExposeToLua

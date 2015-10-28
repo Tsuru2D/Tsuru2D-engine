@@ -5,13 +5,12 @@ import com.badlogic.gdx.Net.HttpRequest;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.JsonWriter;
-import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.LuaTable;
 
 import java.io.IOException;
 import java.io.StringWriter;
 
-public class NetManagerImpl extends ExposedJavaClass implements NetManager {
+public class NetManagerImpl implements NetManager {
     private static class TsuruApi {
         private static final String BASE_URL = "http://127.0.0.1:8080/apiv1/";
         public static final String CREATE_USER = BASE_URL + "create_user";
@@ -163,12 +162,7 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
             throw new AssertionError(e);
         }
 
-        getJson(TsuruApi.WRITE_SAVE, jsonWriter, new JsonResponseListener(callback) {
-            @Override
-            protected void onSuccess(JsonValue responseJson) {
-                callbackSuccess(null);
-            }
-        });
+        getJson(TsuruApi.WRITE_SAVE, jsonWriter, new JsonResponseListener(callback));
     }
 
     @Override
@@ -184,12 +178,7 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
             throw new AssertionError(e);
         }
 
-        getJson(TsuruApi.DELETE_SAVE, jsonWriter, new JsonResponseListener(callback) {
-            @Override
-            protected void onSuccess(JsonValue responseJson) {
-                callbackSuccess(null);
-            }
-        });
+        getJson(TsuruApi.DELETE_SAVE, jsonWriter, new JsonResponseListener(callback));
     }
 
     @Override
@@ -231,11 +220,6 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
             throw new AssertionError(e);
         }
 
-        getJson(TsuruApi.WRITE_GAME_SETTINGS, jsonWriter, new JsonResponseListener(callback) {
-            @Override
-            protected void onSuccess(JsonValue responseJson) {
-                callbackSuccess(null);
-            }
-        });
+        getJson(TsuruApi.WRITE_GAME_SETTINGS, jsonWriter, new JsonResponseListener(callback));
     }
 }

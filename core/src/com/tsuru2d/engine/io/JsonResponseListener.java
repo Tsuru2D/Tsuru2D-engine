@@ -5,7 +5,7 @@ import com.badlogic.gdx.net.HttpStatus;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
-public abstract class JsonResponseListener implements Net.HttpResponseListener {
+public class JsonResponseListener implements Net.HttpResponseListener {
     private final NetManager.Callback mCallback;
 
     public JsonResponseListener(NetManager.Callback callback) {
@@ -21,12 +21,11 @@ public abstract class JsonResponseListener implements Net.HttpResponseListener {
 
         JsonReader jsonReader = new JsonReader();
         JsonValue responseJson = jsonReader.parse(httpResponse.getResultAsStream());
-        if (!responseJson.getBoolean("success")) {
-            callbackError(responseJson.getString("error"), null);
-            return;
+        if (responseJson.getBoolean("success")) {
+            onSuccess(responseJson);
+        } else {
+            onError(responseJson);
         }
-
-        onSuccess(responseJson);
     }
 
     @Override
@@ -58,5 +57,11 @@ public abstract class JsonResponseListener implements Net.HttpResponseListener {
         mCallback.onResult(result);
     }
 
-    protected abstract void onSuccess(JsonValue responseJson);
+    protected void onSuccess(JsonValue responseJson) {
+        callbackSuccess(null);
+    }
+
+    protected void onError(JsonValue responseJson) {
+        callbackError(responseJson.getString("error"), null);
+    }
 }

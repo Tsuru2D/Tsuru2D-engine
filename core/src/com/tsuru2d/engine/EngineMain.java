@@ -14,6 +14,8 @@ import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.gameapi.GameScreen;
 import com.tsuru2d.engine.gameapi.MenuScreen;
 import com.tsuru2d.engine.io.GameSaveData;
+import com.tsuru2d.engine.io.NetManager;
+import com.tsuru2d.engine.io.NetManagerImpl;
 import com.tsuru2d.engine.loader.*;
 import com.tsuru2d.engine.model.GameMetadataInfo;
 import org.luaj.vm2.LuaTable;
@@ -34,6 +36,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private ManagedAsset<String> mTitle;
     private ManagedAsset<Music> mMusic;
     private ArrayDeque<BaseScreen> mScreens;
+    private NetManager mNetManager;
 
     public EngineMain(PlatformApi platformApi) {
         mPlatformApi = platformApi;
@@ -42,6 +45,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     @Override
     public void create() {
         mAssetLoader = new AssetLoader(mPlatformApi.getRawAssetLoader());
+        mNetManager = new NetManagerImpl(getMetadata().mPackageName);
         MetadataLoader.Resolution resolution = getMetadata().mResolution;
         if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
             Gdx.graphics.setDisplayMode(resolution.getWidth(), resolution.getHeight(), false);
@@ -52,7 +56,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         mScreens = new ArrayDeque<BaseScreen>();
         mTitle = mAssetLoader.getText(getMetadata().mTitle);
         mTitle.addObserver(this);
-        pushMenuScreen(mAssetLoader.getMetadata().mMainScreen, LuaValue.NIL);
+        pushMenuScreen(getMetadata().mMainScreen, LuaValue.NIL);
     }
 
     @Override
@@ -197,6 +201,10 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     public AssetLoader getAssetLoader() {
         return mAssetLoader;
+    }
+
+    public NetManager getNetManager() {
+        return mNetManager;
     }
 
     public GameMetadataInfo getMetadata() {
