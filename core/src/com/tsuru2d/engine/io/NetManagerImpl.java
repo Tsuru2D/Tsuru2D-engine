@@ -8,7 +8,8 @@ import com.badlogic.gdx.utils.JsonWriter;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.LuaTable;
 
-import java.util.HashMap;
+import java.io.IOException;
+import java.io.StringWriter;
 
 public class NetManagerImpl extends ExposedJavaClass implements NetManager {
     private static class TsuruApi {
@@ -37,8 +38,15 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
         mAuthToken = responseJson.getString("auth_token");
     }
 
-    private void getJson(String url, HashMap<String, Object> requestJson, JsonResponseListener listener) {
-        String jsonStr = mJson.toJson(requestJson);
+    private JsonWriter newJsonWriter() {
+        StringWriter writer = new StringWriter();
+        JsonWriter jsonWriter = new JsonWriter(writer);
+        jsonWriter.setOutputType(JsonWriter.OutputType.json);
+        return jsonWriter;
+    }
+
+    private void getJson(String url, JsonWriter requestJson, JsonResponseListener listener) {
+        String jsonStr = requestJson.getWriter().toString();
         HttpRequest request = new HttpRequest("POST");
         request.setUrl(url);
         request.setContent(jsonStr);
@@ -54,13 +62,44 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
 
     @Override
     public void login(String email, String password, Callback callback) {
-        HashMap<String, Object> json = new HashMap<String, Object>();
-        json.put("email", email);
-        json.put("password", password);
-        getJson(TsuruApi.LOGIN, json, new JsonResponseListener(mJson, callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("email").value(email);
+            jsonWriter.name("password").value(password);
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+
+        getJson(TsuruApi.LOGIN, jsonWriter, new JsonResponseListener(callback) {
             @Override
-            protected void handleJson(JsonValue responseJson) {
+            protected void onSuccess(JsonValue responseJson) {
                 storeAuthToken(responseJson);
+                callbackSuccess(null);
+            }
+        });
+    }
+
+    @Override
+    public void register(String email, String password, Callback callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("email").value(email);
+            jsonWriter.name("password").value(password);
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+
+        getJson(TsuruApi.CREATE_USER, jsonWriter, new JsonResponseListener(callback) {
+            @Override
+            protected void onSuccess(JsonValue responseJson) {
+                storeAuthToken(responseJson);
+                callbackSuccess(null);
             }
         });
     }
@@ -72,15 +111,23 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
     }
 
     @Override
-    public void enumerateSaves(int startIndex, int endIndex, Callback callback) {
-        HashMap<String, Object> json = new HashMap<String, Object>();
-        json.put("auth_token", mAuthToken);
-        json.put("game_package", mGamePackage);
-        json.put("from_index", startIndex);
-        json.put("to_index", endIndex);
-        getJson(TsuruApi.ENUMERATE_SAVES, json, new JsonResponseListener(mJson, callback) {
+    public void enumerateSaves(int startIndex, final int endIndex, Callback callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("auth_token").value(mAuthToken);
+            jsonWriter.name("game_package").value(mGamePackage);
+            jsonWriter.name("from_index").value(startIndex);
+            jsonWriter.name("to_index").value(endIndex);
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
+
+        getJson(TsuruApi.ENUMERATE_SAVES, jsonWriter, new JsonResponseListener(callback) {
             @Override
-            protected void handleJson(JsonValue responseJson) {
+            protected void onSuccess(JsonValue responseJson) {
                 JsonValue saves = responseJson.get("saves");
                 GameSaveData[] saveDatas = new GameSaveData[saves.size];
                 for (int i = 0; i < saves.size; ++i) {
@@ -91,26 +138,104 @@ public class NetManagerImpl extends ExposedJavaClass implements NetManager {
                 callbackSuccess(saveDatas);
             }
         });
-
     }
 
     @Override
-    public void writeSave(GameSaveData data, boolean forceOverwrite, Callback callback) {
+    public void writeSave(GameSaveData data, boolean overwrite, Callback callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("auth_token").value(mAuthToken);
+            jsonWriter.name("game_package").value(mGamePackage);
+            jsonWriter.name("overwrite").value(overwrite);
+            jsonWriter.name("index").value(data.mIndex);
+            jsonWriter.name("version").value(data.mVersion);
+            jsonWriter.name("time").value(data.mCreationTime);
+            jsonWriter.name("scene_id").value(data.mSceneId);
+            jsonWriter.name("frame_id").value(data.mFrameId);
+            mJson.setWriter(jsonWriter);
+            mJson.writeValue("custom_state", data.mCustomState);
+            // mJson.setWriter(null);
+            // jsonWriter.name("custom_state").object().pop();
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
 
+        getJson(TsuruApi.WRITE_SAVE, jsonWriter, new JsonResponseListener(callback) {
+            @Override
+            protected void onSuccess(JsonValue responseJson) {
+                callbackSuccess(null);
+            }
+        });
     }
 
     @Override
-    public void deleteSave(long saveID) {
+    public void deleteSave(long saveID, Callback callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("auth_token").value(mAuthToken);
+            jsonWriter.name("save_id").value(saveID);
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
 
+        getJson(TsuruApi.DELETE_SAVE, jsonWriter, new JsonResponseListener(callback) {
+            @Override
+            protected void onSuccess(JsonValue responseJson) {
+                callbackSuccess(null);
+            }
+        });
     }
 
     @Override
     public void readGameSettings(Callback callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("auth_token").value(mAuthToken);
+            jsonWriter.name("game_package").value(mGamePackage);
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
 
+        getJson(TsuruApi.READ_GAME_SETTINGS, jsonWriter, new JsonResponseListener(callback) {
+            @Override
+            protected void onSuccess(JsonValue responseJson) {
+                JsonValue settingsRaw = responseJson.get("settings");
+                LuaTable settings = mJson.readValue(LuaTable.class, settingsRaw);
+                callbackSuccess(settings);
+            }
+        });
     }
 
     @Override
     public void writeGameSettings(LuaTable data, Callback callback) {
+        JsonWriter jsonWriter = newJsonWriter();
+        try {
+            jsonWriter.object();
+            jsonWriter.name("auth_token").value(mAuthToken);
+            jsonWriter.name("game_package").value(mGamePackage);
+            mJson.setWriter(jsonWriter);
+            mJson.writeValue("settings", data);
+            // mJson.setWriter(null);
+            jsonWriter.pop();
+            jsonWriter.close();
+        } catch (IOException e) {
+            throw new AssertionError(e);
+        }
 
+        getJson(TsuruApi.WRITE_GAME_SETTINGS, jsonWriter, new JsonResponseListener(callback) {
+            @Override
+            protected void onSuccess(JsonValue responseJson) {
+                callbackSuccess(null);
+            }
+        });
     }
 }

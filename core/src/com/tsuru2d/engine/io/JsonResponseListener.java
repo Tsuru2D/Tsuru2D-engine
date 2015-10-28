@@ -1,55 +1,55 @@
 package com.tsuru2d.engine.io;
 
-
 import com.badlogic.gdx.Net;
 import com.badlogic.gdx.net.HttpStatus;
-import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 public abstract class JsonResponseListener implements Net.HttpResponseListener {
-    private final Json mJson;
     private final NetManager.Callback mCallback;
 
-    public JsonResponseListener(Json json, NetManager.Callback callback) {
-        mJson = json;
+    public JsonResponseListener(NetManager.Callback callback) {
         mCallback = callback;
     }
 
     @Override
     public void handleHttpResponse(Net.HttpResponse httpResponse) {
         if (httpResponse.getStatus().getStatusCode() != HttpStatus.SC_OK) {
-            callbackError("connection_failed");
+            callbackError("connection_failed", null);
             return;
         }
 
-        JsonValue responseJson = mJson.fromJson(JsonValue.class, httpResponse.getResultAsStream());
+        JsonReader jsonReader = new JsonReader();
+        JsonValue responseJson = jsonReader.parse(httpResponse.getResultAsStream());
         if (!responseJson.getBoolean("success")) {
-            callbackError(responseJson.getString("error"));
+            callbackError(responseJson.getString("error"), null);
+            return;
         }
 
-        handleJson(responseJson);
+        onSuccess(responseJson);
     }
 
     @Override
     public void failed(Throwable t) {
-        callbackError("connection_failed");
+        callbackError("unknown_error", t);
     }
 
     @Override
     public void cancelled() {
-        callbackError("request_cancelled");
+        callbackError("request_cancelled", null);
     }
 
-    protected void callbackError(String errorCode) {
+    protected void callbackError(String errorCode, Throwable e) {
         NetResult result = new NetResult();
         result.mSuccess = false;
         result.mErrorCode = errorCode;
+        result.mData = e;
         runCallback(result);
     }
 
     protected void callbackSuccess(Object data) {
         NetResult result = new NetResult();
-        result.mSuccess = false;
+        result.mSuccess = true;
         result.mData = data;
         runCallback(result);
     }
@@ -58,5 +58,5 @@ public abstract class JsonResponseListener implements Net.HttpResponseListener {
         mCallback.onResult(result);
     }
 
-    protected abstract void handleJson(JsonValue responseJson);
+    protected abstract void onSuccess(JsonValue responseJson);
 }

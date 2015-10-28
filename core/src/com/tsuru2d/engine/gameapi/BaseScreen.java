@@ -21,10 +21,7 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import com.tsuru2d.engine.uiapi.*;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
-import org.luaj.vm2.Varargs;
+import org.luaj.vm2.*;
 
 public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final EngineMain mGame;
@@ -35,7 +32,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     private final TextureRegionDrawable mBackgroundDrawable;
     private ManagedAsset<Texture> mBackgroundTexture;
 
-    private NetManager net=new NetManagerImpl("com.game");//TODO delete this
+    private NetManager net=new NetManagerImpl("com.test.game");//TODO delete this
 
     public BaseScreen(EngineMain game, LuaTable screenScript) {
         mGame = game;
@@ -134,34 +131,67 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     }
 
     @ExposeToLua
-    public void login(String email, String password, final LuaFunction callback){
-        System.out.println("login");//TODO delete this
-        net.login(email, password, new NetManager.Callback() {
+    public void register(String email, String password, final LuaFunction callback) {
+        net.register(email, password, new NetManager.Callback() {
             @Override
             public void onResult(NetResult result) {
-                System.out.println("logged in!");
+                callback.call(
+                    LuaValue.valueOf(result.mSuccess),
+                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
+                    LuaValue.NIL);
             }
         });
     }
 
     @ExposeToLua
-    public void enumerateSaveGames(Varargs varargs){
-        System.out.println("enumsavegames");//TODO delete this
-        int startIndex=0;
-        int endIndex=0;
-        final LuaFunction callback;
-        if (varargs.narg()==3){
-            startIndex=varargs.arg(1).checkint();
-            endIndex=varargs.arg(2).checkint();
-            callback=varargs.arg(3).checkfunction();
-        }else{
-            callback=varargs.arg1().checkfunction();
-        }
+    public void login(String email, String password, final LuaFunction callback) {
+        net.login(email, password, new NetManager.Callback() {
+            @Override
+            public void onResult(NetResult result) {
+                callback.call(
+                    LuaValue.valueOf(result.mSuccess),
+                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
+                    LuaValue.NIL);
+            }
+        });
+    }
+
+    @ExposeToLua
+    public void enumerateSaves(int startIndex, int endIndex, final LuaFunction callback) {
         net.enumerateSaves(startIndex, endIndex, new NetManager.Callback() {
             @Override
             public void onResult(NetResult result) {
                 GameSaveData[] data = (GameSaveData[])result.mData;
-                System.out.println("ok");
+                callback.call(
+                    LuaValue.valueOf(result.mSuccess),
+                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
+                    LuaValue.NIL);
+            }
+        });
+    }
+
+    @ExposeToLua
+    public void readGameSettings(final LuaFunction callback) {
+        net.readGameSettings(new NetManager.Callback() {
+            @Override
+            public void onResult(NetResult result) {
+                callback.call(
+                    LuaValue.valueOf(result.mSuccess),
+                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
+                    result.mData == null ? LuaValue.NIL : (LuaTable)result.mData);
+            }
+        });
+    }
+
+    @ExposeToLua
+    public void writeGameSettings(LuaTable settings, final LuaFunction callback) {
+        net.writeGameSettings(settings, new NetManager.Callback() {
+            @Override
+            public void onResult(NetResult result) {
+                callback.call(
+                    LuaValue.valueOf(result.mSuccess),
+                    result.mErrorCode == null ? LuaValue.NIL : LuaValue.valueOf(result.mErrorCode),
+                    LuaValue.NIL);
             }
         });
     }

@@ -58,7 +58,7 @@ public class GameSaveData implements Json.Serializable {
 
     @Override
     public void write(Json json) {
-        json.writeValue("id", mId);
+        json.writeValue("save_id", mId);
         json.writeValue("index", mIndex);
         json.writeValue("version", mVersion);
         json.writeValue("time", mCreationTime);
@@ -69,7 +69,7 @@ public class GameSaveData implements Json.Serializable {
 
     @Override
     public void read(Json json, JsonValue jsonData) {
-        mId = json.readValue("id", long.class, jsonData);
+        mId = json.readValue("save_id", long.class, jsonData);
         mIndex = json.readValue("index", int.class, jsonData);
         mVersion = json.readValue("version", int.class, jsonData);
         mCreationTime = json.readValue("time", long.class, jsonData);

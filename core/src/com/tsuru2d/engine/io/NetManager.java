@@ -9,15 +9,17 @@ public interface NetManager {
 
     boolean isLoggedIn();
 
-    void login(String username, String password, Callback callback);
+    void register(String email, String password, Callback callback);
+
+    void login(String email, String password, Callback callback);
 
     void logout();
 
     void enumerateSaves(int startIndex, int endIndex, Callback callback);
 
-    void writeSave(GameSaveData data, boolean forceOverwrite, Callback callback);
+    void writeSave(GameSaveData data, boolean overwrite, Callback callback);
 
-    void deleteSave(long saveID);
+    void deleteSave(long saveID, Callback callback);
 
     void readGameSettings(Callback callback);
 
