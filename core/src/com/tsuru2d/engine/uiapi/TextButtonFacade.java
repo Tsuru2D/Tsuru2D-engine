@@ -1,6 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
-
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -9,6 +9,8 @@ import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public class TextButtonFacade extends ButtonFacade {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
@@ -21,19 +23,29 @@ public class TextButtonFacade extends ButtonFacade {
 
     @Override
     protected Button createActor() {
-        return new TextButton(null, (TextButton.TextButtonStyle)createAndPopulateStyle());
+        return new TextButton(null, (TextButton.TextButtonStyle)createStyle());
     }
 
     @Override
     protected Button.ButtonStyle createStyle() {
-        return new TextButton.TextButtonStyle();
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = new BitmapFont();
+        return style;
     }
 
     @Override
-    protected Button.ButtonStyle createAndPopulateStyle() {
-        Button.ButtonStyle style = super.createAndPopulateStyle();
-        ((TextButton.TextButtonStyle)style).font = new BitmapFont();
-        return style;
+    protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
+        super.populateStyle(style, styleTable);
+        LuaValue colorValue = styleTable.get("textColor");
+        if (!colorValue.isnil()) {
+            LuaTable colorTable = colorValue.checktable();
+            float r = getfloat(colorTable, 1);
+            float g = getfloat(colorTable, 2);
+            float b = getfloat(colorTable, 3);
+            float a = getoptfloat(colorTable, 4, 1);
+            Color color = new Color(r, g, b, a);
+            ((TextButton.TextButtonStyle)style).fontColor = color;
+        }
     }
 
     @ExposeToLua
@@ -54,6 +66,24 @@ public class TextButtonFacade extends ButtonFacade {
             mScreen.getAssetLoader().freeAsset(mText);
             mText = null;
         }
+        super.dispose();
+    }
+
+    private static float checkfloat(LuaValue value) {
+        return (float)value.checkdouble();
+    }
+
+    private static float getfloat(LuaTable table, int index) {
+        LuaValue value = table.get(index);
+        return checkfloat(value);
+    }
+
+    private static float getoptfloat(LuaTable table, int index, float defaultValue) {
+        LuaValue value = table.get(index);
+        if (value.isnil()) {
+            return defaultValue;
+        }
+        return checkfloat(value);
     }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {

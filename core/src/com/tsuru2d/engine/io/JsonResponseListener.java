@@ -30,6 +30,7 @@ public class JsonResponseListener implements Net.HttpResponseListener {
 
     @Override
     public void failed(Throwable t) {
+        t.printStackTrace();
         callbackError("unknown_error", t);
     }
 

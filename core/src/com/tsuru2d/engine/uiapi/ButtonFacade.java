@@ -25,29 +25,29 @@ public class ButtonFacade extends ActorFacade<Button> {
     }
 
     protected Button createActor() {
-        return new Button(createAndPopulateStyle());
+        return new Button(createStyle());
     }
 
     protected Button.ButtonStyle createStyle() {
         return new Button.ButtonStyle();
     }
 
-    protected Button.ButtonStyle createAndPopulateStyle() {
-        Button.ButtonStyle style = createStyle();
+    protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
+        mUp = getAsset(styleTable, "up");
+        mDown = getAsset(styleTable, "down");
+        mHover = getAsset(styleTable, "hover");
+
         style.up = getDrawable(mUp);
         style.down = getDrawable(mDown);
         style.over = getDrawable(mHover);
-        return style;
     }
 
     @ExposeToLua
     public void setStyle(LuaTable styleTable) {
         dispose();
-        mUp = getAsset(styleTable, "up");
-        mDown = getAsset(styleTable, "down");
-        mHover = getAsset(styleTable, "hover");
-        Button.ButtonStyle style = createAndPopulateStyle();
-        mActor.setStyle(style);
+        Button.ButtonStyle newStyle = createStyle();
+        populateStyle(newStyle, styleTable);
+        mActor.setStyle(newStyle);
     }
 
     @ExposeToLua
