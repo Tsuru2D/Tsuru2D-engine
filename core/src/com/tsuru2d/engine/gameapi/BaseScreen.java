@@ -17,7 +17,7 @@ import com.tsuru2d.engine.loader.AssetLoader;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
-import com.tsuru2d.engine.lua.LuaUIManager;
+import com.tsuru2d.engine.uiapi.LuaUIManager;
 import com.tsuru2d.engine.uiapi.*;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;

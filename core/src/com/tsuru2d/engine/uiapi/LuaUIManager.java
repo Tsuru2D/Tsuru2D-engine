@@ -1,10 +1,8 @@
-package com.tsuru2d.engine.lua;
+package com.tsuru2d.engine.uiapi;
 
 import com.tsuru2d.engine.gameapi.BaseScreen;
-import com.tsuru2d.engine.uiapi.ButtonFacade;
-import com.tsuru2d.engine.uiapi.LabelFacade;
-import com.tsuru2d.engine.uiapi.TableFacade;
-import com.tsuru2d.engine.uiapi.TextButtonFacade;
+import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.lua.ExposedJavaClass;
 
 public class LuaUIManager extends ExposedJavaClass {
     private final BaseScreen mScreen;
