@@ -24,13 +24,13 @@ public class TextAreaFacade extends ActorFacade<TextArea>{
 
     public TextAreaFacade (BaseScreen baseScreen) {
         super(baseScreen);
-        TextArea textArea = new TextArea("", getStyle());
+        TextArea textArea = new TextArea("", createStyle());
         setActor(textArea);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
         mChangeHandler = new ChangeHandler();
     }
 
-    public TextArea.TextFieldStyle getStyle() {
+    private TextArea.TextFieldStyle createStyle() {
         TextArea.TextFieldStyle textFieldStyle = new TextArea.TextFieldStyle();
         textFieldStyle.background = getDrawable(mBackground);
         textFieldStyle.cursor = getDrawable(mCursor);
@@ -52,7 +52,7 @@ public class TextAreaFacade extends ActorFacade<TextArea>{
         mSelection = getStyleAsset(styleTable, "selection");
         mDisabledBackground = getStyleAsset(styleTable, "disabledbackground");
         mFocusedBackground = getStyleAsset(styleTable, "focusedbackground");
-        TextArea.TextFieldStyle textFieldStyle = getStyle();
+        TextArea.TextFieldStyle textFieldStyle = createStyle();
         mActor.setStyle(textFieldStyle);
     }
 
@@ -86,13 +86,13 @@ public class TextAreaFacade extends ActorFacade<TextArea>{
     }
 
     @ExposeToLua
-    public void setDisabled(boolean disabled) {
-        getActor().setDisabled(disabled);
+    public void setEnabled(boolean enabled) {
+        getActor().setDisabled(!enabled);
     }
 
     @ExposeToLua
-    public boolean isDisabled() {
-        return getActor().isDisabled();
+    public boolean isEnabled() {
+        return !getActor().isDisabled();
     }
 
     @Override
