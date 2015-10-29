@@ -2,6 +2,7 @@ package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
@@ -10,10 +11,12 @@ import com.tsuru2d.engine.lua.ExposedJavaClass;
 public class LuaUIManager extends ExposedJavaClass implements Disposable {
     private final BaseScreen mScreen;
     private final Table mTable;
+    private final Array<ActorFacade<?>> mControls;
 
     public LuaUIManager(BaseScreen screen, Table rootTable) {
         mScreen = screen;
         mTable = rootTable;
+        mControls = new Array<ActorFacade<?>>();
     }
 
     @ExposeToLua
@@ -23,27 +26,42 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
     }
 
     @ExposeToLua
+    public void remove(ActorFacade<?> actor) {
+        mTable.removeActor(actor.getActor());
+    }
+
+    @ExposeToLua
     public TableFacade newTable() {
-        return new TableFacade(mScreen);
+        TableFacade table = new TableFacade(mScreen);
+        mControls.add(table);
+        return table;
     }
 
     @ExposeToLua
     public TextButtonFacade newTextButton() {
-        return new TextButtonFacade(mScreen);
+        TextButtonFacade button = new TextButtonFacade(mScreen);
+        mControls.add(button);
+        return button;
     }
 
     @ExposeToLua
     public ButtonFacade newButton() {
-        return new ButtonFacade(mScreen);
+        ButtonFacade button = new ButtonFacade(mScreen);
+        mControls.add(button);
+        return button;
     }
 
     @ExposeToLua
     public LabelFacade newLabel() {
-        return new LabelFacade(mScreen);
+        LabelFacade label = new LabelFacade(mScreen);
+        mControls.add(label);
+        return label;
     }
 
     @Override
     public void dispose() {
-        // TODO
+        for (ActorFacade<?> control : mControls) {
+            control.dispose();
+        }
     }
 }
