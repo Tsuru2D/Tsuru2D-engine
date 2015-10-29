@@ -1,88 +1,100 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
+import org.luaj.vm2.LuaTable;
 
 public class DropDownFacade extends ActorFacade<SelectBox>{
-    private final SelectBox mSelectBox;
-    private SelectBox.SelectBoxStyle mSelectBoxStyle;
+    private ManagedAsset<Texture> mBackground,mSelection,
+        mBackgroundDisabled,mBackgroundOpen,mBackgroundOver;
     private LuaFunction mCallBack;
     private ChangeHandler mChangeHandler;
-    private ManagedAsset<String> atLeastSomething;
 
-    public DropDownFacade(BaseScreen screen,String ZipfileLocation,String pathInZip){
+    public DropDownFacade(BaseScreen screen){
         super(screen);
-        mChangeHandler=new ChangeHandler();
-        //mSelectBoxStyle=new SelectBox.SelectBoxStyle();
-        //mSelectBox=new SelectBox(mSelectBoxStyle);
-        BitmapFont font = new BitmapFont();
-        Drawable selection;
-        try{
-            selection=null;
-            List.ListStyle mListStyle= new List.ListStyle(font, Color.BLUE, Color.RED, selection);
-            mSelectBoxStyle = new SelectBox.SelectBoxStyle(new BitmapFont(), Color.BLUE,selection, new ScrollPane.ScrollPaneStyle(), mListStyle);
-        } catch (Exception e){
-            e.printStackTrace();
-        }
-        mSelectBox=new SelectBox(mSelectBoxStyle);
+        SelectBox selectBox=new SelectBox(createStyle());
+        setActor(selectBox);
+        mChangeHandler = new ChangeHandler();
+    }
+
+    public SelectBox.SelectBoxStyle createStyle(){
+        BitmapFont font=new BitmapFont();
+        TextureRegionDrawable backGround=getDrawable(mBackground);
+        List.ListStyle listStyle=new List.ListStyle
+            (font,Color.BLACK,Color.BLUE,getDrawable(mSelection));
+        listStyle.background=backGround; // can be optional out if error occurs
+        SelectBox.SelectBoxStyle selectBoxStyle=new SelectBox.SelectBoxStyle
+            (font,Color.BLUE,backGround,new ScrollPane.ScrollPaneStyle(),listStyle);
+        selectBoxStyle.backgroundDisabled=getDrawable(mBackgroundDisabled);
+        selectBoxStyle.backgroundOpen=getDrawable(mBackgroundOpen);
+        selectBoxStyle.backgroundOver=getDrawable(mBackgroundOver);
+        selectBoxStyle.disabledFontColor=Color.GOLD;
+        return selectBoxStyle;
+    }
+
+    private TextureRegionDrawable getDrawable(ManagedAsset<Texture> texture) {
+        return (texture==null)? null:new TextureRegionDrawable(new TextureRegion(texture.get()));
     }
 
     @ExposeToLua
-    public void setPosition(float x, float y) {
-        mSelectBox.setPosition(x, y);
+    public void setStyle(LuaTable styleTable) {
+        dispose();
+        mBackground = getStyleAsset(styleTable, "background");
+        mSelection = getStyleAsset(styleTable, "selection");
+        mBackgroundDisabled = getStyleAsset(styleTable, "backgrounddisabled");
+        mBackgroundOpen = getStyleAsset(styleTable, "backgroundopen");
+        mBackgroundOver = getStyleAsset(styleTable, "backgroundover");
+        mBackground = getStyleAsset(styleTable, "background");
+        SelectBox.SelectBoxStyle selectBoxStyle = createStyle();
+        mActor.setStyle(selectBoxStyle);
     }
 
     @ExposeToLua
     public void setOnChange(LuaFunction callBack) {
         mCallBack = callBack;
         if(mCallBack != null) {
-            mSelectBox.addListener(mChangeHandler);
+            getActor().addListener(mChangeHandler);
         }else {
-            mSelectBox.removeListener(mChangeHandler);
+            getActor().removeListener(mChangeHandler);
         }
     }
 
-
     @Override
     public void dispose() {
-
+        dispose(mBackground);
+        dispose(mSelection);
+        dispose(mBackgroundDisabled);
+        dispose(mBackgroundOpen);
+        dispose(mBackgroundOver);
     }
 
-    @ExposeToLua
-    public String getSelected(){
-        if(mSelectBox.getSelected() instanceof String)
-            return (String)mSelectBox.getSelected();
-        else
-            return null;
-    }
-
-    @ExposeToLua
-    public void setSelected(String item){
-        mSelectBox.setSelected(item);
-    }
-
-    @ExposeToLua
-    public Array getItems(){
-        return mSelectBox.getItems();
+    private void dispose(ManagedAsset asset){
+        if(asset!=null) {
+            mScreen.getAssetLoader().freeAsset(asset);
+            asset=null;
+        }
     }
 
     private class ChangeHandler extends ChangeListener {
         @Override
-        public void changed(ChangeListener.ChangeEvent event, Actor actor) {
-            if (mCallBack != null) {
+        public void changed(ChangeEvent event, Actor actor) {
+            getActor().setSelectedIndex(getActor().getSelectedIndex());
+            if(mCallBack != null) {
                 mCallBack.call();
             }
         }
     }
+
 }

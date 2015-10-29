@@ -3,20 +3,21 @@ local game = {}
 function game:onCreate(screen)
     print("game::onCreate()")
     self.screen = screen
+    local ui = screen:getUIManager()
     screen:setOnClick(function()
         screen:nextFrame()
     end)
-    local label = screen:newLabel()
+    local label = ui:newLabel()
     self.label = label
-    screen:add(label):bottom():expand()
+    ui:add(label):bottom():expand()
 
-    local button = screen:newTextButton()
+    local button = ui:newTextButton()
     button:setText(R.text.common.back_to_menu)
     button:setOnClick(function()
         screen:setMenuScreen(R.screen.mainmenu)
     end)
     self.button = button
-    screen:add(button):top():right()
+    ui:add(button):top():right()
 end
 
 function game:onResume(params)
