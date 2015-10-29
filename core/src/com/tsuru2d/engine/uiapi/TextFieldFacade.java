@@ -1,6 +1,8 @@
 package com.tsuru2d.engine.uiapi;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
@@ -42,6 +44,9 @@ public class TextFieldFacade extends ActorFacade<TextField>{
                 mDisabledBackground == null ? null : new TextureRegionDrawable(new TextureRegion(mDisabledBackground.get()));
         textFieldStyle.focusedBackground =
                 mFocusedBackground == null ? null : new TextureRegionDrawable(new TextureRegion(mFocusedBackground.get()));
+        //Temporary Code
+        textFieldStyle.font = new BitmapFont();
+        textFieldStyle.fontColor = Color.BLUE;
         return textFieldStyle;
     }
 
@@ -68,7 +73,7 @@ public class TextFieldFacade extends ActorFacade<TextField>{
     }
 
     @ExposeToLua
-    public void setOnClick(LuaFunction callBack) {
+    public void setTextChangeListener(LuaFunction callBack) {
         mCallBack = callBack;
         if(mCallBack != null) {
             getActor().addListener(mChangeHandler);
