@@ -10,9 +10,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.lua.LuaArrayIterator;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
@@ -59,6 +61,16 @@ public class DropDownFacade extends ActorFacade<SelectBox>{
         mBackground = getStyleAsset(styleTable, "background");
         SelectBox.SelectBoxStyle selectBoxStyle = createStyle();
         mActor.setStyle(selectBoxStyle);
+    }
+
+    @ExposeToLua
+    public void setItems(LuaTable table){
+        LuaArrayIterator luaArrayIterator = new LuaArrayIterator(table);
+        Array newItems=new Array();
+        while (luaArrayIterator.hasNext()){
+            newItems.add(luaArrayIterator.next());
+        }
+        getActor().setItems(newItems);
     }
 
     @ExposeToLua
