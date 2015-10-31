@@ -1,9 +1,7 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.ui.Slider;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
@@ -11,35 +9,35 @@ import org.luaj.vm2.LuaTable;
 
 public class SliderFacade extends ActorFacade<Slider>{
     private ManagedAsset<Texture> mBackground, mDisabledBackground,
-                                    mKnob, mDisabledKnob;
+                                  mKnob, mDisabledKnob;
 
     public SliderFacade(BaseScreen screen) {
         super(screen);
-        Slider slider = new Slider(0.0f, 1.0f, 0.01f, false, getStyle());
+        Slider slider = new Slider(0.0f, 1.0f, 0.01f, false, createStyle());
         setActor(slider);
     }
 
-    public Slider.SliderStyle getStyle() {
-        Slider.SliderStyle style = new Slider.SliderStyle();
-        style.background = mBackground == null ? null : new TextureRegionDrawable(new TextureRegion(mBackground.get()));
-        style.disabledBackground =
-                mDisabledBackground == null ? null : new TextureRegionDrawable(new TextureRegion(mDisabledBackground.get()));
-        style.disabledKnob =
-                mDisabledKnob == null ? null : new TextureRegionDrawable(new TextureRegion(mDisabledKnob.get()));
-        style.knob =
-                mKnob == null ? null : new TextureRegionDrawable(new TextureRegion(mKnob.get()));
-        return style;
+    private Slider.SliderStyle createStyle() {
+        return new Slider.SliderStyle();
+    }
+
+    private void populateStyle(Slider.SliderStyle style, LuaTable styleTable) {
+        mBackground = swapStyleImage(styleTable, "background", mBackground);
+        mDisabledBackground = swapStyleImage(styleTable, "disabledBackground", mDisabledBackground);
+        mKnob = swapStyleImage(styleTable, "knob", mKnob);
+        mDisabledKnob = swapStyleImage(styleTable, "disabledKnob", mDisabledKnob);
+
+        style.background = toDrawable(mBackground);
+        style.disabledBackground = toDrawable(mDisabledBackground);
+        style.knob = toDrawable(mKnob);
+        style.disabledKnob = toDrawable(mDisabledKnob);
     }
 
     @ExposeToLua
     public void setStyle(LuaTable styleTable) {
-        dispose();
-        mBackground = getStyleAsset(styleTable, "background");
-        mDisabledBackground = getStyleAsset(styleTable, "disabledbackground");
-        mKnob = getStyleAsset(styleTable, "knob");
-        mDisabledBackground = getStyleAsset(styleTable, "disabledknob");
-        Slider.SliderStyle sliderStyle = getStyle();
-        getActor().setStyle(sliderStyle);
+        Slider.SliderStyle style = createStyle();
+        populateStyle(style, styleTable);
+        getActor().setStyle(style);
     }
 
     @ExposeToLua
@@ -58,24 +56,20 @@ public class SliderFacade extends ActorFacade<Slider>{
     }
 
     @ExposeToLua
-    public void setDisabled(boolean disabled) {
-        getActor().setDisabled(disabled);
+    public void setEnabled(boolean enabled) {
+        getActor().setDisabled(!enabled);
     }
 
     @ExposeToLua
-    public boolean isDisabled() {
-        return getActor().isDisabled();
+    public boolean isEnabled() {
+        return !getActor().isDisabled();
     }
 
     @Override
     public void dispose() {
-        if(mBackground != null) {mScreen.getAssetLoader().freeAsset(mBackground); mBackground = null;}
-        if(mDisabledBackground != null) {
-            mScreen.getAssetLoader().freeAsset(mDisabledBackground); mDisabledBackground = null;
-        }
-        if(mKnob != null) {mScreen.getAssetLoader().freeAsset(mKnob); mKnob = null;}
-        if(mDisabledKnob != null) {
-            mScreen.getAssetLoader().freeAsset(mDisabledKnob); mDisabledKnob = null;
-        }
+        mBackground = freeAsset(mBackground);
+        mDisabledBackground = freeAsset(mDisabledBackground);
+        mKnob = freeAsset(mKnob);
+        mDisabledKnob = freeAsset(mDisabledKnob);
     }
 }
