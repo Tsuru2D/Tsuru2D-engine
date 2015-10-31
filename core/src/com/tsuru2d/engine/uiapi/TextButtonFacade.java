@@ -22,11 +22,11 @@ public class TextButtonFacade extends ButtonFacade {
 
     @Override
     protected Button createActor() {
-        return new TextButton(null, (TextButton.TextButtonStyle)createStyle());
+        return new TextButton(null, createStyle());
     }
 
     @Override
-    protected Button.ButtonStyle createStyle() {
+    protected TextButton.TextButtonStyle createStyle() {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = new BitmapFont();
         return style;

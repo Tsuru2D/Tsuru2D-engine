@@ -66,6 +66,13 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
     }
 
     @ExposeToLua
+    public TextAreaFacade newTextArea() {
+        TextAreaFacade textArea = new TextAreaFacade(mScreen);
+        mControls.add(textArea);
+        return textArea;
+    }
+
+    @ExposeToLua
     public CheckBoxFacade newCheckBox() {
         CheckBoxFacade checkBox = new CheckBoxFacade(mScreen);
         mControls.add(checkBox);

@@ -14,7 +14,7 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class TextFieldFacade extends ActorFacade<TextField>{
+public class TextFieldFacade extends ActorFacade<TextField> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<Texture> mBackground, mCursor, mSelection,
                                   mDisabledBackground, mFocusedBackground;
@@ -23,19 +23,23 @@ public class TextFieldFacade extends ActorFacade<TextField>{
 
     public TextFieldFacade (BaseScreen baseScreen) {
         super(baseScreen);
-        TextField textField = new TextField(null, createStyle());
+        TextField textField = createActor();
         textField.addListener(new ChangeHandler());
         setActor(textField);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
     }
 
-    private TextField.TextFieldStyle createStyle() {
+    protected TextField createActor() {
+        return new TextField(null, createStyle());
+    }
+
+    protected TextField.TextFieldStyle createStyle() {
         TextField.TextFieldStyle style = new TextField.TextFieldStyle();
         style.font = new BitmapFont();
         return style;
     }
 
-    private void populateStyle(TextField.TextFieldStyle style, LuaTable styleTable) {
+    protected void populateStyle(TextField.TextFieldStyle style, LuaTable styleTable) {
         mBackground = swapStyleImage(styleTable, "background", mBackground);
         mCursor = swapStyleImage(styleTable, "cursor", mCursor);
         mSelection = swapStyleImage(styleTable, "selection", mSelection);
