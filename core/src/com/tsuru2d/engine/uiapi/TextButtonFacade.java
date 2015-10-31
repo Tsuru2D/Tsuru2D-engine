@@ -42,7 +42,12 @@ public class TextButtonFacade extends ButtonFacade {
     @ExposeToLua
     public void setText(AssetID textID) {
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
-        ((TextButton)getActor()).setText(mText.get());
+        TextButton textButton = (TextButton)getActor();
+        if (mText != null) {
+            textButton.setText(mText.get());
+        } else {
+            textButton.setText(null);
+        }
     }
 
     @Override

@@ -11,7 +11,7 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
 public class ButtonFacade extends ActorFacade<Button> {
-    private LuaFunction mOnClickCallback;
+    private LuaFunction mClickedCallback;
     private ManagedAsset<Texture> mUp, mDown, mHover;
 
     public ButtonFacade(BaseScreen screen) {
@@ -47,8 +47,8 @@ public class ButtonFacade extends ActorFacade<Button> {
     }
 
     @ExposeToLua
-    public void setOnClick(LuaFunction callback) {
-        mOnClickCallback = callback;
+    public void setOnClickedListener(LuaFunction callback) {
+        mClickedCallback = callback;
     }
 
     @Override
@@ -61,8 +61,8 @@ public class ButtonFacade extends ActorFacade<Button> {
     private class OnClickHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            if (mOnClickCallback != null) {
-                mOnClickCallback.call(ButtonFacade.this);
+            if (mClickedCallback != null) {
+                mClickedCallback.call(ButtonFacade.this);
             }
         }
     }

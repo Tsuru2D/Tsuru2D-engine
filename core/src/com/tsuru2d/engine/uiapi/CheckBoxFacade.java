@@ -58,7 +58,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox> {
     }
 
     @ExposeToLua
-    public void setOnChecked(LuaFunction callback) {
+    public void setOnCheckedListener(LuaFunction callback) {
         mCheckedCallback = callback;
     }
 
@@ -85,7 +85,11 @@ public class CheckBoxFacade extends ActorFacade<CheckBox> {
     @ExposeToLua
     public void setText(AssetID textID) {
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
-        getActor().setText(mText.get());
+        if (mText != null) {
+            getActor().setText(mText.get());
+        } else {
+            getActor().setText(null);
+        }
     }
 
     @Override
@@ -95,6 +99,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox> {
         mCheckboxOn = freeAsset(mCheckboxOn);
         mCheckboxOnDisabled = freeAsset(mCheckboxOnDisabled);
         mCheckboxOver = freeAsset(mCheckboxOver);
+        mText = freeAsset(mText, mAssetUpdatedObserver);
     }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {

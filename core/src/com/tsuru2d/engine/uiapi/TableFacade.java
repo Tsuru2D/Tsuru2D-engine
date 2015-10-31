@@ -14,19 +14,19 @@ public class TableFacade extends ActorFacade<Table> {
 
     @ExposeToLua
     public CellFacade add(ActorFacade<? extends Actor> wrapper) {
-        Cell<? extends Actor> cell = mActor.add(wrapper.mActor);
+        Cell<? extends Actor> cell = getActor().add(wrapper.getActor());
         return new CellFacade(cell);
     }
 
     @ExposeToLua
     public boolean remove(ActorFacade<? extends Actor> wrapper) {
-        Actor actor = wrapper.mActor;
-        return mActor.removeActor(actor);
+        Actor actor = wrapper.getActor();
+        return getActor().removeActor(actor);
     }
 
     @ExposeToLua
     public CellFacade row() {
-        Cell cell = mActor.row();
+        Cell cell = getActor().row();
         return new CellFacade(cell);
     }
 }
