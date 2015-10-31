@@ -1,13 +1,10 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
-import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
@@ -33,21 +30,20 @@ public class ButtonFacade extends ActorFacade<Button> {
     }
 
     protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
-        mUp = getAsset(styleTable, "up");
-        mDown = getAsset(styleTable, "down");
-        mHover = getAsset(styleTable, "hover");
+        mUp = swapStyleImage(styleTable, "up", mUp);
+        mDown = swapStyleImage(styleTable, "down", mUp);
+        mHover = swapStyleImage(styleTable, "hover", mUp);
 
-        style.up = getDrawable(mUp);
-        style.down = getDrawable(mDown);
-        style.over = getDrawable(mHover);
+        style.up = toDrawable(mUp);
+        style.down = toDrawable(mDown);
+        style.over = toDrawable(mHover);
     }
 
     @ExposeToLua
     public void setStyle(LuaTable styleTable) {
-        dispose();
         Button.ButtonStyle newStyle = createStyle();
         populateStyle(newStyle, styleTable);
-        mActor.setStyle(newStyle);
+        getActor().setStyle(newStyle);
     }
 
     @ExposeToLua
@@ -57,41 +53,16 @@ public class ButtonFacade extends ActorFacade<Button> {
 
     @Override
     public void dispose() {
-        if (mUp != null) {
-            mScreen.getAssetLoader().freeAsset(mUp);
-            mUp = null;
-        }
-        if (mDown != null) {
-            mScreen.getAssetLoader().freeAsset(mDown);
-            mDown = null;
-        }
-        if (mHover != null) {
-            mScreen.getAssetLoader().freeAsset(mHover);
-            mHover = null;
-        }
-    }
-
-    private ManagedAsset<Texture> getAsset(LuaTable style, String key) {
-        if (style.get(key).isnil()) {
-            return null;
-        } else {
-            AssetID assetID = (AssetID)style.get(key).checkuserdata(AssetID.class);
-            return mScreen.getAssetLoader().getImage(assetID);
-        }
-    }
-
-    private TextureRegionDrawable getDrawable(ManagedAsset<Texture> texture) {
-        if (texture == null) {
-            return null;
-        }
-        return new TextureRegionDrawable(new TextureRegion(texture.get()));
+        mUp = freeAsset(mUp);
+        mDown = freeAsset(mDown);
+        mHover = freeAsset(mHover);
     }
 
     private class OnClickHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
             if (mOnClickCallback != null) {
-                mOnClickCallback.call();
+                mOnClickCallback.call(ButtonFacade.this);
             }
         }
     }

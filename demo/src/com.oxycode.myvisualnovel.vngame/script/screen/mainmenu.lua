@@ -9,6 +9,10 @@ function mainmenu:onCreate(screen)
 
     self.mainTable = self.ui:newTable()
 
+    self.usernameTextField = self.ui:newTextField()
+    self.mainTable:add(self.usernameTextField):fillX():height(30)
+    self.mainTable:row()
+
     -- Login status label
     self.loginStatusLabel = self.ui:newLabel()
     self.loginStatusLabel:setText(R.text.common.logging_in)

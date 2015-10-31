@@ -58,6 +58,13 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
         return label;
     }
 
+    @ExposeToLua
+    public TextFieldFacade newTextField() {
+        TextFieldFacade textField = new TextFieldFacade(mScreen);
+        mControls.add(textField);
+        return textField;
+    }
+
     @Override
     public void dispose() {
         for (ActorFacade<?> control : mControls) {
