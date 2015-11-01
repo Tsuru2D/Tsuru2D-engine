@@ -29,10 +29,10 @@ public class AssetLoader implements Disposable {
         mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
         mLoaderDelegates.put(AssetType.IMAGE, new SingleAssetLoaderDelegate<Texture>(this, Texture.class));
         mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this));
+        mLoaderDelegates.put(AssetType.SKIN, new SkinAssetLoaderDelegate(this));
         mLoaderDelegates.put(AssetType.SCREEN, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         mLoaderDelegates.put(AssetType.SCENE, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         mLoaderDelegates.put(AssetType.OBJECT, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
-        // TODO: Add other types
         mAssetPool = new Pool<ManagedAsset<?>>() {
             @Override
             protected ManagedAsset<?> newObject() {
@@ -54,34 +54,38 @@ public class AssetLoader implements Disposable {
     }
 
     public ManagedAsset<Sound> getSound(AssetID id) {
-        return getAsset(id.checkType(AssetType.SOUND));
+        return getAsset(AssetType.SOUND, id);
     }
 
     public ManagedAsset<Music> getMusic(AssetID id) {
-        return getAsset(id.checkType(AssetType.MUSIC));
+        return getAsset(AssetType.MUSIC, id);
     }
 
     public ManagedAsset<Sound> getVoice(AssetID id) {
-        return getAsset(id.checkType(AssetType.VOICE));
+        return getAsset(AssetType.VOICE, id);
     }
 
     public ManagedAsset<Texture> getImage(AssetID id) {
-        return getAsset(id.checkType(AssetType.IMAGE));
+        return getAsset(AssetType.IMAGE, id);
     }
 
     public ManagedAsset<String> getText(AssetID id) {
-        return getAsset(id.checkType(AssetType.TEXT));
+        return getAsset(AssetType.TEXT, id);
+    }
+
+    public ManagedAsset<LuaTable> getSkin(AssetID id) {
+        return getAsset(AssetType.SKIN, id);
     }
 
     public LuaTable getScreen(AssetID id) {
-        ManagedAsset<LuaValue> screenWrapper = getAsset(id.checkType(AssetType.SCREEN));
+        ManagedAsset<LuaValue> screenWrapper = getAsset(AssetType.SCREEN, id);
         LuaTable screen = screenWrapper.get().checktable();
         freeAsset(screenWrapper);
         return screen;
     }
 
     public GameScene getScene(AssetID id) {
-        ManagedAsset<LuaValue> sceneFuncWrapper = getAsset(id.checkType(AssetType.SCENE));
+        ManagedAsset<LuaValue> sceneFuncWrapper = getAsset(AssetType.SCENE, id);
         LuaFunction sceneFunc = sceneFuncWrapper.get().checkfunction();
         GameScene scene = GameScene.loadFunc(sceneFunc);
         freeAsset(sceneFuncWrapper);
@@ -89,7 +93,7 @@ public class AssetLoader implements Disposable {
     }
 
     public LuaTable getObject(AssetID id) {
-        ManagedAsset<LuaValue> objectWrapper = getAsset(id.checkType(AssetType.OBJECT));
+        ManagedAsset<LuaValue> objectWrapper = getAsset(AssetType.OBJECT, id);
         LuaTable object = objectWrapper.get().checktable();
         freeAsset(objectWrapper);
         return object;
@@ -129,9 +133,11 @@ public class AssetLoader implements Disposable {
      * Gets an asset with the specified asset ID, and increment its
      * reference counter. Make sure to call {@link #freeAsset(ManagedAsset)}
      * once you are done using the asset.
+     * @param assetType The expected type of the asset.
      * @param id The managed ID used to search for the asset.
      */
-    private <T> ManagedAsset<T> getAsset(AssetID id) {
+    public <T> ManagedAsset<T> getAsset(AssetType assetType, AssetID id) {
+        id.checkType(assetType);
         AssetLoaderDelegate<T, ?> delegate = getDelegate(id);
         ManagedAsset<T> asset = delegate.getAsset(id);
         asset.incrementRef();

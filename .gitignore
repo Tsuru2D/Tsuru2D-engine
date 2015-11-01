@@ -65,4 +65,8 @@ build/
 
 
 ## Game zip
-demo/out/
+audio/
+demo/*.zip
+
+desktop.ini
+Thumbs.db

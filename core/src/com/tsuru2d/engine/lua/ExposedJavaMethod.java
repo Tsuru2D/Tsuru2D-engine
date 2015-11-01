@@ -43,9 +43,13 @@ import java.lang.reflect.Modifier;
         if (!Modifier.isStatic(mJavaMethod.getModifiers())) {
             LuaValue arg1 = args.arg1();
             if (!(arg1 instanceof ExposedJavaClass)) {
+                String methodName = mAnnotation.name();
+                if (methodName.equals("")) {
+                    methodName = mJavaMethod.getName();
+                }
                 String errMsg = String.format(
                     "First argument is not a Java object, " +
-                    "did you mean :%1$s() instead of .%1$s()?", mAnnotation.name());
+                    "did you mean :%1$s() instead of .%1$s()?", methodName);
                 throw new LuaError(errMsg);
             }
             thisObject = arg1.touserdata();

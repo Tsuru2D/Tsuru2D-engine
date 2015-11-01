@@ -71,15 +71,13 @@ public final class MetadataLoader {
 
     private static Map<AssetType, String> parseAssetDirs(LuaValue value) {
         LuaTable table = value.checktable();
-        HashMap<AssetType, String> output = new HashMap<AssetType, String>();
-        output.put(AssetType.SOUND, table.get("sound").checkjstring());
-        output.put(AssetType.MUSIC, table.get("music").checkjstring());
-        output.put(AssetType.VOICE, table.get("voice").checkjstring());
-        output.put(AssetType.IMAGE, table.get("image").checkjstring());
-        output.put(AssetType.TEXT, table.get("text").checkjstring());
-        output.put(AssetType.SCREEN, table.get("screen").checkjstring());
-        output.put(AssetType.SCENE, table.get("scene").checkjstring());
-        output.put(AssetType.OBJECT, table.get("object").checkjstring());
-        return output;
+        HashMap<AssetType, String> assetDirs = new HashMap<AssetType, String>();
+        AssetType[] assetTypes = AssetType.values();
+        for (AssetType assetType : assetTypes) {
+            String key = assetType.name().toLowerCase();
+            String path = table.get(key).checkjstring();
+            assetDirs.put(assetType, path);
+        }
+        return assetDirs;
     }
 }

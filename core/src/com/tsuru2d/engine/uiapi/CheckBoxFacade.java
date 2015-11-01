@@ -1,85 +1,79 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
+import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class CheckBoxFacade extends ActorFacade<CheckBox> {
-    private ManagedAsset<Texture> mCheckboxOff, mCheckboxOffDisabled, mCheckboxOn,
-                                    mCheckboxOnDisabled, mCheckboxOver;
-    private ManagedAsset<String> mText;
-    private ChangeHandler mChangeHandler;
-    private LuaFunction mCallBack;
+public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
+    private ManagedAsset<Texture> mCheckboxOff, mCheckboxOffDisabled,
+                                  mCheckboxOn, mCheckboxOnDisabled, mCheckboxOver;
+    private ManagedAsset<String> mText;
+    private LuaFunction mCheckedCallback;
 
-    public CheckBoxFacade(BaseScreen screen) {
-        super(screen);
-        CheckBox checkBox = new CheckBox("", getStyle());
-        setActor(checkBox);
+    public CheckBoxFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
-        mChangeHandler = new ChangeHandler();
     }
 
-    public CheckBox.CheckBoxStyle getStyle() {
+    @Override
+    protected CheckBox createActor(CheckBox.CheckBoxStyle style) {
+        CheckBox checkBox = new CheckBox(null, style);
+        checkBox.addListener(new CheckedHandler());
+        return checkBox;
+    }
+
+    @Override
+    protected CheckBox.CheckBoxStyle createStyle() {
         CheckBox.CheckBoxStyle style = new CheckBox.CheckBoxStyle();
-        style.checkboxOff =
-                mCheckboxOff == null ? null : new TextureRegionDrawable(new TextureRegion(mCheckboxOff.get()));
-        style.checkboxOn =
-                mCheckboxOn == null ? null : new TextureRegionDrawable(new TextureRegion(mCheckboxOn.get()));
-        style.checkboxOver =
-                mCheckboxOver == null ? null : new TextureRegionDrawable(new TextureRegion(mCheckboxOver.get()));
-        style.checkboxOffDisabled =
-                mCheckboxOffDisabled == null ? null : new TextureRegionDrawable(new TextureRegion(mCheckboxOffDisabled.get()));
-        style.checkboxOnDisabled =
-                mCheckboxOnDisabled == null ? null : new TextureRegionDrawable(new TextureRegion(mCheckboxOnDisabled.get()));
-        //Temporary Code
         style.font = new BitmapFont();
-        style.fontColor = Color.BLUE;
         return style;
     }
 
-    @ExposeToLua
-    public void setStyle(LuaTable styleTable) {
-        dispose();
-        mCheckboxOff = getStyleAsset(styleTable, "checkboxoff");
-        mCheckboxOffDisabled = getStyleAsset(styleTable, "checkboxoffdisabled");
-        mCheckboxOn = getStyleAsset(styleTable, "checkboxon");
-        mCheckboxOnDisabled = getStyleAsset(styleTable, "checkboxondisabled");
-        mCheckboxOver = getStyleAsset(styleTable, "checkboxover");
-        CheckBox.CheckBoxStyle checkBoxStyle = getStyle();
-        getActor().setStyle(checkBoxStyle);
+    @Override
+    protected void populateStyle(CheckBox.CheckBoxStyle style, LuaTable styleTable) {
+        mCheckboxOff = swapStyleImage(styleTable, "off", mCheckboxOff);
+        mCheckboxOffDisabled = swapStyleImage(styleTable, "offDisabled", mCheckboxOffDisabled);
+        mCheckboxOn = swapStyleImage(styleTable, "on", mCheckboxOn);
+        mCheckboxOnDisabled = swapStyleImage(styleTable, "onDisabled", mCheckboxOnDisabled);
+        mCheckboxOver = swapStyleImage(styleTable, "over", mCheckboxOver);
+
+        style.checkboxOff = toDrawable(mCheckboxOff);
+        style.checkboxOffDisabled = toDrawable(mCheckboxOffDisabled);
+        style.checkboxOn = toDrawable(mCheckboxOn);
+        style.checkboxOnDisabled = toDrawable(mCheckboxOnDisabled);
+        style.over = toDrawable(mCheckboxOver);
+        style.fontColor = tableToColor(styleTable.get("textColor"));
     }
 
     @ExposeToLua
-    public void setChangeListener(LuaFunction callBack) {
-        mCallBack = callBack;
-        if(mCallBack != null) {
-            getActor().addListener(mChangeHandler);
-        }else {
-            getActor().removeListener(mChangeHandler);
-        }
+    public void setOnCheckedListener(LuaFunction callback) {
+        mCheckedCallback = callback;
     }
 
     @ExposeToLua
-    public void setDisabled(boolean disabled) {
-        getActor().setDisabled(disabled);
+    public void setEnabled(boolean enabled) {
+        getActor().setDisabled(!enabled);
     }
 
     @ExposeToLua
-    public boolean isDisabled() {
-        return getActor().isDisabled();
+    public boolean isEnabled() {
+        return !getActor().isDisabled();
+    }
+
+    @ExposeToLua
+    public void setChecked(boolean checked) {
+        getActor().setChecked(checked);
     }
 
     @ExposeToLua
@@ -88,40 +82,24 @@ public class CheckBoxFacade extends ActorFacade<CheckBox> {
     }
 
     @ExposeToLua
-    public void setText(AssetID hint) {
-        ManagedAsset<String> text = mScreen.getAssetLoader().getText(hint);
+    public void setText(AssetID textID) {
+        mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
         if (mText != null) {
-            mText.removeObserver(mAssetUpdatedObserver);
-            mScreen.getAssetLoader().freeAsset(mText);
-            mText = null;
+            getActor().setText(mText.get());
+        } else {
+            getActor().setText(null);
         }
-        mText = text;
-        mText.addObserver(mAssetUpdatedObserver);
-        getActor().setText(mText.get());
     }
 
     @Override
     public void dispose() {
-        if (mCheckboxOff != null) {
-            mScreen.getAssetLoader().freeAsset(mCheckboxOff);
-            mCheckboxOff = null;
-        }
-        if (mCheckboxOffDisabled != null) {
-            mScreen.getAssetLoader().freeAsset(mCheckboxOffDisabled);
-            mCheckboxOffDisabled = null;
-        }
-        if (mCheckboxOn != null) {
-            mScreen.getAssetLoader().freeAsset(mCheckboxOn);
-            mCheckboxOn = null;
-        }
-        if (mCheckboxOnDisabled != null) {
-            mScreen.getAssetLoader().freeAsset(mCheckboxOnDisabled);
-            mCheckboxOnDisabled = null;
-        }
-        if (mCheckboxOver != null) {
-            mScreen.getAssetLoader().freeAsset(mCheckboxOver);
-            mCheckboxOver = null;
-        }
+        mCheckboxOff = freeAsset(mCheckboxOff);
+        mCheckboxOffDisabled = freeAsset(mCheckboxOffDisabled);
+        mCheckboxOn = freeAsset(mCheckboxOn);
+        mCheckboxOnDisabled = freeAsset(mCheckboxOnDisabled);
+        mCheckboxOver = freeAsset(mCheckboxOver);
+        mText = freeAsset(mText, mAssetUpdatedObserver);
+        super.dispose();
     }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {
@@ -131,11 +109,11 @@ public class CheckBoxFacade extends ActorFacade<CheckBox> {
         }
     }
 
-    private class ChangeHandler extends ChangeListener {
+    private class CheckedHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            if(mCallBack != null) {
-                mCallBack.call();
+            if (mCheckedCallback != null) {
+                mCheckedCallback.call(CheckBoxFacade.this);
             }
         }
     }

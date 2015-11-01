@@ -13,7 +13,8 @@ assetPaths = {
     image = "image",
     object = "script/object",
     screen = "script/screen",
-    scene = "script/scene"
+    scene = "script/scene",
+    skin = "script/skin"
 }
 title = R.text.common.title
 author = R.text.common.author

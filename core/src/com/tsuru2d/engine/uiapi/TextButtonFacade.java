@@ -1,65 +1,65 @@
 package com.tsuru2d.engine.uiapi;
 
-
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetObserver;
+import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import org.luaj.vm2.LuaTable;
 
 public class TextButtonFacade extends ButtonFacade {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<String> mText;
 
-    public TextButtonFacade(BaseScreen screen) {
-        super(screen);
+    public TextButtonFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
     }
 
     @Override
-    protected Button createActor() {
-        return new TextButton(null, (TextButton.TextButtonStyle)createAndPopulateStyle());
+    protected Button createActor(Button.ButtonStyle style) {
+        return new TextButton(null, (TextButton.TextButtonStyle)style);
     }
 
     @Override
     protected Button.ButtonStyle createStyle() {
-        return new TextButton.TextButtonStyle();
+        TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
+        style.font = new BitmapFont();
+        return style;
     }
 
     @Override
-    protected Button.ButtonStyle createAndPopulateStyle() {
-        Button.ButtonStyle style = super.createAndPopulateStyle();
-        ((TextButton.TextButtonStyle)style).font = new BitmapFont();
-        return style;
+    protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
+        super.populateStyle(style, styleTable);
+        TextButton.TextButtonStyle realStyle = (TextButton.TextButtonStyle)style;
+        realStyle.fontColor = tableToColor(styleTable.get("textColor"));
     }
 
     @ExposeToLua
     public void setText(AssetID textID) {
-        // Load the new asset before disposing the old one, to make sure
-        // that the raw asset is not unloaded and then immediately reloaded
-        ManagedAsset<String> newText = mScreen.getAssetLoader().getText(textID);
-        dispose();
-        mText = newText;
-        newText.addObserver(mAssetUpdatedObserver);
-        ((TextButton)mActor).setText(newText.get());
+        mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
+        TextButton textButton = (TextButton)getActor();
+        if (mText != null) {
+            textButton.setText(mText.get());
+        } else {
+            textButton.setText(null);
+        }
     }
 
     @Override
     public void dispose() {
-        if (mText != null) {
-            mText.removeObserver(mAssetUpdatedObserver);
-            mScreen.getAssetLoader().freeAsset(mText);
-            mText = null;
-        }
+        freeAsset(mText, mAssetUpdatedObserver);
+        super.dispose();
     }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            ((TextButton)mActor).setText(asset.get());
+            ((TextButton)getActor()).setText(asset.get());
         }
     }
 }

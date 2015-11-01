@@ -1,11 +1,9 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -13,85 +11,55 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class ButtonFacade extends ActorFacade<Button> {
-    private LuaFunction mOnClickCallback;
+public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
+    private LuaFunction mClickedCallback;
     private ManagedAsset<Texture> mUp, mDown, mHover;
 
-    public ButtonFacade(BaseScreen screen) {
-        super(screen);
-        Button button = createActor();
-        setActor(button);
-        button.addListener(new OnClickHandler());
+    public ButtonFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
     }
 
-    protected Button createActor() {
-        return new Button(createAndPopulateStyle());
+    @Override
+    protected Button createActor(Button.ButtonStyle style) {
+        Button button = new Button(style);
+        button.addListener(new ClickedHandler());
+        return button;
     }
 
+    @Override
     protected Button.ButtonStyle createStyle() {
         return new Button.ButtonStyle();
     }
 
-    protected Button.ButtonStyle createAndPopulateStyle() {
-        Button.ButtonStyle style = createStyle();
-        style.up = getDrawable(mUp);
-        style.down = getDrawable(mDown);
-        style.over = getDrawable(mHover);
-        return style;
+    @Override
+    protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
+        mUp = swapStyleImage(styleTable, "up", mUp);
+        mDown = swapStyleImage(styleTable, "down", mDown);
+        mHover = swapStyleImage(styleTable, "hover", mHover);
+
+        style.up = toDrawable(mUp);
+        style.down = toDrawable(mDown);
+        style.over = toDrawable(mHover);
     }
 
     @ExposeToLua
-    public void setStyle(LuaTable styleTable) {
-        dispose();
-        mUp = getAsset(styleTable, "up");
-        mDown = getAsset(styleTable, "down");
-        mHover = getAsset(styleTable, "hover");
-        Button.ButtonStyle style = createAndPopulateStyle();
-        mActor.setStyle(style);
-    }
-
-    @ExposeToLua
-    public void setOnClick(LuaFunction callback) {
-        mOnClickCallback = callback;
+    public void setOnClickedListener(LuaFunction callback) {
+        mClickedCallback = callback;
     }
 
     @Override
     public void dispose() {
-        if (mUp != null) {
-            mScreen.getAssetLoader().freeAsset(mUp);
-            mUp = null;
-        }
-        if (mDown != null) {
-            mScreen.getAssetLoader().freeAsset(mDown);
-            mDown = null;
-        }
-        if (mHover != null) {
-            mScreen.getAssetLoader().freeAsset(mHover);
-            mHover = null;
-        }
+        mUp = freeAsset(mUp);
+        mDown = freeAsset(mDown);
+        mHover = freeAsset(mHover);
+        super.dispose();
     }
 
-    private ManagedAsset<Texture> getAsset(LuaTable style, String key) {
-        if (style.get(key).isnil()) {
-            return null;
-        } else {
-            AssetID assetID = (AssetID)style.get(key).checkuserdata(AssetID.class);
-            return mScreen.getAssetLoader().getImage(assetID);
-        }
-    }
-
-    private TextureRegionDrawable getDrawable(ManagedAsset<Texture> texture) {
-        if (texture == null) {
-            return null;
-        }
-        return new TextureRegionDrawable(new TextureRegion(texture.get()));
-    }
-
-    private class OnClickHandler extends ChangeListener {
+    private class ClickedHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            if (mOnClickCallback != null) {
-                mOnClickCallback.call();
+            if (mClickedCallback != null) {
+                mClickedCallback.call(ButtonFacade.this);
             }
         }
     }
