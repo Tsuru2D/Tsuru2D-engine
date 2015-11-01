@@ -5,45 +5,41 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.tsuru2d.engine.gameapi.BaseScreen;
+import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class ButtonFacade extends ActorFacade<Button> {
+public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
     private LuaFunction mClickedCallback;
     private ManagedAsset<Texture> mUp, mDown, mHover;
 
-    public ButtonFacade(BaseScreen screen) {
-        super(screen);
-        Button button = createActor();
-        setActor(button);
-        button.addListener(new OnClickHandler());
+    public ButtonFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
     }
 
-    protected Button createActor() {
-        return new Button(createStyle());
+    @Override
+    protected Button createActor(Button.ButtonStyle style) {
+        Button button = new Button(style);
+        button.addListener(new ClickedHandler());
+        return button;
     }
 
+    @Override
     protected Button.ButtonStyle createStyle() {
         return new Button.ButtonStyle();
     }
 
+    @Override
     protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
         mUp = swapStyleImage(styleTable, "up", mUp);
-        mDown = swapStyleImage(styleTable, "down", mUp);
-        mHover = swapStyleImage(styleTable, "hover", mUp);
+        mDown = swapStyleImage(styleTable, "down", mDown);
+        mHover = swapStyleImage(styleTable, "hover", mHover);
 
         style.up = toDrawable(mUp);
         style.down = toDrawable(mDown);
         style.over = toDrawable(mHover);
-    }
-
-    @ExposeToLua
-    public void setStyle(LuaTable styleTable) {
-        Button.ButtonStyle newStyle = createStyle();
-        populateStyle(newStyle, styleTable);
-        getActor().setStyle(newStyle);
     }
 
     @ExposeToLua
@@ -56,9 +52,10 @@ public class ButtonFacade extends ActorFacade<Button> {
         mUp = freeAsset(mUp);
         mDown = freeAsset(mDown);
         mHover = freeAsset(mHover);
+        super.dispose();
     }
 
-    private class OnClickHandler extends ChangeListener {
+    private class ClickedHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
             if (mClickedCallback != null) {

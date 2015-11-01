@@ -9,24 +9,18 @@ function mainmenu:onCreate(screen)
 
     self.mainTable = self.ui:newTable()
 
-    self.usernameTextField = self.ui:newTextField()
+    self.usernameTextField = self.ui:newTextField(R.skin.default.textbox)
     self.mainTable:add(self.usernameTextField):fillX():height(30)
     self.mainTable:row()
 
     -- Login status label
-    self.loginStatusLabel = self.ui:newLabel()
+    self.loginStatusLabel = self.ui:newLabel(R.skin.default.label)
     self.loginStatusLabel:setText(R.text.common.logging_in)
     self.mainTable:add(self.loginStatusLabel):fillX():padBottom(15)
     self.mainTable:row()
 
-    self.theButton = self.ui:newTextButton()
+    self.theButton = self.ui:newTextButton(R.skin.default.button)
     self.theButton:setText(R.text.common.click_me)
-    self.theButton:setStyle({
-        up = R.image.button_up,
-        down = R.image.button_down,
-        hover = R.image.button_hover,
-        textColor = {0.2,0.2,0.2}
-    })
     self.theButton:setOnClick(function()
         if self.settings then
             if not self.settings.lolis then
@@ -43,13 +37,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Start game button
-    self.startGameButton = self.ui:newTextButton()
-    self.startGameButton:setStyle({
-        up = R.image.button_up,
-        down = R.image.button_down,
-        hover = R.image.button_hover,
-        textColor = {0.2,0.2,0.2}
-    })
+    self.startGameButton = self.ui:newTextButton(R.skin.default.button)
     self.startGameButton:setText(R.text.common.start_game)
     self.startGameButton:setOnClick(function()
         screen:setGameScreenNew(R.scene.simplescene1, {})

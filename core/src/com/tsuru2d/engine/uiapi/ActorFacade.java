@@ -15,20 +15,34 @@ import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public abstract class ActorFacade<T extends Actor> extends ExposedJavaClass implements Disposable {
+public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJavaClass implements Disposable {
     private final BaseScreen mScreen;
-    private T mActor;
+    private final ManagedAsset<LuaTable> mStyleTable;
+    private TActor mActor;
 
-    public ActorFacade(BaseScreen screen) {
+    public ActorFacade(BaseScreen screen, AssetID styleID) {
         mScreen = screen;
+        if (styleID != null) {
+            mStyleTable = screen.getAssetLoader().getStyle(styleID);
+        } else {
+            mStyleTable = null;
+        }
     }
 
-    protected void setActor(T actor) {
-        mActor = actor;
+    public void initialize() {
+        TStyle style = createStyle();
+        if (style != null) {
+            populateStyle(style, getStyleTable());
+        }
+        mActor = createActor(style);
     }
 
-    public T getActor() {
+    public TActor getActor() {
         return mActor;
+    }
+
+    protected LuaTable getStyleTable() {
+        return mStyleTable.get();
     }
 
     protected <U> ManagedAsset<U> getAsset(AssetType assetType, AssetID id) {
@@ -69,6 +83,15 @@ public abstract class ActorFacade<T extends Actor> extends ExposedJavaClass impl
         return freeAsset(asset, null);
     }
 
+    @Override
+    public void dispose() {
+        freeAsset(mStyleTable);
+    }
+
+    protected abstract TStyle createStyle();
+    protected abstract void populateStyle(TStyle style, LuaTable styleTable);
+    protected abstract TActor createActor(TStyle style);
+
     protected static AssetID getAssetID(LuaTable styleTable, String key) {
         LuaValue value = styleTable.get(key);
         if (value.isnil()) {
@@ -86,17 +109,15 @@ public abstract class ActorFacade<T extends Actor> extends ExposedJavaClass impl
     }
 
     protected static Color tableToColor(LuaValue colorValue) {
+        if (colorValue.isnil()) {
+            return null;
+        }
         LuaTable colorTable = colorValue.checktable();
         float r = getfloat(colorTable, 1);
         float g = getfloat(colorTable, 2);
         float b = getfloat(colorTable, 3);
         float a = getoptfloat(colorTable, 4, 1);
         return new Color(r, g, b, a);
-    }
-
-    @Override
-    public void dispose() {
-
     }
 
     private static float checkfloat(LuaValue value) {

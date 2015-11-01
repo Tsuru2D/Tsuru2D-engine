@@ -15,18 +15,18 @@ public class TextButtonFacade extends ButtonFacade {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<String> mText;
 
-    public TextButtonFacade(BaseScreen screen) {
-        super(screen);
+    public TextButtonFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
     }
 
     @Override
-    protected Button createActor() {
-        return new TextButton(null, createStyle());
+    protected Button createActor(Button.ButtonStyle style) {
+        return new TextButton(null, (TextButton.TextButtonStyle)style);
     }
 
     @Override
-    protected TextButton.TextButtonStyle createStyle() {
+    protected Button.ButtonStyle createStyle() {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = new BitmapFont();
         return style;

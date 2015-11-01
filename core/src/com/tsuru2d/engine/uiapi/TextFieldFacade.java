@@ -14,31 +14,33 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
-public class TextFieldFacade extends ActorFacade<TextField> {
+public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<Texture> mBackground, mCursor, mSelection,
                                   mDisabledBackground, mFocusedBackground;
     private ManagedAsset<String> mHint;
     private LuaFunction mTextChangedCallback;
 
-    public TextFieldFacade (BaseScreen baseScreen) {
-        super(baseScreen);
-        TextField textField = createActor();
-        textField.addListener(new ChangeHandler());
-        setActor(textField);
+    public TextFieldFacade(BaseScreen baseScreen, AssetID styleID) {
+        super(baseScreen, styleID);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
     }
 
-    protected TextField createActor() {
-        return new TextField(null, createStyle());
+    @Override
+    protected TextField createActor(TextField.TextFieldStyle style) {
+        TextField textField =  new TextField(null, style);
+        textField.addListener(new TextChangedHandler());
+        return textField;
     }
 
+    @Override
     protected TextField.TextFieldStyle createStyle() {
         TextField.TextFieldStyle style = new TextField.TextFieldStyle();
         style.font = new BitmapFont();
         return style;
     }
 
+    @Override
     protected void populateStyle(TextField.TextFieldStyle style, LuaTable styleTable) {
         mBackground = swapStyleImage(styleTable, "background", mBackground);
         mCursor = swapStyleImage(styleTable, "cursor", mCursor);
@@ -52,13 +54,6 @@ public class TextFieldFacade extends ActorFacade<TextField> {
         style.disabledBackground = toDrawable(mDisabledBackground);
         style.focusedBackground = toDrawable(mFocusedBackground);
         style.fontColor = tableToColor(styleTable.get("textColor"));
-    }
-
-    @ExposeToLua
-    public void setStyle(LuaTable styleTable) {
-        TextField.TextFieldStyle style = createStyle();
-        populateStyle(style, styleTable);
-        getActor().setStyle(style);
     }
 
     @ExposeToLua
@@ -114,9 +109,10 @@ public class TextFieldFacade extends ActorFacade<TextField> {
         mDisabledBackground = freeAsset(mDisabledBackground);
         mFocusedBackground = freeAsset(mFocusedBackground);
         mHint = freeAsset(mHint, mAssetUpdatedObserver);
+        super.dispose();
     }
 
-    private class ChangeHandler extends ChangeListener {
+    private class TextChangedHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
             if (mTextChangedCallback != null) {
