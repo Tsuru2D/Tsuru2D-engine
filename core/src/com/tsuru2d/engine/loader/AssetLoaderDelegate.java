@@ -2,6 +2,7 @@ package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.Array;
 
 /* package */ abstract class AssetLoaderDelegate<T, TRaw> {
     private class LoadedCallbackImpl implements AssetLoaderParameters.LoadedCallback {
@@ -31,6 +32,7 @@ import com.badlogic.gdx.assets.AssetManager;
     protected abstract AssetID getRawAssetID(AssetID assetID);
     protected abstract void onRawAssetLoaded(AssetID rawAssetID, TRaw value);
     protected abstract void onRawAssetInvalidated(AssetID baseRawAssetID);
+    protected abstract Array<AssetID> getLoadedAssetIDs();
 
     protected AssetLoaderParameters<TRaw> getParameters() {
         // Sub-classes must override this method if they use a

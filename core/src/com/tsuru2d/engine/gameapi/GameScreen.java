@@ -14,9 +14,9 @@ import org.luaj.vm2.LuaTable;
 
 public class GameScreen extends BaseScreen {
     private final Globals mGameState;
+    private final LuaTable mGlobalsTable;
     private GameScene mScene;
     private LuaTable mLocals;
-    private final LuaTable mGlobalsTable;
     private FrameApi mFrameApi;
     private LuaFunction mClickCallback;
     private Array<GameActor> mActors;
@@ -27,6 +27,9 @@ public class GameScreen extends BaseScreen {
         mGlobalsTable = globalsTable;
         mActors = new Array<GameActor>();
         mFrameApi = new FrameApi(this, mGameState, screenScript);
+        // TODO: For some reason, all touch events on actors within the screen
+        // still fire this click listener, which causes memory leaks when
+        // leaving a game screen.
         mStage.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
@@ -44,9 +47,9 @@ public class GameScreen extends BaseScreen {
 
     public void setScene(AssetID sceneID, String frameID) {
         for (GameActor actor : mActors) {
-            Actor actor1 = actor.getActor();
-            actor1.clearActions();
-            actor1.remove();
+            Actor gdxActor = actor.getActor();
+            gdxActor.clearActions();
+            gdxActor.remove();
             actor.dispose();
         }
 
@@ -107,5 +110,13 @@ public class GameScreen extends BaseScreen {
     @ExposeToLua
     public void transform(GameActor actor, LuaTable params) {
         actor.transform(params);
+    }
+
+    @Override
+    public void dispose() {
+        for (GameActor actor : mActors) {
+            actor.dispose();
+        }
+        super.dispose();
     }
 }

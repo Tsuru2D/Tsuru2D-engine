@@ -14,6 +14,9 @@ function game:onCreate(screen)
     local button = ui:newTextButton(R.skin.default.button)
     button:setText(R.text.common.back_to_menu)
     button:setClickListener(function()
+        -- TODO: This next line is a workaround for the bug detailed in
+        -- GameScreen. Once the bug has been fixed, this should be removed
+        screen:setClickListener(nil)
         screen:setMenuScreen(R.screen.mainmenu)
     end)
     self.button = button
@@ -66,7 +69,7 @@ end
 
 function game:onMusic(musicID)
     print("game::onMusic()")
-    self.screen:playMusic(musicID)
+    -- self.screen:playMusic(musicID)
 end
 
 function game:onBackground(imageID)

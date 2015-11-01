@@ -4,10 +4,12 @@ import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.Pool;
 import com.tsuru2d.engine.gameapi.GameScene;
 import com.tsuru2d.engine.model.GameMetadataInfo;
+import com.tsuru2d.engine.util.Xlog;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -17,6 +19,8 @@ import java.util.List;
 import java.util.Map;
 
 public class AssetLoader implements Disposable {
+    private static final boolean DEBUG_LEAKS = true;
+
     private final RawAssetLoader mRawAssetLoader;
     private final Map<AssetType, AssetLoaderDelegate<?, ?>> mLoaderDelegates;
     private final Pool<ManagedAsset<?>> mAssetPool;
@@ -165,6 +169,16 @@ public class AssetLoader implements Disposable {
 
     @Override
     public void dispose() {
+        if (DEBUG_LEAKS) {
+            for (AssetLoaderDelegate<?, ?> delegate : mLoaderDelegates.values()) {
+                Array<AssetID> loadedIDs = delegate.getLoadedAssetIDs();
+                if (loadedIDs.size > 0) {
+                    for (AssetID leakedID : loadedIDs) {
+                        Xlog.e("Asset leaked: %s", leakedID);
+                    }
+                }
+            }
+        }
         mRawAssetLoader.dispose();
     }
 }

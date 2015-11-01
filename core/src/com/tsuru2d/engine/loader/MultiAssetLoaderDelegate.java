@@ -75,6 +75,17 @@ import java.util.Map;
         }
     }
 
+    @Override
+    protected Array<AssetID> getLoadedAssetIDs() {
+        Array<AssetID> ids = new Array<AssetID>();
+        for (Array<ManagedAsset<T>> assetList : mAssets.values()) {
+            for (ManagedAsset<T> asset : assetList) {
+                ids.add(asset.getAssetID());
+            }
+        }
+        return ids;
+    }
+
     private ManagedAsset<T> getCachedAsset(AssetID assetID, AssetID rawAssetID) {
         Array<ManagedAsset<T>> container = mAssets.get(rawAssetID);
         if (container == null) {
