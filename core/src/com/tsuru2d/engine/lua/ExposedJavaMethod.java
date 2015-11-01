@@ -74,6 +74,12 @@ import java.lang.reflect.Modifier;
             }
         }
 
+        // This is necessary in case a call to this method is re-entrant -
+        // the previous call might not have reached the cleanup block yet
+        for (int i = destIndex; i < mParameters.length; ++i) {
+            mParameters[i] = null;
+        }
+
         // TODO: This code doesn't work with Varargs, have a special case
         // for when Varargs is the last parameter
         if (argCount != mParameters.length && mAnnotation.strictArgs()) {

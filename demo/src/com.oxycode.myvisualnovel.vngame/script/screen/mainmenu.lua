@@ -6,8 +6,6 @@ function mainmenu:onCreate(screen)
     self.netManager = screen:getNetManager()
     self.ui = screen:getUIManager()
 
-    self.mainTable = self.ui:newTable()
-
     -- Login status label
     self.loginStatusLabel = self.ui:newLabel(R.skin.default.label)
     if self.netManager:isLoggedIn() then
@@ -18,6 +16,9 @@ function mainmenu:onCreate(screen)
     self.ui:add(self.loginStatusLabel):top():left():expandX()
     self.ui:row()
 
+    self.mainTable = self.ui:newTable()
+
+    -- Username textbox
     self.usernameTextField = self.ui:newTextField(R.skin.default.textbox)
     self.usernameTextField:setHint(R.text.common.username)
     self.usernameTextField:setText("test@test.com")
@@ -27,6 +28,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:add(self.usernameTextField):fillX():height(30):padLeft(10):padRight(10)
     self.mainTable:row()
 
+    -- Password textbox
     self.passwordTextField = self.ui:newTextField(R.skin.default.textbox)
     self.passwordTextField:setText("abc")
     self.passwordTextField:setHint(R.text.common.password)
@@ -37,6 +39,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:add(self.passwordTextField):fillX():height(30):padLeft(10):padRight(10):spaceBottom(15)
     self.mainTable:row()
 
+    -- Login button
     self.loginButton = self.ui:newTextButton(R.skin.default.button)
     self.loginButton:setText(R.text.common.log_in)
     self.loginButton:setClickListener(function()
@@ -48,7 +51,6 @@ function mainmenu:onCreate(screen)
             end
         )
     end)
-
     self.mainTable:add(self.loginButton):fillX():spaceBottom(15)
     self.mainTable:row()
 

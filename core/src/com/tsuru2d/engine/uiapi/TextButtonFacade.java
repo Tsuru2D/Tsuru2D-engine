@@ -29,11 +29,6 @@ public class TextButtonFacade extends ButtonFacade {
     }
 
     @Override
-    public TextButton getActor() {
-        return (TextButton)super.getActor();
-    }
-
-    @Override
     protected Button.ButtonStyle createStyle() {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
         style.font = new BitmapFont();
@@ -56,13 +51,14 @@ public class TextButtonFacade extends ButtonFacade {
 
     private void updateText() {
         String text = mText.get();
+        TextButton button = (TextButton)getActor();
         if (text == null) {
-            getActor().setText(null);
+            button.setText(null);
         } else {
             if (mFormatParams != null) {
                 text = String.format(text, mFormatParams);
             }
-            getActor().setText(text);
+            button.setText(text);
         }
     }
 

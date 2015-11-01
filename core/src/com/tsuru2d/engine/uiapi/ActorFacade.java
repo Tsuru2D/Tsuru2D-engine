@@ -40,7 +40,9 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     }
 
     protected void initializeActor(TActor actor) {
-
+        // Override this method if you need to perform
+        // additional initialization of the actor, such as
+        // adding observers or setting default properties.
     }
 
     public TActor getActor() {
