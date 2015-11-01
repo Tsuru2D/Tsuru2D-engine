@@ -7,6 +7,8 @@ import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.TwoArgFunction;
 
 import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Wraps a Java object as a {@link LuaUserdata} object, and exposes
@@ -15,6 +17,11 @@ import java.lang.reflect.Method;
  * while instance methods should be called using {@code obj:method()}.
  */
 public class ExposedJavaClass extends LuaUserdata {
+    private static Map<Class<?>, LuaTable> sMetatableCache;
+    static {
+        sMetatableCache = new HashMap<Class<?>, LuaTable>();
+    }
+
     /**
      * Creates a Java object wrapper class from {@code this}. This
      * constructor should be used if you subclass this class. This
@@ -24,7 +31,7 @@ public class ExposedJavaClass extends LuaUserdata {
     protected ExposedJavaClass() {
         super(null);
         m_instance = this;
-        m_metatable = createMetatable(this);
+        m_metatable = getMetatable(getClass());
     }
 
     /**
@@ -34,11 +41,19 @@ public class ExposedJavaClass extends LuaUserdata {
      * @param obj The object to delegate method calls to.
      */
     public ExposedJavaClass(Object obj) {
-        super(obj, createMetatable(obj));
+        super(obj, createMetatable(obj.getClass()));
     }
 
-    private static LuaTable createMetatable(Object javaObject) {
-        Class<?> cls = javaObject.getClass();
+    private static LuaTable getMetatable(Class<?> cls) {
+        LuaTable metatable = sMetatableCache.get(cls);
+        if (metatable == null) {
+            metatable = createMetatable(cls);
+            sMetatableCache.put(cls, metatable);
+        }
+        return metatable;
+    }
+
+    private static LuaTable createMetatable(Class<?> cls) {
         final LuaTable methodTable = new LuaTable();
 
         for (Method method : cls.getMethods()) {
