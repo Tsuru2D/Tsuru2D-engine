@@ -41,9 +41,9 @@ function game:onEnterFrame()
     print("game::onEnterFrame()")
 end
 
-function game:onText(textID)
+function game:onText(textID, ...)
     print("game::onText()")
-    self.label:setText(textID)
+    self.label:setText(textID, ...)
 end
 
 function game:onSound()
