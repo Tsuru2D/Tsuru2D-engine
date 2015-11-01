@@ -61,6 +61,14 @@ public class NetManagerImpl implements NetManager {
 
     @Override
     public void login(String email, String password, Callback callback) {
+        if (isLoggedIn()) {
+            NetResult result = new NetResult();
+            result.mSuccess = false;
+            result.mErrorCode = "already_logged_in";
+            callback.onResult(result);
+            return;
+        }
+
         JsonWriter jsonWriter = newJsonWriter();
         try {
             jsonWriter.object();

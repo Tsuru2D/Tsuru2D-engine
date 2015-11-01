@@ -111,6 +111,8 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     }
 
     protected static TextureRegionDrawable toDrawable(ManagedAsset<Texture> image) {
+        // TODO: Once we have support for transparently loading 9patches, this
+        // should be removed and getImage() should directly return a managed Drawable.
         if (image == null) {
             return null;
         }

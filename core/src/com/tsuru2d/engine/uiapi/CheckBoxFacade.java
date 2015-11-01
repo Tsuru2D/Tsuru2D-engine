@@ -13,6 +13,7 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
@@ -55,7 +56,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
         style.checkboxOffDisabled = toDrawable(mCheckboxOffDisabled);
         style.checkboxOn = toDrawable(mCheckboxOn);
         style.checkboxOnDisabled = toDrawable(mCheckboxOnDisabled);
-        style.over = toDrawable(mCheckboxOver);
+        style.checkboxOver = toDrawable(mCheckboxOver);
         style.fontColor = tableToColor(styleTable.get("textColor"));
     }
 
@@ -116,7 +117,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
         @Override
         public void changed(ChangeEvent event, Actor actor) {
             if (mCheckedChangedCallback != null) {
-                mCheckedChangedCallback.call(CheckBoxFacade.this);
+                mCheckedChangedCallback.call(CheckBoxFacade.this, LuaValue.valueOf(isChecked()));
             }
         }
     }

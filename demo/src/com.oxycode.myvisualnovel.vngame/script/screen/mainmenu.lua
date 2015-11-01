@@ -10,12 +10,55 @@ function mainmenu:onCreate(screen)
     self.mainTable = self.ui:newTable()
 
     self.usernameTextField = self.ui:newTextField(R.skin.default.textbox)
-    self.mainTable:add(self.usernameTextField):fillX():height(30)
+    self.usernameTextField:setHint(R.text.common.username)
+    self.usernameTextField:setTextChangedListener(function(textbox, value)
+        print("Username: " .. value)
+    end)
+    self.mainTable:add(self.usernameTextField):fillX():height(30):padLeft(10):padRight(10)
+    self.mainTable:row()
+
+    self.passwordTextField = self.ui:newTextField(R.skin.default.textbox)
+    self.passwordTextField:setHint(R.text.common.password)
+    self.passwordTextField:setPasswordMode(true)
+    self.passwordTextField:setTextChangedListener(function(textbox, value)
+        print("Password: " .. value)
+    end)
+    self.mainTable:add(self.passwordTextField):fillX():height(30):padLeft(10):padRight(10)
+    self.mainTable:row()
+
+    self.loginButton = self.ui:newTextButton(R.skin.default.button)
+    self.loginButton:setText(R.text.common.log_in)
+    self.loginButton:setClickListener(function()
+        self.netManager:login(
+            self.usernameTextField:getText(),
+            self.passwordTextField:getText(),
+            function(success, errorCode, data)
+                self:onLoginResult(success, errorCode, data)
+            end
+        )
+    end)
+
+    self.mainTable:add(self.loginButton):fillX()
+    self.mainTable:row()
+
+    self.slider = self.ui:newSlider(R.skin.default.slider)
+    self.slider:setValueChangedListener(function(slider, value)
+        print("Value: " .. value)
+    end)
+    self.mainTable:add(self.slider):fillX()
+    self.mainTable:row()
+
+    self.checkbox = self.ui:newCheckBox(R.skin.default.checkbox)
+    self.checkbox:setText(R.text.common.check_me)
+    self.checkbox:setCheckedChangedListener(function(checkbox, value)
+        print("Checked: " .. (value and "true" or "false"))
+    end)
+    self.mainTable:add(self.checkbox):fillX()
     self.mainTable:row()
 
     -- Login status label
     self.loginStatusLabel = self.ui:newLabel(R.skin.default.label)
-    self.loginStatusLabel:setText(R.text.common.logging_in)
+    self.loginStatusLabel:setText(R.text.common.please_log_in, "FMT1", "FMT2")
     self.mainTable:add(self.loginStatusLabel):fillX():padBottom(15)
     self.mainTable:row()
 
@@ -31,6 +74,8 @@ function mainmenu:onCreate(screen)
             self.netManager:writeGameSettings(self.settings, function(success, errorCode, data)
                 self:onWriteSettingsResult(success, errorCode, data)
             end)
+        else
+            print("Not logged in!")
         end
     end)
     self.mainTable:add(self.theButton):fillX():padBottom(15)
@@ -48,9 +93,10 @@ function mainmenu:onCreate(screen)
     self.ui:add(self.mainTable):expand()
 
     -- Login to server
+    --[[
     self.netManager:login("test@test.com", "abc", function(success, errorCode, data)
         self:onLoginResult(success, errorCode, data)
-    end)
+    end)]]
 
     -- screen:playMusic(R.music.bg1)
 end

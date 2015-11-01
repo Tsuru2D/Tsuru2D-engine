@@ -37,6 +37,12 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
     }
 
     @ExposeToLua
+    public CellFacade row() {
+        Cell cell = mTable.row();
+        return new CellFacade(cell);
+    }
+
+    @ExposeToLua
     public TableFacade newTable() {
         TableFacade table = new TableFacade(mScreen);
         initActor(table);
