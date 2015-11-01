@@ -22,9 +22,12 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
 
     @Override
     protected Slider createActor(Slider.SliderStyle style) {
-        Slider slider = new Slider(0.0f, 1.0f, 0.01f, false, style);
-        slider.addListener(new ValueChangedHandler());
-        return slider;
+        return new Slider(0.0f, 1.0f, 0.01f, false, style);
+    }
+
+    @Override
+    protected void initializeActor(Slider actor) {
+        actor.addListener(new ValueChangedHandler());
     }
 
     @Override

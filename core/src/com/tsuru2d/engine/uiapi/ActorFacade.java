@@ -34,7 +34,13 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
         if (style != null) {
             populateStyle(style, getStyleTable());
         }
-        mActor = createActor(style);
+        TActor actor = createActor(style);
+        initializeActor(actor);
+        mActor = actor;
+    }
+
+    protected void initializeActor(TActor actor) {
+
     }
 
     public TActor getActor() {

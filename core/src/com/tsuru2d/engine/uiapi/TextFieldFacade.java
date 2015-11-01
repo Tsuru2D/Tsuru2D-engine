@@ -28,9 +28,12 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
 
     @Override
     protected TextField createActor(TextField.TextFieldStyle style) {
-        TextField textField =  new TextField(null, style);
-        textField.addListener(new TextChangedHandler());
-        return textField;
+        return new TextField(null, style);
+    }
+
+    @Override
+    protected void initializeActor(TextField actor) {
+        actor.addListener(new TextChangedHandler());
     }
 
     @Override

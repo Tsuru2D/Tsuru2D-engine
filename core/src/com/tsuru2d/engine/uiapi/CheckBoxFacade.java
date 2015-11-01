@@ -28,9 +28,12 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
 
     @Override
     protected CheckBox createActor(CheckBox.CheckBoxStyle style) {
-        CheckBox checkBox = new CheckBox(null, style);
-        checkBox.addListener(new CheckedHandler());
-        return checkBox;
+        return new CheckBox(null, style);
+    }
+
+    @Override
+    protected void initializeActor(CheckBox actor) {
+        actor.addListener(new CheckedHandler());
     }
 
     @Override

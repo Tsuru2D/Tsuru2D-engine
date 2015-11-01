@@ -21,9 +21,12 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
 
     @Override
     protected Button createActor(Button.ButtonStyle style) {
-        Button button = new Button(style);
-        button.addListener(new ClickedHandler());
-        return button;
+        return new Button(style);
+    }
+
+    @Override
+    protected void initializeActor(Button actor) {
+        actor.addListener(new ClickedHandler());
     }
 
     @Override
