@@ -74,6 +74,8 @@ import java.lang.reflect.Modifier;
             }
         }
 
+        // TODO: This code doesn't work with Varargs, have a special case
+        // for when Varargs is the last parameter
         if (argCount != mParameters.length && mAnnotation.strictArgs()) {
             String errMsg = String.format(
                 "Argument count mismatch (expected %d, got %d)",

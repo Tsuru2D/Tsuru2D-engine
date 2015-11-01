@@ -9,11 +9,14 @@ import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.lua.LuaUtils;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.Varargs;
 
 public class TextButtonFacade extends ButtonFacade {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<String> mText;
+    private Object[] mFormatParams;
 
     public TextButtonFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
@@ -23,6 +26,11 @@ public class TextButtonFacade extends ButtonFacade {
     @Override
     protected Button createActor(Button.ButtonStyle style) {
         return new TextButton(null, (TextButton.TextButtonStyle)style);
+    }
+
+    @Override
+    public TextButton getActor() {
+        return (TextButton)super.getActor();
     }
 
     @Override
@@ -40,26 +48,35 @@ public class TextButtonFacade extends ButtonFacade {
     }
 
     @ExposeToLua
-    public void setText(AssetID textID) {
+    public void setText(AssetID textID, Varargs args) {
+        mFormatParams = (args == null) ? null : LuaUtils.toArray(args);
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
-        TextButton textButton = (TextButton)getActor();
-        if (mText != null) {
-            textButton.setText(mText.get());
+        updateText();
+    }
+
+    private void updateText() {
+        String text = mText.get();
+        if (text == null) {
+            getActor().setText(null);
         } else {
-            textButton.setText(null);
+            if (mFormatParams != null) {
+                text = String.format(text, mFormatParams);
+            }
+            getActor().setText(text);
         }
     }
 
     @Override
     public void dispose() {
-        freeAsset(mText, mAssetUpdatedObserver);
+        mText = freeAsset(mText, mAssetUpdatedObserver);
+        mFormatParams = null;
         super.dispose();
     }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            ((TextButton)getActor()).setText(asset.get());
+            updateText();
         }
     }
 }

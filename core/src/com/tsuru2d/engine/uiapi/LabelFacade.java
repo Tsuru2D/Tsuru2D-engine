@@ -9,12 +9,15 @@ import com.tsuru2d.engine.loader.AssetObserver;
 import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.lua.LuaUtils;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.Varargs;
 
 public class LabelFacade extends ActorFacade<Label, Label.LabelStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<Texture> mBackground;
     private ManagedAsset<String> mText;
+    private Object[] mFormatParams;
 
     public LabelFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
@@ -42,12 +45,21 @@ public class LabelFacade extends ActorFacade<Label, Label.LabelStyle> {
     }
 
     @ExposeToLua
-    public void setText(AssetID textID) {
+    public void setText(AssetID textID, Varargs args) {
+        mFormatParams = (args == null) ? null : LuaUtils.toArray(args);
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
-        if (mText != null) {
-            getActor().setText(mText.get());
-        } else {
+        updateText();
+    }
+
+    private void updateText() {
+        String text = mText.get();
+        if (text == null) {
             getActor().setText(null);
+        } else {
+            if (mFormatParams != null) {
+                text = String.format(text, mFormatParams);
+            }
+            getActor().setText(text);
         }
     }
 
@@ -55,13 +67,14 @@ public class LabelFacade extends ActorFacade<Label, Label.LabelStyle> {
     public void dispose() {
         mBackground = freeAsset(mBackground);
         mText = freeAsset(mText, mAssetUpdatedObserver);
+        mFormatParams = null;
         super.dispose();
     }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {
         @Override
         public void onAssetUpdated(ManagedAsset<String> asset) {
-            getActor().setText(asset.get());
+            updateText();
         }
     }
 }
