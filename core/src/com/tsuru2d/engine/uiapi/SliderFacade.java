@@ -75,6 +75,11 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
     }
 
     @ExposeToLua
+    public void setValue(float value) {
+        getActor().setValue(value);
+    }
+
+    @ExposeToLua
     public void setEnabled(boolean enabled) {
         getActor().setDisabled(!enabled);
     }
