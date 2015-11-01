@@ -29,7 +29,7 @@ public class AssetLoader implements Disposable {
         mLoaderDelegates.put(AssetType.VOICE, new SingleAssetLoaderDelegate<Sound>(this, Sound.class));
         mLoaderDelegates.put(AssetType.IMAGE, new SingleAssetLoaderDelegate<Texture>(this, Texture.class));
         mLoaderDelegates.put(AssetType.TEXT, new TextAssetLoaderDelegate(this));
-        mLoaderDelegates.put(AssetType.STYLE, new StyleAssetLoaderDelegate(this));
+        mLoaderDelegates.put(AssetType.SKIN, new SkinAssetLoaderDelegate(this));
         mLoaderDelegates.put(AssetType.SCREEN, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         mLoaderDelegates.put(AssetType.SCENE, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
         mLoaderDelegates.put(AssetType.OBJECT, new SingleAssetLoaderDelegate<LuaValue>(this, LuaValue.class));
@@ -73,8 +73,8 @@ public class AssetLoader implements Disposable {
         return getAsset(AssetType.TEXT, id);
     }
 
-    public ManagedAsset<LuaTable> getStyle(AssetID id) {
-        return getAsset(AssetType.STYLE, id);
+    public ManagedAsset<LuaTable> getSkin(AssetID id) {
+        return getAsset(AssetType.SKIN, id);
     }
 
     public LuaTable getScreen(AssetID id) {

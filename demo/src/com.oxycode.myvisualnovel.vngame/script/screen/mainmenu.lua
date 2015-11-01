@@ -21,7 +21,7 @@ function mainmenu:onCreate(screen)
 
     self.theButton = self.ui:newTextButton(R.skin.default.button)
     self.theButton:setText(R.text.common.click_me)
-    self.theButton:setOnClick(function()
+    self.theButton:setOnClickedListener(function()
         if self.settings then
             if not self.settings.lolis then
                 self.settings.lolis = 0
@@ -39,7 +39,7 @@ function mainmenu:onCreate(screen)
     -- Start game button
     self.startGameButton = self.ui:newTextButton(R.skin.default.button)
     self.startGameButton:setText(R.text.common.start_game)
-    self.startGameButton:setOnClick(function()
+    self.startGameButton:setOnClickedListener(function()
         screen:setGameScreenNew(R.scene.simplescene1, {})
     end)
     self.mainTable:add(self.startGameButton):fillX()

@@ -23,7 +23,7 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     public ActorFacade(BaseScreen screen, AssetID styleID) {
         mScreen = screen;
         if (styleID != null) {
-            mStyleTable = screen.getAssetLoader().getStyle(styleID);
+            mStyleTable = screen.getAssetLoader().getSkin(styleID);
         } else {
             mStyleTable = null;
         }
@@ -46,6 +46,9 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     }
 
     protected <U> ManagedAsset<U> getAsset(AssetType assetType, AssetID id) {
+        if (id == null) {
+            return null;
+        }
         return mScreen.getAssetLoader().getAsset(assetType, id);
     }
 

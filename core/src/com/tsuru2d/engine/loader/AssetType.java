@@ -6,7 +6,7 @@ public enum AssetType {
     VOICE,
     IMAGE,
     TEXT,
-    STYLE,
+    SKIN,
     SCREEN,
     SCENE,
     OBJECT
