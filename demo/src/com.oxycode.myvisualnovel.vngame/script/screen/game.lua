@@ -4,16 +4,16 @@ function game:onCreate(screen)
     print("game::onCreate()")
     self.screen = screen
     local ui = screen:getUIManager()
-    screen:setOnClick(function()
+    screen:setClickListener(function()
         screen:nextFrame()
     end)
-    local label = ui:newLabel()
+    local label = ui:newLabel(R.skin.default.label)
     self.label = label
     ui:add(label):bottom():expand()
 
-    local button = ui:newTextButton()
+    local button = ui:newTextButton(R.skin.default.button)
     button:setText(R.text.common.back_to_menu)
-    button:setOnClick(function()
+    button:setClickListener(function()
         screen:setMenuScreen(R.screen.mainmenu)
     end)
     self.button = button

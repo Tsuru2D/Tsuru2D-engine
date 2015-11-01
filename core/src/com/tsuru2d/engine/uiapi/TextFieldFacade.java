@@ -70,7 +70,7 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
     }
 
     @ExposeToLua
-    public void setOnTextChangedListener(LuaFunction callback) {
+    public void setTextChangedListener(LuaFunction callback) {
         mTextChangedCallback = callback;
     }
 

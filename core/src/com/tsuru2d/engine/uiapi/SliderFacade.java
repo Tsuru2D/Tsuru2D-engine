@@ -49,7 +49,7 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
     }
 
     @ExposeToLua
-    public void setOnValueChangedListener(LuaFunction callback) {
+    public void setValueChangedListener(LuaFunction callback) {
         mValueChangedCallback = callback;
     }
 

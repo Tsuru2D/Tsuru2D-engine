@@ -19,7 +19,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
     private ManagedAsset<Texture> mCheckboxOff, mCheckboxOffDisabled,
                                   mCheckboxOn, mCheckboxOnDisabled, mCheckboxOver;
     private ManagedAsset<String> mText;
-    private LuaFunction mCheckedCallback;
+    private LuaFunction mCheckedChangedCallback;
 
     public CheckBoxFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
@@ -33,7 +33,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
 
     @Override
     protected void initializeActor(CheckBox actor) {
-        actor.addListener(new CheckedHandler());
+        actor.addListener(new CheckedChangedHandler());
     }
 
     @Override
@@ -60,8 +60,8 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
     }
 
     @ExposeToLua
-    public void setOnCheckedListener(LuaFunction callback) {
-        mCheckedCallback = callback;
+    public void setCheckedChangedListener(LuaFunction callback) {
+        mCheckedChangedCallback = callback;
     }
 
     @ExposeToLua
@@ -112,11 +112,11 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
         }
     }
 
-    private class CheckedHandler extends ChangeListener {
+    private class CheckedChangedHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            if (mCheckedCallback != null) {
-                mCheckedCallback.call(CheckBoxFacade.this);
+            if (mCheckedChangedCallback != null) {
+                mCheckedChangedCallback.call(CheckBoxFacade.this);
             }
         }
     }

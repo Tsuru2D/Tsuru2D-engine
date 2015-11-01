@@ -18,7 +18,7 @@ public class GameScreen extends BaseScreen {
     private LuaTable mLocals;
     private final LuaTable mGlobalsTable;
     private FrameApi mFrameApi;
-    private LuaFunction mOnClickHandler;
+    private LuaFunction mClickCallback;
     private Array<GameActor> mActors;
 
     public GameScreen(EngineMain game, LuaTable screenScript, LuaTable globalsTable) {
@@ -35,8 +35,8 @@ public class GameScreen extends BaseScreen {
 
             @Override
             public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
-                if (mOnClickHandler != null) {
-                    mOnClickHandler.call();
+                if (mClickCallback != null) {
+                    mClickCallback.call();
                 }
             }
         });
@@ -83,8 +83,8 @@ public class GameScreen extends BaseScreen {
     }
 
     @ExposeToLua
-    public void setOnClick(LuaFunction callback) {
-        mOnClickHandler = callback;
+    public void setClickListener(LuaFunction callback) {
+        mClickCallback = callback;
     }
 
     @ExposeToLua

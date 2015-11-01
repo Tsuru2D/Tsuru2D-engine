@@ -2,16 +2,10 @@ package com.tsuru2d.engine.gameapi;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.io.LuaNetManager;
@@ -30,7 +24,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final Stage mStage;
     private final LuaNetManager mNetManager;
     private final LuaUIManager mUIManager;
-    private final Skin mSkin;
     private final Table mTable;
     private final TextureRegionDrawable mBackgroundDrawable;
     private ManagedAsset<Texture> mBackgroundTexture;
@@ -40,7 +33,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mScreenScript = screenScript;
         mStage = new Stage(game.getViewport(), game.getSpriteBatch());
         mBackgroundDrawable = new TextureRegionDrawable(new TextureRegion());
-        mSkin = createSkin();
         Table table = new Table();
         table.setDebug(true);
         table.setFillParent(true);
@@ -49,27 +41,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mNetManager = new LuaNetManager(game.getNetManager());
         mUIManager = new LuaUIManager(this, table);
         mScreenScript.invokemethod("onCreate", this);
-    }
-
-    private static Skin createSkin() {
-        Skin skin = new Skin();
-        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        pixmap.setColor(Color.WHITE);
-        pixmap.fill();
-        skin.add("white", new Texture(pixmap));
-        skin.add("default", new BitmapFont());
-        TextButton.TextButtonStyle textButtonStyle = new TextButton.TextButtonStyle();
-        textButtonStyle.up = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.down = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.checked = skin.newDrawable("white", Color.DARK_GRAY);
-        textButtonStyle.over = skin.newDrawable("white", Color.LIGHT_GRAY);
-        textButtonStyle.font = skin.getFont("default");
-        skin.add("default", textButtonStyle);
-        Label.LabelStyle labelStyle = new Label.LabelStyle();
-        labelStyle.background = skin.newDrawable("white", Color.DARK_GRAY);
-        labelStyle.font = skin.getFont("default");
-        skin.add("default", labelStyle);
-        return skin;
     }
 
     public void show(LuaValue params) {
@@ -123,12 +94,6 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
 
     public AssetLoader getAssetLoader() {
         return mGame.getAssetLoader();
-    }
-
-    @Deprecated
-    public Skin getSkin() {
-        // This method is for TESTING ONLY!
-        return mSkin;
     }
 
     @ExposeToLua
