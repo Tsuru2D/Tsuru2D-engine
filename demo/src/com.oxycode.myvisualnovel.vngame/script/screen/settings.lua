@@ -5,7 +5,7 @@ function settings:onCreate(screen)
     self.screen = screen
     self.netManager = screen:getNetManager()
     self.ui = screen:getUIManager()
-    self.settings = nil
+    self.settings = {}
 
     -- Status label
     self.statusLabel = self.ui:newLabel(R.skin.default.label)
