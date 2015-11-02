@@ -50,6 +50,16 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
         mClickCallback = callback;
     }
 
+    @ExposeToLua
+    public boolean isEnabled() {
+        return !getActor().isDisabled();
+    }
+
+    @ExposeToLua
+    public void setEnabled(boolean enabled) {
+        getActor().setDisabled(!enabled);
+    }
+
     @Override
     public void dispose() {
         mUp = freeAsset(mUp);

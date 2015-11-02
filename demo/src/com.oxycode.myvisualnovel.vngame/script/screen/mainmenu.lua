@@ -11,7 +11,7 @@ function mainmenu:onCreate(screen)
     if self.netManager:isLoggedIn() then
         self.loginStatusLabel:setText(R.text.common.logged_in)
     else
-        self.loginStatusLabel:setText(R.text.common.please_log_in)
+        self.loginStatusLabel:setText(R.text.common.logged_out)
     end
     self.ui:add(self.loginStatusLabel):top():left():expandX()
     self.ui:row()
@@ -41,15 +41,26 @@ function mainmenu:onCreate(screen)
 
     -- Login button
     self.loginButton = self.ui:newTextButton(R.skin.default.button)
-    self.loginButton:setText(R.text.common.log_in)
+    if self.netManager:isLoggedIn() then
+        self.loginButton:setText(R.text.common.log_out)
+    else
+        self.loginButton:setText(R.text.common.log_in)
+    end
     self.loginButton:setClickListener(function()
-        self.netManager:login(
-            self.usernameTextField:getText(),
-            self.passwordTextField:getText(),
-            function(success, errorCode, data)
-                self:onLoginResult(success, errorCode, data)
-            end
-        )
+        if self.netManager:isLoggedIn() then
+            self.netManager:logout()
+            self.loginButton:setText(R.text.common.log_in)
+            self.loginStatusLabel:setText(R.text.common.logged_out)
+        else
+            self.loginButton:setEnabled(false)
+            self.netManager:login(
+                self.usernameTextField:getText(),
+                self.passwordTextField:getText(),
+                function(success, errorCode, data)
+                    self:onLoginResult(success, errorCode, data)
+                end
+            )
+        end
     end)
     self.mainTable:add(self.loginButton):fillX():spaceBottom(15)
     self.mainTable:row()
@@ -68,7 +79,7 @@ function mainmenu:onCreate(screen)
     self.settingsButton:setText(R.text.common.settings)
     self.settingsButton:setClickListener(function()
         if not self.netManager:isLoggedIn() then
-            print("Not logged in!")
+            self.loginStatusLabel:setText(R.text.common.not_logged_in)
         else
             screen:setMenuScreen(R.screen.settings)
         end
@@ -82,6 +93,7 @@ function mainmenu:onCreate(screen)
 end
 
 function mainmenu:onLoginResult(success, errorCode, data)
+    self.loginButton:setEnabled(true)
     if not success then
         self.loginStatusLabel:setText(R.text.common.login_failed, errorCode)
         if errorCode then
@@ -90,6 +102,7 @@ function mainmenu:onLoginResult(success, errorCode, data)
         return
     end
     self.loginStatusLabel:setText(R.text.common.logged_in)
+    self.loginButton:setText(R.text.common.log_out)
 end
 
 function mainmenu:onResume(params)
