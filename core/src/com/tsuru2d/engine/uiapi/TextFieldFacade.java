@@ -84,7 +84,7 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
     public void setHint(AssetID hintTextID) {
         mHint = swapAsset(AssetType.TEXT, hintTextID, mHint, mAssetUpdatedObserver);
         if (mHint != null) {
-            getActor().setMessageText(mHint.get());
+            mHint.touch();
         } else {
             getActor().setMessageText(null);
         }

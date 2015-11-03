@@ -46,20 +46,17 @@ public class TextButtonFacade extends ButtonFacade {
     public void setText(AssetID textID, Varargs args) {
         mFormatParams = (args == null) ? null : LuaUtils.toArray(args);
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
-        updateText();
+        if (mText != null) {
+            mText.touch();
+        } else {
+            updateText();
+        }
     }
 
     private void updateText() {
-        String text = mText.get();
+        String text = getText(mText, mFormatParams);
         TextButton button = (TextButton)getActor();
-        if (text == null) {
-            button.setText(null);
-        } else {
-            if (mFormatParams != null) {
-                text = String.format(text, mFormatParams);
-            }
-            button.setText(text);
-        }
+        button.setText(text);
     }
 
     @Override

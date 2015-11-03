@@ -48,19 +48,16 @@ public class LabelFacade extends ActorFacade<Label, Label.LabelStyle> {
     public void setText(AssetID textID, Varargs args) {
         mFormatParams = (args == null) ? null : LuaUtils.toArray(args);
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
-        updateText();
+        if (mText != null) {
+            mText.touch();
+        } else {
+            updateText();
+        }
     }
 
     private void updateText() {
-        String text = mText.get();
-        if (text == null) {
-            getActor().setText(null);
-        } else {
-            if (mFormatParams != null) {
-                text = String.format(text, mFormatParams);
-            }
-            getActor().setText(text);
-        }
+        String text = getText(mText, mFormatParams);
+        getActor().setText(text);
     }
 
     @Override

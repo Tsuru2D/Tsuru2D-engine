@@ -31,16 +31,7 @@ public class ManagedAsset<T> implements Pool.Poolable {
             return;
         }
         mAsset = value;
-        if (mObservers != null && mObservers.size > 0) {
-            AssetObserver<T>[] observers = mObservers.begin();
-            // Use mObservers.size instead of observers.length here,
-            // since we are using the raw backing array that
-            // may contain trailing nulls
-            for (int i = 0, n = mObservers.size; i < n; ++i) {
-                observers[i].onAssetUpdated(this);
-            }
-            mObservers.end();
-        }
+        notifyObservers();
     }
 
     /* package */ void invalidate() {
@@ -53,6 +44,19 @@ public class ManagedAsset<T> implements Pool.Poolable {
 
     /* package */ int decrementRef() {
         return --mReferenceCount;
+    }
+
+    private void notifyObservers() {
+        if (mObservers != null && mObservers.size > 0) {
+            AssetObserver<T>[] observers = mObservers.begin();
+            // Use mObservers.size instead of observers.length here,
+            // since we are using the raw backing array that
+            // may contain trailing nulls
+            for (int i = 0, n = mObservers.size; i < n; ++i) {
+                observers[i].onAssetUpdated(this);
+            }
+            mObservers.end();
+        }
     }
 
     /**
@@ -99,6 +103,21 @@ public class ManagedAsset<T> implements Pool.Poolable {
     }
 
     /**
+     * Ensures the asset is loaded, then runs all observer
+     * callbacks. Use this to avoid a re-entrant call to
+     * the observer callback in case the asset has not
+     * been loaded yet.
+     */
+    public void touch() {
+        if (mAsset == null) {
+            // This will notify the observers through setRawAsset()
+            mLoader.fillRawAsset(this);
+        } else {
+            notifyObservers();
+        }
+    }
+
+    /**
      * Get the raw asset wrapped by this class. Do NOT
      * hold a reference to the object returned by this method
      * for a prolonged time, since the underlying asset may
@@ -125,8 +144,11 @@ public class ManagedAsset<T> implements Pool.Poolable {
         mLoader = null;
         mAssetID = null;
         mAsset = null;
-        if (mObservers != null) {
+        // This might actually increase memory allocations,
+        // since when an observer is added the array will resize
+        // from zero to 8 instead of 1.
+        /* if (mObservers != null) {
             mObservers.shrink();
-        }
+        } */
     }
 }

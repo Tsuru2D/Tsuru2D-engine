@@ -89,7 +89,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
     public void setText(AssetID textID) {
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
         if (mText != null) {
-            getActor().setText(mText.get());
+            mText.touch();
         } else {
             getActor().setText(null);
         }

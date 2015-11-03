@@ -103,6 +103,17 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     protected abstract void populateStyle(TStyle style, LuaTable styleTable);
     protected abstract TActor createActor(TStyle style);
 
+    protected static String getText(ManagedAsset<String> text, Object[] formatParams) {
+        if (text == null) {
+            return null;
+        }
+        String textStr = text.get();
+        if (formatParams != null) {
+            textStr = String.format(textStr, formatParams);
+        }
+        return textStr;
+    }
+
     protected static AssetID getAssetID(LuaTable styleTable, String key) {
         LuaValue value = styleTable.get(key);
         if (value.isnil()) {
