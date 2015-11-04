@@ -12,7 +12,7 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 
 public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
-    private LuaFunction mClickedCallback;
+    private LuaFunction mClickCallback;
     private ManagedAsset<Texture> mUp, mDown, mHover;
 
     public ButtonFacade(BaseScreen screen, AssetID styleID) {
@@ -21,9 +21,12 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
 
     @Override
     protected Button createActor(Button.ButtonStyle style) {
-        Button button = new Button(style);
-        button.addListener(new ClickedHandler());
-        return button;
+        return new Button(style);
+    }
+
+    @Override
+    protected void initializeActor(Button actor) {
+        actor.addListener(new ClickHandler());
     }
 
     @Override
@@ -43,8 +46,18 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
     }
 
     @ExposeToLua
-    public void setOnClickedListener(LuaFunction callback) {
-        mClickedCallback = callback;
+    public void setClickListener(LuaFunction callback) {
+        mClickCallback = callback;
+    }
+
+    @ExposeToLua
+    public boolean isEnabled() {
+        return !getActor().isDisabled();
+    }
+
+    @ExposeToLua
+    public void setEnabled(boolean enabled) {
+        getActor().setDisabled(!enabled);
     }
 
     @Override
@@ -55,11 +68,11 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
         super.dispose();
     }
 
-    private class ClickedHandler extends ChangeListener {
+    private class ClickHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            if (mClickedCallback != null) {
-                mClickedCallback.call(ButtonFacade.this);
+            if (mClickCallback != null) {
+                mClickCallback.call(ButtonFacade.this);
             }
         }
     }

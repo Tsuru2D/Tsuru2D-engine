@@ -3,10 +3,7 @@ package com.tsuru2d.engine.gameapi;
 import com.tsuru2d.engine.loader.LuaAssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
-import org.luaj.vm2.Globals;
-import org.luaj.vm2.LuaFunction;
-import org.luaj.vm2.LuaTable;
-import org.luaj.vm2.LuaValue;
+import org.luaj.vm2.*;
 
 public class FrameApi extends ExposedJavaClass {
     private final GameScreen mScreen;
@@ -77,8 +74,9 @@ public class FrameApi extends ExposedJavaClass {
     }
 
     @ExposeToLua
-    public InstantGameAction text(LuaAssetID textID) {
-        mUIEnvironment.invokemethod("onText", textID);
+    public InstantGameAction text(LuaAssetID textID, Varargs args) {
+        Varargs params = (args == null) ? textID : LuaValue.varargsOf(textID, args);
+        mUIEnvironment.invokemethod("onText", params);
         return InstantGameAction.EMPTY;
     }
 

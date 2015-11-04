@@ -66,7 +66,7 @@ public class LuaNetManager extends ExposedJavaClass {
         mNetManager.enumerateSaves(startIndex, endIndex, new LuaCallback(callback) {
             @Override
             public void onResult(NetResult result) {
-                GameSaveData[] data = (GameSaveData[])result.mData;
+                // GameSaveData[] data = (GameSaveData[])result.mData;
                 // TODO
                 runCallback(result.mSuccess, result.mErrorCode);
             }
@@ -88,8 +88,12 @@ public class LuaNetManager extends ExposedJavaClass {
         mNetManager.readGameSettings(new LuaCallback(callback) {
             @Override
             public void onResult(NetResult result) {
-                LuaTable settings = (LuaTable)result.mData;
-                runCallback(result.mSuccess, result.mErrorCode, settings);
+                if (!result.mSuccess) {
+                    runCallback(false, result.mErrorCode);
+                } else {
+                    LuaTable settings = (LuaTable)result.mData;
+                    runCallback(true, result.mErrorCode, settings);
+                }
             }
         });
     }

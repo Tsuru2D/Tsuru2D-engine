@@ -53,6 +53,15 @@ import com.badlogic.gdx.utils.Array;
         }
     }
 
+    @Override
+    protected Array<AssetID> getLoadedAssetIDs() {
+        Array<AssetID> ids = new Array<AssetID>(mAssets.size);
+        for (ManagedAsset<T> asset : mAssets) {
+            ids.add(asset.getAssetID());
+        }
+        return ids;
+    }
+
     private ManagedAsset<T> createNewAsset(AssetID assetID) {
         ManagedAsset<T> asset = obtainAssetFromPool();
         asset.setAssetID(assetID);

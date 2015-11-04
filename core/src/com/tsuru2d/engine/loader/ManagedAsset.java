@@ -1,14 +1,14 @@
 package com.tsuru2d.engine.loader;
 
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Pool;
+import com.badlogic.gdx.utils.SnapshotArray;
 
 public class ManagedAsset<T> implements Pool.Poolable {
     private AssetLoaderDelegate<T, ?> mLoader;
     private AssetID mAssetID;
     private T mAsset;
     private int mReferenceCount;
-    private Array<AssetObserver<T>> mObservers;
+    private SnapshotArray<AssetObserver<T>> mObservers;
 
     /* package */ ManagedAsset() {
 
@@ -30,22 +30,11 @@ public class ManagedAsset<T> implements Pool.Poolable {
         if (mAsset == value) {
             return;
         }
-
-        disposeCurrentAsset();
         mAsset = value;
-
-        if (mObservers != null && mObservers.size > 0) {
-            // We call toArray() here to make a copy of the observer
-            // list, so that callback code can add or remove observers
-            // in the middle of iteration.
-            for (AssetObserver<T> observer : mObservers.toArray()) {
-                observer.onAssetUpdated(this);
-            }
-        }
+        notifyObservers();
     }
 
     /* package */ void invalidate() {
-        disposeCurrentAsset();
         mAsset = null;
     }
 
@@ -55,6 +44,19 @@ public class ManagedAsset<T> implements Pool.Poolable {
 
     /* package */ int decrementRef() {
         return --mReferenceCount;
+    }
+
+    private void notifyObservers() {
+        if (mObservers != null && mObservers.size > 0) {
+            AssetObserver<T>[] observers = mObservers.begin();
+            // Use mObservers.size instead of observers.length here,
+            // since we are using the raw backing array that
+            // may contain trailing nulls
+            for (int i = 0, n = mObservers.size; i < n; ++i) {
+                observers[i].onAssetUpdated(this);
+            }
+            mObservers.end();
+        }
     }
 
     /**
@@ -76,7 +78,7 @@ public class ManagedAsset<T> implements Pool.Poolable {
         if (mObservers == null) {
             // Use an initial capacity of one, since in the typical
             // use case only one observer is required
-            mObservers = new Array<AssetObserver<T>>(false, 1, AssetObserver.class);
+            mObservers = new SnapshotArray<AssetObserver<T>>(false, 1, AssetObserver.class);
         }
 
         if (!mObservers.contains(observer, true)) {
@@ -93,8 +95,25 @@ public class ManagedAsset<T> implements Pool.Poolable {
     public void removeObserver(AssetObserver<T> observer) {
         if (mObservers != null) {
             if (mObservers.removeValue(observer, true)) {
-                decrementRef();
+                if (decrementRef() == 0) {
+                    mLoader.freeAsset(this);
+                }
             }
+        }
+    }
+
+    /**
+     * Ensures the asset is loaded, then runs all observer
+     * callbacks. Use this to avoid a re-entrant call to
+     * the observer callback in case the asset has not
+     * been loaded yet.
+     */
+    public void touch() {
+        if (mAsset == null) {
+            // This will notify the observers through setRawAsset()
+            mLoader.fillRawAsset(this);
+        } else {
+            notifyObservers();
         }
     }
 
@@ -120,25 +139,16 @@ public class ManagedAsset<T> implements Pool.Poolable {
         return mAsset;
     }
 
-    private void disposeCurrentAsset() {
-        // TODO: I think this is actually incorrect -
-        // Assets obtained through AssetManager should only be
-        // released through AssetManager#unload(). Remove
-        // this code once this has been confirmed
-
-        /* if (mAsset instanceof Disposable) {
-            ((Disposable)mAsset).dispose();
-        } */
-    }
-
     @Override
     public void reset() {
-        disposeCurrentAsset();
         mLoader = null;
         mAssetID = null;
         mAsset = null;
-        if (mObservers != null) {
+        // This might actually increase memory allocations,
+        // since when an observer is added the array will resize
+        // from zero to 8 instead of 1.
+        /* if (mObservers != null) {
             mObservers.shrink();
-        }
+        } */
     }
 }

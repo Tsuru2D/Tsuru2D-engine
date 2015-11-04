@@ -10,6 +10,7 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
     private ManagedAsset<Texture> mBackground, mDisabledBackground,
@@ -22,9 +23,12 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
 
     @Override
     protected Slider createActor(Slider.SliderStyle style) {
-        Slider slider = new Slider(0.0f, 1.0f, 0.01f, false, style);
-        slider.addListener(new ValueChangedHandler());
-        return slider;
+        return new Slider(0.0f, 1.0f, 0.01f, false, style);
+    }
+
+    @Override
+    protected void initializeActor(Slider actor) {
+        actor.addListener(new ValueChangedHandler());
     }
 
     @Override
@@ -46,7 +50,12 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
     }
 
     @ExposeToLua
-    public void setOnValueChangedListener(LuaFunction callback) {
+    public void setValueChangedListener(LuaFunction callback) {
+        // Note: there is an issue with the callback being run twice when
+        // the slider bar is clicked directly. This is a limitation with
+        // libGDX, and we can't do much about it. Generally speaking though,
+        // this is not a big problem, since the callback will be run many
+        // times when dragging the knob anyways.
         mValueChangedCallback = callback;
     }
 
@@ -63,6 +72,11 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
     @ExposeToLua
     public float getValue() {
         return getActor().getValue();
+    }
+
+    @ExposeToLua
+    public void setValue(float value) {
+        getActor().setValue(value);
     }
 
     @ExposeToLua
@@ -88,7 +102,7 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
             if (mValueChangedCallback != null) {
-                mValueChangedCallback.call(SliderFacade.this);
+                mValueChangedCallback.call(SliderFacade.this, LuaValue.valueOf(getValue()));
             }
         }
     }

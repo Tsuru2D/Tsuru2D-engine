@@ -1,5 +1,6 @@
 package com.tsuru2d.engine.loader;
 
+import com.tsuru2d.engine.loader.exception.AssetNotFoundException;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -11,8 +12,11 @@ import org.luaj.vm2.LuaValue;
     @Override
     protected void consumeRawAsset(ManagedAsset<LuaTable> asset, LuaValue table) {
         String key = asset.getAssetID().getName();
-        LuaTable value = table.checktable().get(key).checktable();
-        asset.setRawAsset(value);
+        LuaValue value = table.get(key);
+        if (value.isnil()) {
+            throw new AssetNotFoundException("Cannot find asset: " + asset.getAssetID());
+        }
+        asset.setRawAsset(value.checktable());
     }
 
     @Override

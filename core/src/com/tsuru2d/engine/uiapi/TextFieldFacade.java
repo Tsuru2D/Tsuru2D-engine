@@ -13,6 +13,7 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
@@ -28,9 +29,17 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
 
     @Override
     protected TextField createActor(TextField.TextFieldStyle style) {
-        TextField textField =  new TextField(null, style);
-        textField.addListener(new TextChangedHandler());
-        return textField;
+        return new TextField(null, style);
+    }
+
+    @Override
+    protected void initializeActor(TextField actor) {
+        actor.addListener(new TextChangedHandler());
+        // The default password character (bullet) does not exist
+        // within the default font, and for some reason libGDX decides
+        // that if the character is not displayable, it should
+        // show the password in plaintext...
+        actor.setPasswordCharacter('*');
     }
 
     @Override
@@ -67,7 +76,7 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
     }
 
     @ExposeToLua
-    public void setOnTextChangedListener(LuaFunction callback) {
+    public void setTextChangedListener(LuaFunction callback) {
         mTextChangedCallback = callback;
     }
 
@@ -75,7 +84,7 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
     public void setHint(AssetID hintTextID) {
         mHint = swapAsset(AssetType.TEXT, hintTextID, mHint, mAssetUpdatedObserver);
         if (mHint != null) {
-            getActor().setMessageText(mHint.get());
+            mHint.touch();
         } else {
             getActor().setMessageText(null);
         }
@@ -116,7 +125,7 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
         @Override
         public void changed(ChangeEvent event, Actor actor) {
             if (mTextChangedCallback != null) {
-                mTextChangedCallback.call(TextFieldFacade.this);
+                mTextChangedCallback.call(TextFieldFacade.this, LuaValue.valueOf(getText()));
             }
         }
     }

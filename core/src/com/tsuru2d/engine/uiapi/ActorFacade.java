@@ -34,7 +34,15 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
         if (style != null) {
             populateStyle(style, getStyleTable());
         }
-        mActor = createActor(style);
+        TActor actor = createActor(style);
+        initializeActor(actor);
+        mActor = actor;
+    }
+
+    protected void initializeActor(TActor actor) {
+        // Override this method if you need to perform
+        // additional initialization of the actor, such as
+        // adding observers or setting default properties.
     }
 
     public TActor getActor() {
@@ -95,6 +103,17 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     protected abstract void populateStyle(TStyle style, LuaTable styleTable);
     protected abstract TActor createActor(TStyle style);
 
+    protected static String getText(ManagedAsset<String> text, Object[] formatParams) {
+        if (text == null) {
+            return null;
+        }
+        String textStr = text.get();
+        if (formatParams != null) {
+            textStr = String.format(textStr, formatParams);
+        }
+        return textStr;
+    }
+
     protected static AssetID getAssetID(LuaTable styleTable, String key) {
         LuaValue value = styleTable.get(key);
         if (value.isnil()) {
@@ -105,6 +124,8 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
     }
 
     protected static TextureRegionDrawable toDrawable(ManagedAsset<Texture> image) {
+        // TODO: Once we have support for transparently loading 9patches, this
+        // should be removed and getImage() should directly return a managed Drawable.
         if (image == null) {
             return null;
         }

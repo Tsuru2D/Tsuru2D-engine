@@ -179,14 +179,51 @@ public final class LuaUtils {
      * Converts the specified table to a Java array, converting
      * {@link LuaValue} objects to their corresponding Java
      * equivalents using {@link #bridgeLuaToJava(LuaValue, Class)}.
+     * @param table The table to convert.
+     * @param expectedType The type of the elements within the array.
      */
     public static Object toArray(LuaTable table, Class<?> expectedType) {
-        Object array = Array.newInstance(expectedType, table.length());
-        int i = 0;
-        LuaArrayIterator iterator = new LuaArrayIterator(table);
-        while (iterator.hasNext()) {
-            LuaValue value = iterator.next().arg(2);
-            Array.set(array, i++, bridgeLuaToJava(value, expectedType));
+        int length = table.length();
+        Object array = Array.newInstance(expectedType, length);
+        for (int i = 0; i < length; ++i) {
+            LuaValue value = table.get(i + 1);
+            Array.set(array, i, bridgeLuaToJava(value, expectedType));
+        }
+        return array;
+    }
+
+    /**
+     * Converts the specified table to a Java array, converting
+     * {@link LuaValue} objects to their corresponding Java
+     * equivalents using {@link #bridgeLuaToJava(LuaValue)}.
+     * @param table The table to convert.
+     */
+    public static Object[] toArray(LuaTable table) {
+        int length = table.length();
+        Object[] array = new Object[length];
+        for (int i = 0; i < length; ++i) {
+            LuaValue value = table.get(i + 1);
+            array[i] = bridgeLuaToJava(value);
+        }
+        return array;
+    }
+
+    /**
+     * Converts the specified {@link Varargs} instance to a Java
+     * array, converting {@link LuaValue} objects to their corresponding
+     * Java equivalents using {@link #bridgeLuaToJava(LuaValue)}.
+     *
+     * This method is intended to be used for converting Lua {@link Varargs}
+     * to be used in Java methods that take {@code Object...} as a parameter,
+     * such as {@link String#format(String, Object...)}.
+     * @param args The varargs to convert.
+     */
+    public static Object[] toArray(Varargs args) {
+        int length = args.narg();
+        Object[] array = new Object[length];
+        for (int i = 0; i < length; ++i) {
+            LuaValue value = args.arg(i + 1);
+            array[i] = bridgeLuaToJava(value);
         }
         return array;
     }
@@ -195,14 +232,14 @@ public final class LuaUtils {
      * Converts the specified Java array to a Lua table, converting
      * Java objects to their corresponding Lua equivalents using
      * {@link #bridgeJavaToLuaIn(Object)}.
+     * @param array The array to convert.
      */
     public static LuaTable toTable(Object array) {
         int length = Array.getLength(array);
         LuaTable table = new LuaTable(length, 0);
-        int i = 0;
-        while (i < length) {
+        for (int i = 0; i < length; ++i) {
             LuaValue value = bridgeJavaToLuaIn(Array.get(array, i));
-            table.set(++i, value);
+            table.set(i + 1, value);
         }
         return table;
     }

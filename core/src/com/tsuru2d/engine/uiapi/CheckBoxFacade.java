@@ -13,13 +13,14 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
 public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<Texture> mCheckboxOff, mCheckboxOffDisabled,
                                   mCheckboxOn, mCheckboxOnDisabled, mCheckboxOver;
     private ManagedAsset<String> mText;
-    private LuaFunction mCheckedCallback;
+    private LuaFunction mCheckedChangedCallback;
 
     public CheckBoxFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
@@ -28,9 +29,12 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
 
     @Override
     protected CheckBox createActor(CheckBox.CheckBoxStyle style) {
-        CheckBox checkBox = new CheckBox(null, style);
-        checkBox.addListener(new CheckedHandler());
-        return checkBox;
+        return new CheckBox(null, style);
+    }
+
+    @Override
+    protected void initializeActor(CheckBox actor) {
+        actor.addListener(new CheckedChangedHandler());
     }
 
     @Override
@@ -52,13 +56,13 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
         style.checkboxOffDisabled = toDrawable(mCheckboxOffDisabled);
         style.checkboxOn = toDrawable(mCheckboxOn);
         style.checkboxOnDisabled = toDrawable(mCheckboxOnDisabled);
-        style.over = toDrawable(mCheckboxOver);
+        style.checkboxOver = toDrawable(mCheckboxOver);
         style.fontColor = tableToColor(styleTable.get("textColor"));
     }
 
     @ExposeToLua
-    public void setOnCheckedListener(LuaFunction callback) {
-        mCheckedCallback = callback;
+    public void setCheckedChangedListener(LuaFunction callback) {
+        mCheckedChangedCallback = callback;
     }
 
     @ExposeToLua
@@ -85,7 +89,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
     public void setText(AssetID textID) {
         mText = swapAsset(AssetType.TEXT, textID, mText, mAssetUpdatedObserver);
         if (mText != null) {
-            getActor().setText(mText.get());
+            mText.touch();
         } else {
             getActor().setText(null);
         }
@@ -109,11 +113,11 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
         }
     }
 
-    private class CheckedHandler extends ChangeListener {
+    private class CheckedChangedHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            if (mCheckedCallback != null) {
-                mCheckedCallback.call(CheckBoxFacade.this);
+            if (mCheckedChangedCallback != null) {
+                mCheckedChangedCallback.call(CheckBoxFacade.this, LuaValue.valueOf(isChecked()));
             }
         }
     }

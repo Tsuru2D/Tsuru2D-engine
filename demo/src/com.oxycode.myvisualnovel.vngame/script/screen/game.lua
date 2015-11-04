@@ -3,21 +3,25 @@ local game = {}
 function game:onCreate(screen)
     print("game::onCreate()")
     self.screen = screen
-    local ui = screen:getUIManager()
-    screen:setOnClick(function()
+    self.ui = screen:getUIManager()
+    screen:setClickListener(function()
         screen:nextFrame()
     end)
-    local label = ui:newLabel()
-    self.label = label
-    ui:add(label):bottom():expand()
 
-    local button = ui:newTextButton()
-    button:setText(R.text.common.back_to_menu)
-    button:setOnClick(function()
+    -- Text label
+    self.textLabel = self.ui:newLabel(R.skin.default.label)
+    self.ui:add(self.textLabel):bottom():expand()
+
+    -- Back to menu button
+    self.backButton = self.ui:newTextButton(R.skin.default.button)
+    self.backButton:setText(R.text.common.back_to_menu)
+    self.backButton:setClickListener(function()
+        -- TODO: This next line is a workaround for the bug detailed in
+        -- GameScreen. Once the bug has been fixed, this should be removed
+        screen:setClickListener(nil)
         screen:setMenuScreen(R.screen.mainmenu)
     end)
-    self.button = button
-    ui:add(button):top():right()
+    self.ui:add(self.backButton):top():right()
 end
 
 function game:onResume(params)
@@ -38,9 +42,9 @@ function game:onEnterFrame()
     print("game::onEnterFrame()")
 end
 
-function game:onText(textID)
+function game:onText(textID, ...)
     print("game::onText()")
-    self.label:setText(textID)
+    self.textLabel:setText(textID, ...)
 end
 
 function game:onSound()
