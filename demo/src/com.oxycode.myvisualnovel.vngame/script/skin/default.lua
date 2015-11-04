@@ -16,7 +16,11 @@ return {
         knob = R.image.slider_knob
     },
     scrollpane = {
-
+        background = R.image.bg1,
+        HScroll = R.image.horizScroll,
+        HScrollKnob = R.image.horizScrollBar,
+        VScroll = R.image.vertScroll,
+        VScrollKnob = R.image.vertScrollBar
     },
     checkbox = {
         off = R.image.checkbox_off,
