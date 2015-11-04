@@ -98,6 +98,12 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
         return slider;
     }
 
+    @ExposeToLua
+    public ScrollPaneFacade newScrollPane(AssetID styleID) {
+        ScrollPaneFacade scrollPane = new ScrollPaneFacade(mScreen, styleID);
+        initActor(scrollPane);
+        return scrollPane;
+    }
     @Override
     public void dispose() {
         for (ActorFacade<?, ?> control : mControls) {

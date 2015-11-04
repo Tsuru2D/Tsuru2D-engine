@@ -1,26 +1,22 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
-public class ScrollPaneFacade extends ActorFacade<ScrollPane> {
+public class ScrollPaneFacade extends ActorFacade<ScrollPane,ScrollPane.ScrollPaneStyle> {
     private ManagedAsset<Texture> mBackground, mCorner, mHScroll, mHScrollKnob, mVScroll, mVScrollKnob;
 
-    public ScrollPaneFacade(BaseScreen screen) {
-        super(screen);
-        ScrollPane scrollPane = createActor();
-        setActor(scrollPane);
+    public ScrollPaneFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
     }
     @ExposeToLua
-    public void setWidget(ActorFacade<? extends Actor> wrapper){
+    public void setWidget(ActorFacade<? extends Actor,?> wrapper){
         getActor().setWidget(wrapper.getActor());
     }
     @ExposeToLua
@@ -156,10 +152,6 @@ public class ScrollPaneFacade extends ActorFacade<ScrollPane> {
         getActor().layout();
     }
     @ExposeToLua
-    public void scrollTo(float x, float y, float width, float height){
-        getActor().scrollTo(x, y, width, height);
-    }
-    @ExposeToLua
     public void scrollTo(float x, float y, float width, float height, boolean centerHorizontal, boolean centerVertical){
         getActor().scrollTo(x, y, width, height, centerHorizontal, centerVertical);
     }
@@ -233,79 +225,38 @@ public class ScrollPaneFacade extends ActorFacade<ScrollPane> {
     }
 
 
-    protected ScrollPane createActor() {
-        return new ScrollPane(null,createAndPopulateStyle());
+    protected ScrollPane createActor(ScrollPane.ScrollPaneStyle style) {
+        return new ScrollPane(null,style);
     }
 
     protected ScrollPane.ScrollPaneStyle createStyle() {
         return new ScrollPane.ScrollPaneStyle();
     }
 
-    protected ScrollPane.ScrollPaneStyle createAndPopulateStyle() {
-        ScrollPane.ScrollPaneStyle style = createStyle();
-        style.background = getDrawable(mBackground);
-        style.corner = getDrawable(mCorner);
-        style.hScroll = getDrawable(mHScroll);
-        style.hScrollKnob = getDrawable(mHScrollKnob);
-        style.vScroll = getDrawable(mVScroll);
-        style.vScrollKnob = getDrawable(mVScrollKnob);
-        return style;
-    }
+    protected void populateStyle(ScrollPane.ScrollPaneStyle style,  LuaTable styleTable) {
+        mVScrollKnob = swapStyleImage(styleTable, "VScrollKnob", mVScrollKnob);
+        mHScrollKnob = swapStyleImage(styleTable, "HScrollKnob", mHScrollKnob);
+        mHScroll = swapStyleImage(styleTable, "HScroll", mHScroll);
+        mVScroll = swapStyleImage(styleTable, "VScroll", mVScroll);
+        mCorner = swapStyleImage(styleTable, "corner", mCorner);
+        mBackground = swapStyleImage(styleTable, "background", mBackground);
 
-    @ExposeToLua
-    public void setStyle(LuaTable styleTable) {
-        dispose();
-        mBackground = getAsset(styleTable, "up");
-        mCorner = getAsset(styleTable, "down");
-        mHScroll = getAsset(styleTable, "hover");
-        mHScrollKnob = getAsset(styleTable, "up");
-        mVScroll = getAsset(styleTable, "up");
-        mVScrollKnob = getAsset(styleTable, "up");
-        ScrollPane.ScrollPaneStyle style = createAndPopulateStyle();
-        mActor.setStyle(style);
+        style.background = toDrawable(mBackground);
+        style.corner = toDrawable(mCorner);
+        style.hScroll = toDrawable(mHScroll);
+        style.hScrollKnob = toDrawable(mHScrollKnob);
+        style.vScroll = toDrawable(mVScroll);
+        style.vScrollKnob = toDrawable(mVScrollKnob);
+
     }
 
 
     @Override
     public void dispose() {
-        if (mBackground != null) {
-            mScreen.getAssetLoader().freeAsset(mBackground);
-            mBackground = null;
-        }
-        if (mCorner != null) {
-            mScreen.getAssetLoader().freeAsset(mCorner);
-            mCorner = null;
-        }
-        if (mHScrollKnob != null) {
-            mScreen.getAssetLoader().freeAsset(mHScrollKnob);
-            mHScrollKnob = null;
-        }if (mHScroll != null) {
-            mScreen.getAssetLoader().freeAsset(mHScroll);
-            mHScroll = null;
-        }
-        if (mVScroll != null) {
-            mScreen.getAssetLoader().freeAsset(mVScroll);
-            mVScroll = null;
-        }
-        if (mVScrollKnob != null) {
-            mScreen.getAssetLoader().freeAsset(mVScrollKnob);
-            mVScrollKnob = null;
-        }
-    }
-
-    private ManagedAsset<Texture> getAsset(LuaTable style, String key) {
-        if (style.get(key).isnil()) {
-            return null;
-        } else {
-            AssetID assetID = (AssetID)style.get(key).checkuserdata(AssetID.class);
-            return mScreen.getAssetLoader().getImage(assetID);
-        }
-    }
-
-    private TextureRegionDrawable getDrawable(ManagedAsset<Texture> texture) {
-        if (texture == null) {
-            return null;
-        }
-        return new TextureRegionDrawable(new TextureRegion(texture.get()));
+        mVScrollKnob = freeAsset(mVScrollKnob);
+        mHScrollKnob = freeAsset(mHScrollKnob);
+        mCorner = freeAsset(mCorner);
+        mVScroll = freeAsset(mVScroll);
+        mHScroll = freeAsset(mHScroll);
     }
 }
