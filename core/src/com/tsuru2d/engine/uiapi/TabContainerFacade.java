@@ -19,12 +19,12 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     private ScrollPane mScrollPane;
     private ButtonGroup mButtonGroup;
     private ManagedAsset<Texture> mBackground;
-    private AssetID mTabStyle;
-    private Array<ActorFacade> mTabArray;
+    private TabContainerStyle mTabContainerStyle;
+    private Array<Tab> mTabArray;
 
     public TabContainerFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
-        mTabArray = new Array<ActorFacade>();
+        mTabArray = new Array<Tab>();
     }
 
     @Override
@@ -33,8 +33,6 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         mPanel = new TableFacade(getScreen());
         mTabs.initialize();
         mPanel.initialize();
-        mTabs.getActor().setDebug(false);
-        mPanel.getActor().setDebug(false);
         Table table = new Table();
         mScrollPane = new ScrollPane(mTabs.getActor());
         mButtonGroup = new ButtonGroup();
@@ -44,6 +42,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         table.row();
         table.add(mPanel.getActor()).expand().fill();
         table.setBackground(tabContainerStyle.background);
+        mTabContainerStyle = tabContainerStyle;
         return table;
     }
 
@@ -56,7 +55,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     @Override
     protected void populateStyle(TabContainerStyle style, LuaTable styleTable) {
         mBackground = swapStyleImage(styleTable, "background", mBackground);
-        mTabStyle = (AssetID)styleTable.get("buttonStyle").checkuserdata(AssetID.class);
+        style.tabStyle = (AssetID)styleTable.get("buttonStyle").checkuserdata(AssetID.class);
         style.background = toDrawable(mBackground);
     }
 
@@ -69,7 +68,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
 
     @ExposeToLua
     public void addTab(AssetID text, LuaFunction callBack) {
-        Tab tab = new Tab(getScreen(), mTabStyle);
+        Tab tab = new Tab(getScreen(), mTabContainerStyle.tabStyle);
         tab.initialize();
         tab.setText(text, null);
         CallbackWrapper callbackWrapper = new CallbackWrapper(callBack);
@@ -93,8 +92,8 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     public class TabContainerStyle {
         /**Optional*/
         public Drawable background;
-        /**Optional*/
-        public AssetID tabStyle;
+        /**Required*/
+        AssetID tabStyle;
         public TabContainerStyle() {
         }
     }

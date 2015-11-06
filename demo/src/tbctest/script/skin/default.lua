@@ -3,6 +3,11 @@ return {
         textColor = {1,1,1}
     },
     button = {
+        up = R.image.buttonup,
+        down = R.image.buttondown,
+        textColor = {0.2,0.2,0.2}
+    },
+    button2 = {
         up = R.image.button_up,
         down = R.image.button_down,
         hover = R.image.button_hover,
@@ -29,6 +34,6 @@ return {
     },
     tabcontainer = {
         background = R.image.bg1,
-        buttonStyle = R.skin.default.button
+        buttonStyle = R.skin.default.button2
     }
 }
