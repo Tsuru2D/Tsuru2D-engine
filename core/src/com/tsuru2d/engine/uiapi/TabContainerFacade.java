@@ -1,9 +1,11 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.SnapshotArray;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -20,6 +22,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     private ButtonGroup mButtonGroup;
     private ManagedAsset<Texture> mBackground;
     private TabContainerStyle mTabContainerStyle;
+    private TableFacade mInnerPanel;
     private Array<Tab> mTabArray;
 
     public TabContainerFacade(BaseScreen screen, AssetID styleID) {
@@ -61,7 +64,6 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
 
     public void replacePane(LuaValue table) {
         TableFacade newTable = (TableFacade) table;
-        newTable.getActor().setDebug(false);
         mPanel.getActor().clearChildren();
         mPanel.add(newTable).expand().fill();
     }
@@ -75,6 +77,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         tab.setClickListener(callbackWrapper);
         mTabs.add(tab).left();
         mButtonGroup.add(tab.getActor());
+        mTabArray.add(tab);
         mTabs.getActor().setHeight(tab.getActor().getPrefHeight());
     }
 
