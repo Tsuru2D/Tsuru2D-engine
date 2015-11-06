@@ -104,6 +104,13 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
         initActor(scrollPane);
         return scrollPane;
     }
+
+    @ExposeToLua
+    public TabContainerFacade newTabContainer(AssetID styleID) {
+        TabContainerFacade tabContainerFacade = new TabContainerFacade(mScreen, styleID);
+        initActor(tabContainerFacade);
+        return tabContainerFacade;
+    }
     @Override
     public void dispose() {
         for (ActorFacade<?, ?> control : mControls) {
