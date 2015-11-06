@@ -118,7 +118,7 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
     private String findPath(AssetID rawAssetID) {
         // TODO: handle multiple zips
         String rootPath = mAssetTypePathMap.get(rawAssetID.getType());
-        String[] splitRootPath = rootPath.replace('\\', '/').split("/");
+        String[] splitRootPath = rootPath.split("[/\\\\]");
         String[] subPath = rawAssetID.getPath();
         StringBuilder sb = new StringBuilder();
         ZipEntryNode curr = mZipRootNode;
@@ -200,7 +200,7 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
                 continue;
             }
 
-            String[] path = entry.getName().split("/");
+            String[] path = entry.getName().split("[/\\\\]");
             ZipEntryNode node = rootNode;
             int i = 0;
             while (i < path.length - 1) {
