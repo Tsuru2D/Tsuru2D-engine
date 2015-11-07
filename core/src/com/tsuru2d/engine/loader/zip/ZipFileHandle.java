@@ -23,6 +23,12 @@ public class ZipFileHandle extends FileHandleStream {
         super(entryPath);
         mZipFile = zipFile;
         mZipEntry = zipFile.getEntry(entryPath);
+        if (mZipEntry == null) {
+            // Java's ZipFile does not normalize directory separators,
+            // so we have to try backslashes if using forward slashes fails.
+            // This is dependent on the program that created the zip file.
+            mZipEntry = zipFile.getEntry(entryPath.replace('/', '\\'));
+        }
     }
 
     @Override
