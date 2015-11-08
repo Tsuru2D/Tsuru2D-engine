@@ -146,15 +146,15 @@ function mainmenu:onCreate(screen)
     end)
     self.tabcontainer:addTab(R.text.common.hellor, function()
         local table = self.ui:newTable()
-        local dropdown = self.ui:newDropDownList(R.skin.default.dropdownstyle)
+        local dropdown = self.ui:newDropDown(R.skin.default.dropdownstyle)
         dropdown:setItems({
             {value = 5, text = R.text.common.settings },
             {value = 6, text = R.text.common.not_logged_in },
             {value = 7, text = R.text.common.buttom }
         })
-        dropdown:setSelected(7);
-        dropdown:setChangedListener(function(dropd, selectitem)
-            if dropdown:getSelectedValue() == 5 then self.ui:print("Hi, clicked") end
+        dropdown:setSelectedValue(7);
+        dropdown:setValueChangedListener(function(dropd, selectitem)
+            if dropdown:getSelectedValue() == 5 then print("Hi, clicked") end
         end)
         table:add(dropdown)
         return table

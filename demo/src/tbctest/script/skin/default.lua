@@ -42,6 +42,8 @@ return {
         backgroundDisabled = R.image.buttondown,
         backgroundOpen = R.image.buttondown,
         backgroundOver = R.image.buttondown,
-        textColor = {0.2,0.2,0.2}
+        textColor = {0.2,0.2,0.2 },
+        fontColorSelected = {0.5,0.5,0.0 },
+        fontColorUnselected = {0.2,0.2,0.2 }
     }
 }

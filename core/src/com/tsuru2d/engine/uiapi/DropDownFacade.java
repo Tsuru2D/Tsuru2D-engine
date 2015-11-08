@@ -19,6 +19,7 @@ import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.LuaArrayIterator;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
@@ -59,8 +60,11 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         mBackgroundOver = swapStyleImage(styleTable, "backgroundOver", mBackgroundOver);
 
         BitmapFont font=new BitmapFont();
-        List.ListStyle listStyle=new List.ListStyle
-            (font,Color.BLACK,Color.BLUE,toDrawable(mSelection));
+        List.ListStyle listStyle=new List.ListStyle(
+                font,
+                tableToColor(styleTable.get("fontColorSelected")),
+                tableToColor(styleTable.get("fontColorUnselected")),
+                toDrawable(mSelection));
         listStyle.background=toDrawable(mBackground);
 
         style.font=new BitmapFont();
@@ -74,14 +78,14 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     }
 
     @ExposeToLua
-    public void setChangedListener(LuaFunction callback) {
-        System.out.println("set the callback");
+    public void setValueChangedListener(LuaFunction callback) {
         mChangedCallback = callback;
     }
 
     @ExposeToLua
     public void setItems(LuaTable table){
         LuaArrayIterator luaArrayIterator = new LuaArrayIterator(table);
+        mItems.clear();
         while(luaArrayIterator.hasNext()) {
             LuaTable luaTable = (LuaTable)luaArrayIterator.next().arg(2);
             LuaValue value = luaTable.get("value");
@@ -97,11 +101,14 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     }
 
     @ExposeToLua
-    public void setSelected(LuaValue value) {
+    public void setSelectedValue(LuaValue value) {
         for(Item i : mItems) {
-            if(i.getValue().eq_b(value))
+            if(i.getValue().eq_b(value)){
                 getActor().setSelected(i);
+                return;
+            }
         }
+        throw new LuaError("Entry with value: " + value.toString() + " not found");
     }
 
     @Override

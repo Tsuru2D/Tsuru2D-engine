@@ -114,16 +114,10 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
     }
 
     @ExposeToLua
-    public DropDownFacade newDropDownList(AssetID styleID) {
+    public DropDownFacade newDropDown(AssetID styleID) {
         DropDownFacade dropDownFacade = new DropDownFacade(mScreen, styleID);
         initActor(dropDownFacade);
         return dropDownFacade;
-    }
-
-    ///Test
-    @ExposeToLua
-    public void print(String s) {
-        System.out.println(s);
     }
 
     @Override
