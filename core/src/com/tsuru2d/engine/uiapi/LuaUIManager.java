@@ -8,6 +8,7 @@ import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
+import org.luaj.vm2.LuaValue;
 
 public class LuaUIManager extends ExposedJavaClass implements Disposable {
     private final BaseScreen mScreen;
@@ -111,6 +112,20 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
         initActor(tabContainerFacade);
         return tabContainerFacade;
     }
+
+    @ExposeToLua
+    public DropDownFacade newDropDownList(AssetID styleID) {
+        DropDownFacade dropDownFacade = new DropDownFacade(mScreen, styleID);
+        initActor(dropDownFacade);
+        return dropDownFacade;
+    }
+
+    ///Test
+    @ExposeToLua
+    public void print(String s) {
+        System.out.println(s);
+    }
+
     @Override
     public void dispose() {
         for (ActorFacade<?, ?> control : mControls) {
