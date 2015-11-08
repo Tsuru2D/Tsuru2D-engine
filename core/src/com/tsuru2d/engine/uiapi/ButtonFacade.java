@@ -66,7 +66,9 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
 
     @ExposeToLua
     public void setChecked(boolean checked){
+        getActor().setProgrammaticChangeEvents(false);
         getActor().setChecked(checked);
+        getActor().setProgrammaticChangeEvents(true);
     }
 
     @Override
@@ -75,7 +77,7 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
         mDown = freeAsset(mDown);
         mHover = freeAsset(mHover);
         mChecked=freeAsset(mChecked);
-        mCheckedHover=freeAsset(mChecked);
+        mCheckedHover=freeAsset(mCheckedHover);
         super.dispose();
     }
 
