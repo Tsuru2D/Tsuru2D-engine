@@ -84,7 +84,6 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     public void setItems(LuaTable table) {
         LuaArrayIterator luaArrayIterator = new LuaArrayIterator(table);
         disposeItems();
-        mItems.clear();
         while (luaArrayIterator.hasNext()) {
             LuaTable luaTable = (LuaTable)luaArrayIterator.next().arg(2);
             LuaValue value = luaTable.get("value");
@@ -101,9 +100,9 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
 
     @ExposeToLua
     public void setSelectedValue(LuaValue value) {
-        for (Item i : mItems) {
-            if (i.getValue().eq_b(value)) {
-                getActor().setSelected(i);
+        for (Item item : mItems) {
+            if (item.getValue().eq_b(value)) {
+                getActor().setSelected(item);
                 return;
             }
         }
