@@ -39,7 +39,8 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         return new SelectBox(style);
     }
 
-    public SelectBox.SelectBoxStyle createStyle() {
+    @Override
+    protected SelectBox.SelectBoxStyle createStyle() {
         return new SelectBox.SelectBoxStyle();
     }
 
@@ -82,9 +83,7 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     @ExposeToLua
     public void setItems(LuaTable table) {
         LuaArrayIterator luaArrayIterator = new LuaArrayIterator(table);
-        for (Item item : mItems) {
-            item.dispose();
-        }
+        disposeItems();
         mItems.clear();
         while (luaArrayIterator.hasNext()) {
             LuaTable luaTable = (LuaTable)luaArrayIterator.next().arg(2);
@@ -118,10 +117,15 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         mBackgroundDisabled = freeAsset(mBackgroundDisabled);
         mBackgroundOpen = freeAsset(mBackgroundOpen);
         mBackgroundOver = freeAsset(mBackgroundOver);
+        disposeItems();
+        super.dispose();
+    }
+
+    private void disposeItems() {
         for (Item i : mItems) {
             i.dispose();
         }
-        super.dispose();
+        mItems.clear();
     }
 
     private class ChangeHandler extends ChangeListener {

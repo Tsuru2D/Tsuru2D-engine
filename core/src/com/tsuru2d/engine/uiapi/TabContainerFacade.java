@@ -60,7 +60,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         style.background = toDrawable(mBackground);
     }
 
-    public void replacePane(LuaValue table) {
+    private void replacePane(LuaValue table) {
         TableFacade newTable = (TableFacade)table;
         mPanel.getActor().clearChildren();
         mPanel.add(newTable).expand().fill();
@@ -90,7 +90,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         super.dispose();
     }
 
-    public class TabContainerStyle {
+    public static class TabContainerStyle {
         /**
          * Optional
          */
@@ -98,10 +98,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         /**
          * Required
          */
-        AssetID tabStyle;
-
-        public TabContainerStyle() {
-        }
+        public AssetID tabStyle;
     }
 
     private class CallbackWrapper extends ZeroArgFunction {
