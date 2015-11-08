@@ -1,15 +1,12 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
@@ -24,15 +21,15 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxStyle>{
-    private ManagedAsset<Texture> mBackground,mSelection,
-        mBackgroundDisabled,mBackgroundOpen,mBackgroundOver;
+public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxStyle> {
+    private ManagedAsset<Texture> mBackground, mSelection,
+        mBackgroundDisabled, mBackgroundOpen, mBackgroundOver;
     private LuaFunction mChangedCallback;
     private Array<Item> mItems;
     private AssetUpdatedObserver mAssetUpdatedObserver;
 
-    public DropDownFacade(BaseScreen screen,AssetID styleID){
-        super(screen,styleID);
+    public DropDownFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
         mAssetUpdatedObserver = new AssetUpdatedObserver();
         mItems = new Array<Item>();
     }
@@ -42,7 +39,7 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         return new SelectBox(style);
     }
 
-    public SelectBox.SelectBoxStyle createStyle(){
+    public SelectBox.SelectBoxStyle createStyle() {
         return new SelectBox.SelectBoxStyle();
     }
 
@@ -59,22 +56,22 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         mBackgroundOpen = swapStyleImage(styleTable, "backgroundOpen", mBackgroundOpen);
         mBackgroundOver = swapStyleImage(styleTable, "backgroundOver", mBackgroundOver);
 
-        BitmapFont font=new BitmapFont();
-        List.ListStyle listStyle=new List.ListStyle(
-                font,
-                tableToColor(styleTable.get("fontColorSelected")),
-                tableToColor(styleTable.get("fontColorUnselected")),
-                toDrawable(mSelection));
-        listStyle.background=toDrawable(mBackground);
+        BitmapFont font = new BitmapFont();
+        List.ListStyle listStyle = new List.ListStyle(
+            font,
+            tableToColor(styleTable.get("fontColorSelected")),
+            tableToColor(styleTable.get("fontColorUnselected")),
+            toDrawable(mSelection));
+        listStyle.background = toDrawable(mBackground);
 
-        style.font=new BitmapFont();
+        style.font = new BitmapFont();
         style.background = toDrawable(mBackground);
         style.backgroundDisabled = toDrawable(mBackgroundDisabled);
         style.backgroundOpen = toDrawable(mBackgroundOpen);
         style.backgroundOver = toDrawable(mBackgroundOver);
         style.fontColor = tableToColor(styleTable.get("textColor"));
-        style.scrollStyle=new ScrollPane.ScrollPaneStyle();
-        style.listStyle=listStyle;
+        style.scrollStyle = new ScrollPane.ScrollPaneStyle();
+        style.listStyle = listStyle;
     }
 
     @ExposeToLua
@@ -83,10 +80,13 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     }
 
     @ExposeToLua
-    public void setItems(LuaTable table){
+    public void setItems(LuaTable table) {
         LuaArrayIterator luaArrayIterator = new LuaArrayIterator(table);
+        for (Item item : mItems) {
+            item.dispose();
+        }
         mItems.clear();
-        while(luaArrayIterator.hasNext()) {
+        while (luaArrayIterator.hasNext()) {
             LuaTable luaTable = (LuaTable)luaArrayIterator.next().arg(2);
             LuaValue value = luaTable.get("value");
             AssetID assetID = (AssetID)luaTable.get("text").checkuserdata(AssetID.class);
@@ -102,8 +102,8 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
 
     @ExposeToLua
     public void setSelectedValue(LuaValue value) {
-        for(Item i : mItems) {
-            if(i.getValue().eq_b(value)){
+        for (Item i : mItems) {
+            if (i.getValue().eq_b(value)) {
                 getActor().setSelected(i);
                 return;
             }
@@ -118,7 +118,7 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         mBackgroundDisabled = freeAsset(mBackgroundDisabled);
         mBackgroundOpen = freeAsset(mBackgroundOpen);
         mBackgroundOver = freeAsset(mBackgroundOver);
-        for(Item i : mItems) {
+        for (Item i : mItems) {
             i.dispose();
         }
         super.dispose();
@@ -133,7 +133,7 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         }
     }
 
-    private class Item implements Disposable{
+    private class Item implements Disposable {
         private ManagedAsset<String> mText;
         private LuaValue mValue;
 

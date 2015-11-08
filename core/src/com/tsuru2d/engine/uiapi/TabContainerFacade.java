@@ -1,11 +1,9 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.SnapshotArray;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.ManagedAsset;
@@ -15,7 +13,7 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 import org.luaj.vm2.lib.ZeroArgFunction;
 
-public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.TabContainerStyle>{
+public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.TabContainerStyle> {
     private TableFacade mTabs;
     private TableFacade mPanel;
     private ScrollPane mScrollPane;
@@ -63,7 +61,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     }
 
     public void replacePane(LuaValue table) {
-        TableFacade newTable = (TableFacade) table;
+        TableFacade newTable = (TableFacade)table;
         mPanel.getActor().clearChildren();
         mPanel.add(newTable).expand().fill();
     }
@@ -84,7 +82,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     @Override
     public void dispose() {
         mBackground = freeAsset(mBackground);
-        for(int i = 0; i < mTabArray.size; i++) {
+        for (int i = 0; i < mTabArray.size; i++) {
             mTabArray.get(i).dispose();
         }
         mTabs.dispose();
@@ -93,10 +91,15 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     }
 
     public class TabContainerStyle {
-        /**Optional*/
+        /**
+         * Optional
+         */
         public Drawable background;
-        /**Required*/
+        /**
+         * Required
+         */
         AssetID tabStyle;
+
         public TabContainerStyle() {
         }
     }
@@ -104,9 +107,11 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     private class CallbackWrapper extends ZeroArgFunction {
 
         private LuaFunction mCallback;
+
         public CallbackWrapper(LuaFunction function) {
             mCallback = function;
         }
+
         @Override
         public LuaValue call() {
             LuaValue table = mCallback.call();
