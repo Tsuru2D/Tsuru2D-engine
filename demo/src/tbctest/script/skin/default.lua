@@ -22,10 +22,10 @@ return {
     },
     scrollpane = {
         background = R.image.bg1,
-        HScroll = R.image.horizScroll,
-        HScrollKnob = R.image.horizScrollBar,
-        VScroll = R.image.vertScroll,
-        VScrollKnob = R.image.vertScrollBar
+        horizontalTrack = R.image.horizScroll,
+        horzontalThumb = R.image.horizScrollBar,
+        verticalTrack = R.image.vertScroll,
+        verticalThumb = R.image.vertScrollBar
     },
     checkbox = {
         off = R.image.checkbox_off,
@@ -37,13 +37,14 @@ return {
         buttonStyle = R.skin.default.button2
     },
     dropdownstyle = {
-        selection = R.image.buttondown,
-        background = R.image.buttondown,
-        backgroundDisabled = R.image.buttondown,
-        backgroundOpen = R.image.buttondown,
-        backgroundOver = R.image.buttondown,
+        dropdownBackgroundSelected = R.image.button_hover,
+        dropdownBackground = R.image.button_down,
+        background = R.image.buttonup,
+        backgroundDisabled = R.image.horizScroll,
+        backgroundOpen = R.image.checkbox_off,
+        backgroundOver = R.image.checkbox_on,
         textColor = {0.2,0.2,0.2 },
-        fontColorSelected = {0.5,0.5,0.0 },
-        fontColorUnselected = {0.2,0.2,0.2 }
+        dropdownTextColorSelected = {0.5,0.5,0.0 },
+        dropdownTextColor = {0.2,0.2,0.2 }
     }
 }

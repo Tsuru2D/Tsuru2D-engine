@@ -24,6 +24,11 @@ public class TextButtonFacade extends ButtonFacade {
     }
 
     @Override
+    public TextButton getActor() {
+        return (TextButton)super.getActor();
+    }
+
+    @Override
     protected Button createActor(Button.ButtonStyle style) {
         return new TextButton(null, (TextButton.TextButtonStyle)style);
     }
@@ -55,7 +60,7 @@ public class TextButtonFacade extends ButtonFacade {
 
     private void updateText() {
         String text = getText(mText, mFormatParams);
-        TextButton button = (TextButton)getActor();
+        TextButton button = getActor();
         button.setText(text);
     }
 

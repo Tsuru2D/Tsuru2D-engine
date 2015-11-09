@@ -21,9 +21,9 @@ import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxStyle> {
-    private ManagedAsset<Texture> mBackground, mSelection,
-        mBackgroundDisabled, mBackgroundOpen, mBackgroundOver;
+public class DropDownFacade extends ActorFacade<SelectBox<DropDownFacade.Item>, SelectBox.SelectBoxStyle> {
+    private ManagedAsset<Texture> mBackground, mDropdownBackground, mDropdownBackgroundSelected,
+                                  mBackgroundDisabled, mBackgroundOpen, mBackgroundOver;
     private LuaFunction mChangedCallback;
     private Array<Item> mItems;
     private AssetUpdatedObserver mAssetUpdatedObserver;
@@ -35,8 +35,8 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     }
 
     @Override
-    protected SelectBox createActor(SelectBox.SelectBoxStyle style) {
-        return new SelectBox(style);
+    protected SelectBox<Item> createActor(SelectBox.SelectBoxStyle style) {
+        return new SelectBox<Item>(style);
     }
 
     @Override
@@ -45,25 +45,31 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     }
 
     @Override
-    protected void initializeActor(SelectBox actor) {
+    protected void initializeActor(SelectBox<Item> actor) {
         actor.addListener(new ChangeHandler());
     }
 
     @Override
     protected void populateStyle(SelectBox.SelectBoxStyle style, LuaTable styleTable) {
+        // Background image of the box
         mBackground = swapStyleImage(styleTable, "background", mBackground);
-        mSelection = swapStyleImage(styleTable, "selection", mSelection);
+        // Background image of the box when the control is disabled
         mBackgroundDisabled = swapStyleImage(styleTable, "backgroundDisabled", mBackgroundDisabled);
+        // Background image of the box when the dropdown list is visible
         mBackgroundOpen = swapStyleImage(styleTable, "backgroundOpen", mBackgroundOpen);
+        // Background image of the box when the mouse is hovered over it
         mBackgroundOver = swapStyleImage(styleTable, "backgroundOver", mBackgroundOver);
+        // Background image of the dropdown list
+        mDropdownBackground = swapStyleImage(styleTable, "dropdownBackground", mDropdownBackground);
+        // Background image of the highlighted item in the dropdown list
+        mDropdownBackgroundSelected = swapStyleImage(styleTable, "dropdownBackgroundSelected", mDropdownBackgroundSelected);
 
-        BitmapFont font = new BitmapFont();
-        List.ListStyle listStyle = new List.ListStyle(
-            font,
-            tableToColor(styleTable.get("fontColorSelected")),
-            tableToColor(styleTable.get("fontColorUnselected")),
-            toDrawable(mSelection));
-        listStyle.background = toDrawable(mBackground);
+        List.ListStyle listStyle = new List.ListStyle();
+        listStyle.font = new BitmapFont();
+        listStyle.fontColorSelected = tableToColor(styleTable.get("dropdownTextColorSelected"));
+        listStyle.fontColorUnselected = tableToColor(styleTable.get("dropdownTextColor"));
+        listStyle.selection = toDrawable(mDropdownBackgroundSelected);
+        listStyle.background = toDrawable(mDropdownBackground);
 
         style.font = new BitmapFont();
         style.background = toDrawable(mBackground);
@@ -95,7 +101,7 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
 
     @ExposeToLua
     public LuaValue getSelectedValue() {
-        return ((Item)getActor().getSelected()).getValue();
+        return getActor().getSelected().getValue();
     }
 
     @ExposeToLua
@@ -112,10 +118,11 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     @Override
     public void dispose() {
         mBackground = freeAsset(mBackground);
-        mSelection = freeAsset(mSelection);
         mBackgroundDisabled = freeAsset(mBackgroundDisabled);
         mBackgroundOpen = freeAsset(mBackgroundOpen);
         mBackgroundOver = freeAsset(mBackgroundOver);
+        mDropdownBackground = freeAsset(mDropdownBackground);
+        mDropdownBackgroundSelected = freeAsset(mDropdownBackgroundSelected);
         disposeItems();
         super.dispose();
     }
@@ -127,26 +134,13 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         mItems.clear();
     }
 
-    private class ChangeHandler extends ChangeListener {
-        @Override
-        public void changed(ChangeEvent event, Actor actor) {
-            if (mChangedCallback != null) {
-                mChangedCallback.call(DropDownFacade.this, getSelectedValue());
-            }
-        }
-    }
-
-    private class Item implements Disposable {
+    public class Item implements Disposable {
         private ManagedAsset<String> mText;
         private LuaValue mValue;
 
         public Item(LuaValue value, AssetID assetID) {
             mValue = value;
             mText = swapAsset(AssetType.TEXT, assetID, mText, mAssetUpdatedObserver);
-        }
-
-        public ManagedAsset getManagedAsset() {
-            return mText;
         }
 
         public LuaValue getValue() {
@@ -164,6 +158,14 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
         }
     }
 
+    private class ChangeHandler extends ChangeListener {
+        @Override
+        public void changed(ChangeEvent event, Actor actor) {
+            if (mChangedCallback != null) {
+                mChangedCallback.call(DropDownFacade.this, getSelectedValue());
+            }
+        }
+    }
 
     private class AssetUpdatedObserver implements AssetObserver<String> {
         @Override
@@ -171,5 +173,4 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
             getActor().invalidate();
         }
     }
-
 }

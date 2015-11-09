@@ -9,254 +9,308 @@ import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
-public class ScrollPaneFacade extends ActorFacade<ScrollPane,ScrollPane.ScrollPaneStyle> {
-    private ManagedAsset<Texture> mBackground, mCorner, mHScroll, mHScrollKnob, mVScroll, mVScrollKnob;
+public class ScrollPaneFacade extends ActorFacade<ScrollPane, ScrollPane.ScrollPaneStyle> {
+    private ManagedAsset<Texture> mBackground, mCorner, mHorizontalTrack,
+                                  mHorizontalThumb, mVerticalTrack, mVerticalThumb;
 
     public ScrollPaneFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
     }
+
     @ExposeToLua
-    public void setWidget(ActorFacade<? extends Actor,?> wrapper){
+    public void setWidget(ActorFacade<? extends Actor, ?> wrapper) {
         getActor().setWidget(wrapper.getActor());
     }
+
     @ExposeToLua
-    public void cancel(){
+    public void cancel() {
         getActor().cancel();
     }
+
     @ExposeToLua
-    public void setCancelTouchFocus(boolean cancelTouchFocus){
+    public void setCancelTouchFocus(boolean cancelTouchFocus) {
         getActor().setCancelTouchFocus(cancelTouchFocus);
     }
+
     @ExposeToLua
-    public void fling(float flingTime, float velocityX, float velocityY){
+    public void fling(float flingTime, float velocityX, float velocityY) {
         getActor().fling(flingTime, velocityX, velocityY);
     }
+
     @ExposeToLua
-    public float getMaxX(){
+    public float getMaxX() {
         return getActor().getMaxX();
     }
+
     @ExposeToLua
-    public float getMaxY(){
+    public float getMaxY() {
         return getActor().getMaxY();
     }
+
     @ExposeToLua
-    public float getMinHeight(){
+    public float getMinHeight() {
         return getActor().getMinHeight();
     }
+
     @ExposeToLua
-    public float getMinWidth(){
+    public float getMinWidth() {
         return getActor().getMinWidth();
     }
+
     @ExposeToLua
-    public float getPrefHeight(){
+    public float getPrefHeight() {
         return getActor().getPrefHeight();
     }
+
     @ExposeToLua
-    public float getPrefWidth (){
+    public float getPrefWidth() {
         return getActor().getPrefWidth();
     }
+
     @ExposeToLua
-    public float getScrollBarHeight(){
+    public float getScrollBarHeight() {
         return getActor().getScrollBarHeight();
     }
+
     @ExposeToLua
-    public float getScrollBarWidth(){
+    public float getScrollBarWidth() {
         return getActor().getScrollBarWidth();
     }
+
     @ExposeToLua
-    public float getScrollPercentX(){
+    public float getScrollPercentX() {
         return getActor().getScrollPercentX();
     }
+
     @ExposeToLua
     public float getScrollPercentY() {
         return getActor().getScrollPercentY();
     }
+
     @ExposeToLua
-    public float getScrollWidth(){
+    public float getScrollWidth() {
         return getActor().getScrollWidth();
     }
+
     @ExposeToLua
-    public float getScrollHeight(){
+    public float getScrollHeight() {
         return getActor().getScrollHeight();
     }
+
     @ExposeToLua
-    public float getVelocityX(){
+    public float getVelocityX() {
         return getActor().getVelocityX();
     }
+
     @ExposeToLua
-    public float getVelocityY(){
+    public float getVelocityY() {
         return getActor().getVelocityY();
     }
+
     @ExposeToLua
-    public float getVisualScrollPercentX(){
+    public float getVisualScrollPercentX() {
         return getActor().getVisualScrollPercentX();
     }
+
     @ExposeToLua
-    public float getVisualScrollPercentY(){
+    public float getVisualScrollPercentY() {
         return getActor().getVisualScrollPercentY();
     }
+
     @ExposeToLua
-    public float getVisualScrollX(){
+    public float getVisualScrollX() {
         return getActor().getVisualScrollX();
     }
+
     @ExposeToLua
-    public float getVisualScrollY(){
+    public float getVisualScrollY() {
         return getActor().getVisualScrollY();
     }
+
     @ExposeToLua
-    public boolean isBottomEdge(){
+    public boolean isBottomEdge() {
         return getActor().isBottomEdge();
     }
+
     @ExposeToLua
-    public boolean isDragging(){
+    public boolean isDragging() {
         return getActor().isDragging();
     }
+
     @ExposeToLua
-    public boolean isFlinging(){
+    public boolean isFlinging() {
         return getActor().isFlinging();
     }
+
     @ExposeToLua
-    public boolean isForceScrollX(){
+    public boolean isForceScrollX() {
         return getActor().isForceScrollX();
     }
+
     @ExposeToLua
-    public boolean isForceScrollY(){
+    public boolean isForceScrollY() {
         return getActor().isForceScrollY();
     }
+
     @ExposeToLua
-    public boolean isLeftEdge(){
+    public boolean isLeftEdge() {
         return getActor().isLeftEdge();
     }
+
     @ExposeToLua
-    public boolean isPanning(){
+    public boolean isPanning() {
         return getActor().isPanning();
     }
+
     @ExposeToLua
-    public boolean isRightEdge(){
+    public boolean isRightEdge() {
         return getActor().isRightEdge();
     }
+
     @ExposeToLua
-    public boolean isScrollX(){
+    public boolean isScrollX() {
         return getActor().isScrollX();
     }
+
     @ExposeToLua
-    public boolean isScrollY(){
+    public boolean isScrollY() {
         return getActor().isScrollY();
     }
+
     @ExposeToLua
-    public boolean isTopEdge(){
+    public boolean isTopEdge() {
         return getActor().isTopEdge();
     }
+
     @ExposeToLua
-    public void layout(){
+    public void layout() {
         getActor().layout();
     }
+
     @ExposeToLua
-    public void scrollTo(float x, float y, float width, float height, boolean centerHorizontal, boolean centerVertical){
+    public void scrollTo(float x, float y, float width, float height, boolean centerHorizontal, boolean centerVertical) {
         getActor().scrollTo(x, y, width, height, centerHorizontal, centerVertical);
     }
+
     @ExposeToLua
-    public void setClamp(boolean clamp){
+    public void setClamp(boolean clamp) {
         getActor().setClamp(clamp);
     }
+
     @ExposeToLua
-    public void setFadeScrollBars(boolean fadeScrollBars){
+    public void setFadeScrollBars(boolean fadeScrollBars) {
         getActor().setFadeScrollBars(fadeScrollBars);
     }
+
     @ExposeToLua
-    public void setFlickScroll(boolean flickScroll){
+    public void setFlickScroll(boolean flickScroll) {
         getActor().setFlickScroll(flickScroll);
     }
+
     @ExposeToLua
-    public void setScrollbarsOnTop(boolean scrollBarsOnTop){
+    public void setScrollbarsOnTop(boolean scrollBarsOnTop) {
         getActor().setScrollbarsOnTop(scrollBarsOnTop);
     }
+
     @ExposeToLua
-    public void setForceScroll(boolean x, boolean y){
-        getActor().setForceScroll(x,y);
+    public void setForceScroll(boolean x, boolean y) {
+        getActor().setForceScroll(x, y);
     }
+
     @ExposeToLua
-    public void setOverscroll(boolean x, boolean y){
-        getActor().setOverscroll(x,y);
+    public void setOverscroll(boolean x, boolean y) {
+        getActor().setOverscroll(x, y);
     }
+
     @ExposeToLua
-    public void setScrollBarPositions(boolean bottom, boolean right){
+    public void setScrollBarPositions(boolean bottom, boolean right) {
         getActor().setScrollBarPositions(bottom, right);
     }
+
     @ExposeToLua
-    public void setScrollingDisabled(boolean x, boolean y){
-        getActor().setScrollingDisabled(x,y);
+    public void setScrollingDisabled(boolean x, boolean y) {
+        getActor().setScrollingDisabled(x, y);
     }
+
     @ExposeToLua
-    public void setSmoothScrolling(boolean smoothScrolling){
+    public void setSmoothScrolling(boolean smoothScrolling) {
         getActor().setSmoothScrolling(smoothScrolling);
     }
+
     @ExposeToLua
-    public void setScrollPercentX(float scrollPercentX){
+    public void setScrollPercentX(float scrollPercentX) {
         getActor().setScrollPercentX(scrollPercentX);
     }
+
     @ExposeToLua
-    public void setScrollPercentY(float scrollPercentY){
+    public void setScrollPercentY(float scrollPercentY) {
         getActor().setScrollPercentY(scrollPercentY);
     }
+
     @ExposeToLua
-    public void setVariableSizeKnobs(boolean variableSizeKnobs){
+    public void setVariableSizeKnobs(boolean variableSizeKnobs) {
         getActor().setVariableSizeKnobs(variableSizeKnobs);
     }
+
     @ExposeToLua
-    public void updateVisualScroll(){
+    public void updateVisualScroll() {
         getActor().updateVisualScroll();
     }
+
     @ExposeToLua
-    public void setScrollX(float scrollX){
+    public void setScrollX(float scrollX) {
         getActor().setScrollX(scrollX);
     }
+
     @ExposeToLua
-    public void setScrollY(float scrollY){
+    public void setScrollY(float scrollY) {
         getActor().setScrollY(scrollY);
     }
+
     @ExposeToLua
-    public void setVelocityX(float velocityX){
+    public void setVelocityX(float velocityX) {
         getActor().setVelocityX(velocityX);
     }
+
     @ExposeToLua
-    public void setVelocityY(float velocityY){
+    public void setVelocityY(float velocityY) {
         getActor().setVelocityY(velocityY);
     }
 
-
+    @Override
     protected ScrollPane createActor(ScrollPane.ScrollPaneStyle style) {
-        return new ScrollPane(null,style);
+        return new ScrollPane(null, style);
     }
 
+    @Override
     protected ScrollPane.ScrollPaneStyle createStyle() {
         return new ScrollPane.ScrollPaneStyle();
     }
 
-    protected void populateStyle(ScrollPane.ScrollPaneStyle style,  LuaTable styleTable) {
-        mVScrollKnob = swapStyleImage(styleTable, "VScrollKnob", mVScrollKnob);
-        mHScrollKnob = swapStyleImage(styleTable, "HScrollKnob", mHScrollKnob);
-        mHScroll = swapStyleImage(styleTable, "HScroll", mHScroll);
-        mVScroll = swapStyleImage(styleTable, "VScroll", mVScroll);
-        mCorner = swapStyleImage(styleTable, "corner", mCorner);
+    @Override
+    protected void populateStyle(ScrollPane.ScrollPaneStyle style, LuaTable styleTable) {
         mBackground = swapStyleImage(styleTable, "background", mBackground);
+        mCorner = swapStyleImage(styleTable, "corner", mCorner);
+        mHorizontalTrack = swapStyleImage(styleTable, "horizontalTrack", mHorizontalTrack);
+        mHorizontalThumb = swapStyleImage(styleTable, "horizontalThumb", mHorizontalThumb);
+        mVerticalTrack = swapStyleImage(styleTable, "verticalTrack", mVerticalTrack);
+        mVerticalThumb = swapStyleImage(styleTable, "verticalThumb", mVerticalThumb);
 
         style.background = toDrawable(mBackground);
         style.corner = toDrawable(mCorner);
-        style.hScroll = toDrawable(mHScroll);
-        style.hScrollKnob = toDrawable(mHScrollKnob);
-        style.vScroll = toDrawable(mVScroll);
-        style.vScrollKnob = toDrawable(mVScrollKnob);
-
+        style.hScroll = toDrawable(mHorizontalTrack);
+        style.hScrollKnob = toDrawable(mHorizontalThumb);
+        style.vScroll = toDrawable(mVerticalTrack);
+        style.vScrollKnob = toDrawable(mVerticalThumb);
     }
-
 
     @Override
     public void dispose() {
-        mVScrollKnob = freeAsset(mVScrollKnob);
-        mHScrollKnob = freeAsset(mHScrollKnob);
+        mBackground = freeAsset(mBackground);
         mCorner = freeAsset(mCorner);
-        mVScroll = freeAsset(mVScroll);
-        mHScroll = freeAsset(mHScroll);
+        mHorizontalTrack = freeAsset(mHorizontalTrack);
+        mHorizontalThumb = freeAsset(mHorizontalThumb);
+        mVerticalTrack = freeAsset(mVerticalTrack);
+        mVerticalThumb = freeAsset(mVerticalThumb);
     }
 }

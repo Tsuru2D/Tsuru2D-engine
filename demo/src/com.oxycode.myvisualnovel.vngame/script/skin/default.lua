@@ -17,10 +17,10 @@ return {
     },
     scrollpane = {
         background = R.image.bg1,
-        HScroll = R.image.horizScroll,
-        HScrollKnob = R.image.horizScrollBar,
-        VScroll = R.image.vertScroll,
-        VScrollKnob = R.image.vertScrollBar
+        horizontalTrack = R.image.horizScroll,
+        horzontalThumb = R.image.horizScrollBar,
+        verticalTrack = R.image.vertScroll,
+        verticalThumb = R.image.vertScrollBar
     },
     checkbox = {
         off = R.image.checkbox_off,

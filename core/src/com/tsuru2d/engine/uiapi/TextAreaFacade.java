@@ -11,6 +11,11 @@ public class TextAreaFacade extends TextFieldFacade {
     }
 
     @Override
+    public TextArea getActor() {
+        return (TextArea)super.getActor();
+    }
+
+    @Override
     protected TextArea createActor(TextField.TextFieldStyle style) {
         return new TextArea(null, style);
     }
