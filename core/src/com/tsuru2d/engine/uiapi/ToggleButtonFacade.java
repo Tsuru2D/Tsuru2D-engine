@@ -32,6 +32,10 @@ public class ToggleButtonFacade extends ButtonFacade {
         getActor().setChecked(checked);
         getActor().setProgrammaticChangeEvents(true);
     }
+    @ExposeToLua
+    public boolean isChecked(){
+        return getActor().isChecked();
+    }
 
     @Override
     public void dispose() {

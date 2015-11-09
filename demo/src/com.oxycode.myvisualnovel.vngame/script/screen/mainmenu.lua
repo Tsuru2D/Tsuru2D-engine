@@ -56,8 +56,6 @@ function mainmenu:onCreate(screen)
         else
             self.loginButton:setEnabled(false)
             self.loginButton:setChecked(false)
-
-            print ("unable")
             self.netManager:login(
                 self.usernameTextField:getText(),
                 self.passwordTextField:getText(),
@@ -71,7 +69,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Start game button
-    self.startGameButton = self.ui:newToggleButton(R.skin.skin.start)
+    self.startGameButton = self.ui:newButton(R.skin.skin.start)
     self.startGameButton:setClickListener(function()
         screen:setGameScreenNew(R.scene.simplescene1, {})
     end)
@@ -79,7 +77,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Settings button
-    self.settingsButton = self.ui:newToggleButton(R.skin.skin.setting)
+    self.settingsButton = self.ui:newButton(R.skin.skin.setting)
     self.settingsButton:setClickListener(function()
         if not self.netManager:isLoggedIn() then
             self.loginStatusLabel:setText(R.text.common.not_logged_in)
@@ -99,7 +97,6 @@ end
 
 function mainmenu:onLoginResult(success, errorCode, data)
     self.loginButton:setEnabled(true)
-    print ("enable")
     if not success then
         self.loginStatusLabel:setText(R.text.common.login_failed, errorCode)
         if errorCode then
