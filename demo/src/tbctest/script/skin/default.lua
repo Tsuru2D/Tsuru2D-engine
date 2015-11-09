@@ -37,7 +37,7 @@ return {
         buttonStyle = R.skin.default.button2
     },
     dropdownstyle = {
-        dropdownSelectionBackground = R.image.button_hover,
+        dropdownBackgroundSelected = R.image.button_hover,
         dropdownBackground = R.image.button_down,
         background = R.image.buttonup,
         backgroundDisabled = R.image.horizScroll,
@@ -45,6 +45,6 @@ return {
         backgroundOver = R.image.checkbox_on,
         textColor = {0.2,0.2,0.2 },
         dropdownTextColorSelected = {0.5,0.5,0.0 },
-        dropdownTextColorUnselected = {0.2,0.2,0.2 }
+        dropdownTextColor = {0.2,0.2,0.2 }
     }
 }

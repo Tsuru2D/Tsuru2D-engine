@@ -22,7 +22,7 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
 public class DropDownFacade extends ActorFacade<SelectBox<DropDownFacade.Item>, SelectBox.SelectBoxStyle> {
-    private ManagedAsset<Texture> mBackground, mDropdownBackground, mDropdownSelectionBackground,
+    private ManagedAsset<Texture> mBackground, mDropdownBackground, mDropdownBackgroundSelected,
                                   mBackgroundDisabled, mBackgroundOpen, mBackgroundOver;
     private LuaFunction mChangedCallback;
     private Array<Item> mItems;
@@ -62,13 +62,13 @@ public class DropDownFacade extends ActorFacade<SelectBox<DropDownFacade.Item>, 
         // Background image of the dropdown list
         mDropdownBackground = swapStyleImage(styleTable, "dropdownBackground", mDropdownBackground);
         // Background image of the highlighted item in the dropdown list
-        mDropdownSelectionBackground = swapStyleImage(styleTable, "dropdownSelectionBackground", mDropdownSelectionBackground);
+        mDropdownBackgroundSelected = swapStyleImage(styleTable, "dropdownBackgroundSelected", mDropdownBackgroundSelected);
 
         List.ListStyle listStyle = new List.ListStyle();
         listStyle.font = new BitmapFont();
         listStyle.fontColorSelected = tableToColor(styleTable.get("dropdownTextColorSelected"));
-        listStyle.fontColorUnselected = tableToColor(styleTable.get("dropdownTextColorUnselected"));
-        listStyle.selection = toDrawable(mDropdownSelectionBackground);
+        listStyle.fontColorUnselected = tableToColor(styleTable.get("dropdownTextColor"));
+        listStyle.selection = toDrawable(mDropdownBackgroundSelected);
         listStyle.background = toDrawable(mDropdownBackground);
 
         style.font = new BitmapFont();
@@ -122,7 +122,7 @@ public class DropDownFacade extends ActorFacade<SelectBox<DropDownFacade.Item>, 
         mBackgroundOpen = freeAsset(mBackgroundOpen);
         mBackgroundOver = freeAsset(mBackgroundOver);
         mDropdownBackground = freeAsset(mDropdownBackground);
-        mDropdownSelectionBackground = freeAsset(mDropdownSelectionBackground);
+        mDropdownBackgroundSelected = freeAsset(mDropdownBackgroundSelected);
         disposeItems();
         super.dispose();
     }
