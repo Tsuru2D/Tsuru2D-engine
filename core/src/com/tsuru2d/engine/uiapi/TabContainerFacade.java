@@ -17,10 +17,9 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     private TableFacade mTabs;
     private TableFacade mPanel;
     private ScrollPane mScrollPane;
-    private ButtonGroup mButtonGroup;
+    private ButtonGroup<TextButton> mButtonGroup;
     private ManagedAsset<Texture> mBackground;
     private TabContainerStyle mTabContainerStyle;
-    private TableFacade mInnerPanel;
     private Array<Tab> mTabArray;
 
     public TabContainerFacade(BaseScreen screen, AssetID styleID) {
@@ -36,7 +35,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         mPanel.initialize();
         Table table = new Table();
         mScrollPane = new ScrollPane(mTabs.getActor());
-        mButtonGroup = new ButtonGroup();
+        mButtonGroup = new ButtonGroup<TextButton>();
         mButtonGroup.setMaxCheckCount(1);
         mButtonGroup.setMinCheckCount(1);
         table.add(mScrollPane).left();
@@ -49,8 +48,7 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
 
     @Override
     protected TabContainerStyle createStyle() {
-        TabContainerStyle style = new TabContainerStyle();
-        return style;
+        return new TabContainerStyle();
     }
 
     @Override
@@ -102,7 +100,6 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     }
 
     private class CallbackWrapper extends ZeroArgFunction {
-
         private LuaFunction mCallback;
 
         public CallbackWrapper(LuaFunction function) {
