@@ -13,7 +13,7 @@ import org.luaj.vm2.LuaTable;
 
 public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
     private LuaFunction mClickCallback;
-    private ManagedAsset<Texture> mUp, mDown, mHover, mChecked, mCheckedHover;
+    private ManagedAsset<Texture> mUp, mDown, mHover;
 
     public ButtonFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
@@ -39,14 +39,11 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
         mUp = swapStyleImage(styleTable, "up", mUp);
         mDown = swapStyleImage(styleTable, "down", mDown);
         mHover = swapStyleImage(styleTable, "hover", mHover);
-        mChecked=swapStyleImage(styleTable,"checked",mChecked);
-        mCheckedHover=swapStyleImage(styleTable,"checkedHover",mCheckedHover);
 
         style.up = toDrawable(mUp);
         style.down = toDrawable(mDown);
         style.over = toDrawable(mHover);
-        style.checked=toDrawable(mChecked);
-        style.checkedOver=toDrawable(mCheckedHover);
+
     }
 
     @ExposeToLua
@@ -64,20 +61,13 @@ public class ButtonFacade extends ActorFacade<Button, Button.ButtonStyle> {
         getActor().setDisabled(!enabled);
     }
 
-    @ExposeToLua
-    public void setChecked(boolean checked){
-        getActor().setProgrammaticChangeEvents(false);
-        getActor().setChecked(checked);
-        getActor().setProgrammaticChangeEvents(true);
-    }
+
 
     @Override
     public void dispose() {
         mUp = freeAsset(mUp);
         mDown = freeAsset(mDown);
         mHover = freeAsset(mHover);
-        mChecked=freeAsset(mChecked);
-        mCheckedHover=freeAsset(mCheckedHover);
         super.dispose();
     }
 

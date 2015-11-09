@@ -42,7 +42,7 @@ function mainmenu:onCreate(screen)
     self.logTable:row()
 
     -- Login button
-    self.loginButton = self.ui:newButton(R.skin.skin.login)
+    self.loginButton = self.ui:newToggleButton(R.skin.skin.login)
     if self.netManager:isLoggedIn() then
         self.loginButton:setChecked(true)
     else
@@ -71,7 +71,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Start game button
-    self.startGameButton = self.ui:newButton(R.skin.skin.start)
+    self.startGameButton = self.ui:newToggleButton(R.skin.skin.start)
     self.startGameButton:setClickListener(function()
         screen:setGameScreenNew(R.scene.simplescene1, {})
     end)
@@ -79,7 +79,7 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Settings button
-    self.settingsButton = self.ui:newButton(R.skin.skin.setting)
+    self.settingsButton = self.ui:newToggleButton(R.skin.skin.setting)
     self.settingsButton:setClickListener(function()
         if not self.netManager:isLoggedIn() then
             self.loginStatusLabel:setText(R.text.common.not_logged_in)
