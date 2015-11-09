@@ -3,6 +3,11 @@ return {
         textColor = {1,1,1}
     },
     button = {
+        up = R.image.buttonup,
+        down = R.image.buttondown,
+        textColor = {0.2,0.2,0.2}
+    },
+    button2 = {
         up = R.image.button_up,
         down = R.image.button_down,
         hover = R.image.button_hover,
@@ -26,5 +31,19 @@ return {
         off = R.image.checkbox_off,
         on = R.image.checkbox_on,
         over = R.image.checkbox_over
+    },
+    tabcontainer = {
+        background = R.image.bg1,
+        buttonStyle = R.skin.default.button2
+    },
+    dropdownstyle = {
+        selection = R.image.buttondown,
+        background = R.image.buttondown,
+        backgroundDisabled = R.image.buttondown,
+        backgroundOpen = R.image.buttondown,
+        backgroundOver = R.image.buttondown,
+        textColor = {0.2,0.2,0.2 },
+        fontColorSelected = {0.5,0.5,0.0 },
+        fontColorUnselected = {0.2,0.2,0.2 }
     }
 }

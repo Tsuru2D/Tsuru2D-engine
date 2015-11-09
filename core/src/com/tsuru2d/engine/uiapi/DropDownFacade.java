@@ -1,111 +1,174 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 import com.badlogic.gdx.scenes.scene2d.ui.SelectBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.tsuru2d.engine.gameapi.BaseScreen;
+import com.tsuru2d.engine.loader.AssetID;
+import com.tsuru2d.engine.loader.AssetObserver;
+import com.tsuru2d.engine.loader.AssetType;
 import com.tsuru2d.engine.loader.ManagedAsset;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.LuaArrayIterator;
+import org.luaj.vm2.LuaError;
 import org.luaj.vm2.LuaFunction;
 import org.luaj.vm2.LuaTable;
+import org.luaj.vm2.LuaValue;
 
-public class DropDownFacade extends ActorFacade<SelectBox>{
-    private ManagedAsset<Texture> mBackground,mSelection,
-        mBackgroundDisabled,mBackgroundOpen,mBackgroundOver;
-    private LuaFunction mCallBack;
-    private ChangeHandler mChangeHandler;
+public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxStyle> {
+    private ManagedAsset<Texture> mBackground, mSelection,
+        mBackgroundDisabled, mBackgroundOpen, mBackgroundOver;
+    private LuaFunction mChangedCallback;
+    private Array<Item> mItems;
+    private AssetUpdatedObserver mAssetUpdatedObserver;
 
-    public DropDownFacade(BaseScreen screen){
-        super(screen);
-        SelectBox selectBox=new SelectBox(createStyle());
-        setActor(selectBox);
-        mChangeHandler = new ChangeHandler();
+    public DropDownFacade(BaseScreen screen, AssetID styleID) {
+        super(screen, styleID);
+        mAssetUpdatedObserver = new AssetUpdatedObserver();
+        mItems = new Array<Item>();
     }
 
-    public SelectBox.SelectBoxStyle createStyle(){
-        BitmapFont font=new BitmapFont();
-        TextureRegionDrawable backGround=getDrawable(mBackground);
-        List.ListStyle listStyle=new List.ListStyle
-            (font,Color.BLACK,Color.BLUE,getDrawable(mSelection));
-        listStyle.background=backGround; // can be optional out if error occurs
-        SelectBox.SelectBoxStyle selectBoxStyle=new SelectBox.SelectBoxStyle
-            (font,Color.BLUE,backGround,new ScrollPane.ScrollPaneStyle(),listStyle);
-        selectBoxStyle.backgroundDisabled=getDrawable(mBackgroundDisabled);
-        selectBoxStyle.backgroundOpen=getDrawable(mBackgroundOpen);
-        selectBoxStyle.backgroundOver=getDrawable(mBackgroundOver);
-        selectBoxStyle.disabledFontColor=Color.GOLD;
-        return selectBoxStyle;
+    @Override
+    protected SelectBox createActor(SelectBox.SelectBoxStyle style) {
+        return new SelectBox(style);
     }
 
-    private TextureRegionDrawable getDrawable(ManagedAsset<Texture> texture) {
-        return (texture==null)? null:new TextureRegionDrawable(new TextureRegion(texture.get()));
+    @Override
+    protected SelectBox.SelectBoxStyle createStyle() {
+        return new SelectBox.SelectBoxStyle();
+    }
+
+    @Override
+    protected void initializeActor(SelectBox actor) {
+        actor.addListener(new ChangeHandler());
+    }
+
+    @Override
+    protected void populateStyle(SelectBox.SelectBoxStyle style, LuaTable styleTable) {
+        mBackground = swapStyleImage(styleTable, "background", mBackground);
+        mSelection = swapStyleImage(styleTable, "selection", mSelection);
+        mBackgroundDisabled = swapStyleImage(styleTable, "backgroundDisabled", mBackgroundDisabled);
+        mBackgroundOpen = swapStyleImage(styleTable, "backgroundOpen", mBackgroundOpen);
+        mBackgroundOver = swapStyleImage(styleTable, "backgroundOver", mBackgroundOver);
+
+        BitmapFont font = new BitmapFont();
+        List.ListStyle listStyle = new List.ListStyle(
+            font,
+            tableToColor(styleTable.get("fontColorSelected")),
+            tableToColor(styleTable.get("fontColorUnselected")),
+            toDrawable(mSelection));
+        listStyle.background = toDrawable(mBackground);
+
+        style.font = new BitmapFont();
+        style.background = toDrawable(mBackground);
+        style.backgroundDisabled = toDrawable(mBackgroundDisabled);
+        style.backgroundOpen = toDrawable(mBackgroundOpen);
+        style.backgroundOver = toDrawable(mBackgroundOver);
+        style.fontColor = tableToColor(styleTable.get("textColor"));
+        style.scrollStyle = new ScrollPane.ScrollPaneStyle();
+        style.listStyle = listStyle;
     }
 
     @ExposeToLua
-    public void setStyle(LuaTable styleTable) {
-        dispose();
-        mBackground = getStyleAsset(styleTable, "background");
-        mSelection = getStyleAsset(styleTable, "selection");
-        mBackgroundDisabled = getStyleAsset(styleTable, "backgrounddisabled");
-        mBackgroundOpen = getStyleAsset(styleTable, "backgroundopen");
-        mBackgroundOver = getStyleAsset(styleTable, "backgroundover");
-        mBackground = getStyleAsset(styleTable, "background");
-        SelectBox.SelectBoxStyle selectBoxStyle = createStyle();
-        mActor.setStyle(selectBoxStyle);
+    public void setValueChangedListener(LuaFunction callback) {
+        mChangedCallback = callback;
     }
 
     @ExposeToLua
-    public void setItems(LuaTable table){
+    public void setItems(LuaTable table) {
         LuaArrayIterator luaArrayIterator = new LuaArrayIterator(table);
-        Array newItems=new Array();
-        while (luaArrayIterator.hasNext()){
-            newItems.add(luaArrayIterator.next());
+        disposeItems();
+        while (luaArrayIterator.hasNext()) {
+            LuaTable luaTable = (LuaTable)luaArrayIterator.next().arg(2);
+            LuaValue value = luaTable.get("value");
+            AssetID assetID = (AssetID)luaTable.get("text").checkuserdata(AssetID.class);
+            mItems.add(new Item(value, assetID));
         }
-        getActor().setItems(newItems);
+        getActor().setItems(mItems);
     }
 
     @ExposeToLua
-    public void setOnChange(LuaFunction callBack) {
-        mCallBack = callBack;
-        if(mCallBack != null) {
-            getActor().addListener(mChangeHandler);
-        }else {
-            getActor().removeListener(mChangeHandler);
+    public LuaValue getSelectedValue() {
+        return ((Item)getActor().getSelected()).getValue();
+    }
+
+    @ExposeToLua
+    public void setSelectedValue(LuaValue value) {
+        for (Item item : mItems) {
+            if (item.getValue().eq_b(value)) {
+                getActor().setSelected(item);
+                return;
+            }
         }
+        throw new LuaError("Entry with value: " + value.toString() + " not found");
     }
 
     @Override
     public void dispose() {
-        dispose(mBackground);
-        dispose(mSelection);
-        dispose(mBackgroundDisabled);
-        dispose(mBackgroundOpen);
-        dispose(mBackgroundOver);
+        mBackground = freeAsset(mBackground);
+        mSelection = freeAsset(mSelection);
+        mBackgroundDisabled = freeAsset(mBackgroundDisabled);
+        mBackgroundOpen = freeAsset(mBackgroundOpen);
+        mBackgroundOver = freeAsset(mBackgroundOver);
+        disposeItems();
+        super.dispose();
     }
 
-    private void dispose(ManagedAsset asset){
-        if(asset!=null) {
-            mScreen.getAssetLoader().freeAsset(asset);
-            asset=null;
+    private void disposeItems() {
+        for (Item item : mItems) {
+            item.dispose();
         }
+        mItems.clear();
     }
 
     private class ChangeHandler extends ChangeListener {
         @Override
         public void changed(ChangeEvent event, Actor actor) {
-            getActor().setSelectedIndex(getActor().getSelectedIndex());
-            if(mCallBack != null) {
-                mCallBack.call();
+            if (mChangedCallback != null) {
+                mChangedCallback.call(DropDownFacade.this, getSelectedValue());
             }
+        }
+    }
+
+    private class Item implements Disposable {
+        private ManagedAsset<String> mText;
+        private LuaValue mValue;
+
+        public Item(LuaValue value, AssetID assetID) {
+            mValue = value;
+            mText = swapAsset(AssetType.TEXT, assetID, mText, mAssetUpdatedObserver);
+        }
+
+        public ManagedAsset getManagedAsset() {
+            return mText;
+        }
+
+        public LuaValue getValue() {
+            return mValue;
+        }
+
+        @Override
+        public void dispose() {
+            mText = freeAsset(mText, mAssetUpdatedObserver);
+        }
+
+        @Override
+        public String toString() {
+            return mText.get();
+        }
+    }
+
+
+    private class AssetUpdatedObserver implements AssetObserver<String> {
+        @Override
+        public void onAssetUpdated(ManagedAsset<String> asset) {
+            getActor().invalidate();
         }
     }
 

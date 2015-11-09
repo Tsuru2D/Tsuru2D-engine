@@ -56,6 +56,11 @@ function mainmenu:onCreate(screen)
         else
             self.loginButton:setEnabled(false)
             self.loginButton:setChecked(false)
+<<<<<<< HEAD
+=======
+
+            print ("unable")
+>>>>>>> master
             self.netManager:login(
                 self.usernameTextField:getText(),
                 self.passwordTextField:getText(),
@@ -69,7 +74,11 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Start game button
+<<<<<<< HEAD
     self.startGameButton = self.ui:newButton(R.skin.skin.start)
+=======
+    self.startGameButton = self.ui:newToggleButton(R.skin.skin.start)
+>>>>>>> master
     self.startGameButton:setClickListener(function()
         screen:setGameScreenNew(R.scene.simplescene1, {})
     end)
@@ -77,7 +86,11 @@ function mainmenu:onCreate(screen)
     self.mainTable:row()
 
     -- Settings button
+<<<<<<< HEAD
     self.settingsButton = self.ui:newButton(R.skin.skin.setting)
+=======
+    self.settingsButton = self.ui:newToggleButton(R.skin.skin.setting)
+>>>>>>> master
     self.settingsButton:setClickListener(function()
         if not self.netManager:isLoggedIn() then
             self.loginStatusLabel:setText(R.text.common.not_logged_in)
@@ -97,7 +110,9 @@ end
 
 function mainmenu:onLoginResult(success, errorCode, data)
     self.loginButton:setEnabled(true)
+    print ("enable")
     if not success then
+        self.loginButton:setChecked(false)
         self.loginStatusLabel:setText(R.text.common.login_failed, errorCode)
         if errorCode then
             print("Login error: " .. errorCode)
@@ -105,7 +120,11 @@ function mainmenu:onLoginResult(success, errorCode, data)
         return
     end
     self.loginStatusLabel:setText(R.text.common.logged_in)
+<<<<<<< HEAD
 --    self.loginButton:setText(R.text.common.log_out)
+=======
+    --    self.loginButton:setText(R.text.common.log_out)
+>>>>>>> master
     self.loginButton:setChecked(true)
 end
 
