@@ -10,11 +10,13 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
 public class ScrollPaneFacade extends ActorFacade<ScrollPane,ScrollPane.ScrollPaneStyle> {
-    private ManagedAsset<Texture> mBackground, mCorner, mHScroll, mHScrollKnob, mVScroll, mVScrollKnob;
+    private ManagedAsset<Texture> mBackground, mCorner, mHorizontalTrack,
+                                  mHorizontalThumb, mVerticalTrack, mVerticalThumb;
 
     public ScrollPaneFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
     }
+
     @ExposeToLua
     public void setWidget(ActorFacade<? extends Actor,?> wrapper){
         getActor().setWidget(wrapper.getActor());
@@ -224,39 +226,40 @@ public class ScrollPaneFacade extends ActorFacade<ScrollPane,ScrollPane.ScrollPa
         getActor().setVelocityY(velocityY);
     }
 
-
+    @Override
     protected ScrollPane createActor(ScrollPane.ScrollPaneStyle style) {
-        return new ScrollPane(null,style);
+        return new ScrollPane(null, style);
     }
 
+    @Override
     protected ScrollPane.ScrollPaneStyle createStyle() {
         return new ScrollPane.ScrollPaneStyle();
     }
 
+    @Override
     protected void populateStyle(ScrollPane.ScrollPaneStyle style,  LuaTable styleTable) {
-        mVScrollKnob = swapStyleImage(styleTable, "VScrollKnob", mVScrollKnob);
-        mHScrollKnob = swapStyleImage(styleTable, "HScrollKnob", mHScrollKnob);
-        mHScroll = swapStyleImage(styleTable, "HScroll", mHScroll);
-        mVScroll = swapStyleImage(styleTable, "VScroll", mVScroll);
-        mCorner = swapStyleImage(styleTable, "corner", mCorner);
         mBackground = swapStyleImage(styleTable, "background", mBackground);
+        mCorner = swapStyleImage(styleTable, "corner", mCorner);
+        mHorizontalTrack = swapStyleImage(styleTable, "horizontalTrack", mHorizontalTrack);
+        mHorizontalThumb = swapStyleImage(styleTable, "horizontalThumb", mHorizontalThumb);
+        mVerticalTrack = swapStyleImage(styleTable, "verticalTrack", mVerticalTrack);
+        mVerticalThumb = swapStyleImage(styleTable, "verticalThumb", mVerticalThumb);
 
         style.background = toDrawable(mBackground);
         style.corner = toDrawable(mCorner);
-        style.hScroll = toDrawable(mHScroll);
-        style.hScrollKnob = toDrawable(mHScrollKnob);
-        style.vScroll = toDrawable(mVScroll);
-        style.vScrollKnob = toDrawable(mVScrollKnob);
-
+        style.hScroll = toDrawable(mHorizontalTrack);
+        style.hScrollKnob = toDrawable(mHorizontalThumb);
+        style.vScroll = toDrawable(mVerticalTrack);
+        style.vScrollKnob = toDrawable(mVerticalThumb);
     }
-
 
     @Override
     public void dispose() {
-        mVScrollKnob = freeAsset(mVScrollKnob);
-        mHScrollKnob = freeAsset(mHScrollKnob);
+        mBackground = freeAsset(mBackground);
         mCorner = freeAsset(mCorner);
-        mVScroll = freeAsset(mVScroll);
-        mHScroll = freeAsset(mHScroll);
+        mHorizontalTrack = freeAsset(mHorizontalTrack);
+        mHorizontalThumb = freeAsset(mHorizontalThumb);
+        mVerticalTrack = freeAsset(mVerticalTrack);
+        mVerticalThumb = freeAsset(mVerticalThumb);
     }
 }
