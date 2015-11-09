@@ -121,8 +121,8 @@ public class DropDownFacade extends ActorFacade<SelectBox, SelectBox.SelectBoxSt
     }
 
     private void disposeItems() {
-        for (Item i : mItems) {
-            i.dispose();
+        for (Item item : mItems) {
+            item.dispose();
         }
         mItems.clear();
     }
