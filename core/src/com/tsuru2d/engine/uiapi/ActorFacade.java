@@ -60,6 +60,10 @@ public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJ
         return mScreen.getAssetLoader().getAsset(assetType, id);
     }
 
+    protected BaseScreen getScreen() {
+        return mScreen;
+    }
+
     protected <U> ManagedAsset<U> swapAsset(AssetType assetType, AssetID id,
                                             ManagedAsset<U> oldAsset, AssetObserver<U> observer) {
         ManagedAsset<U> newAsset = getAsset(assetType, id);
