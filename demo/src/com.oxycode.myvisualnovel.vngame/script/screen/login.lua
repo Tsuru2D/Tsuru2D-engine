@@ -15,28 +15,28 @@ function login:onCreate(screen)
     self.mainTable = self.ui:newTable()
 
     -- Username textbox
-    self.usernameTextField = self.ui:newTextField(R.skin.skin.text)
+    self.usernameTextField = self.ui:newTextField(R.skin.default.textbox)
     self.usernameTextField:setHint(R.text.common.username)
     self.usernameTextField:setText("test@test.com")
     self.usernameTextField:setTextChangedListener(function(textbox, value)
         print("Username: " .. value)
     end)
-    self.mainTable:add(self.usernameTextField):fillX():height(40):padLeft(5):padRight(5)
+    self.mainTable:add(self.usernameTextField):fillX():height(40):padLeft(5):padRight(5):padBottom(5)
     self.mainTable:row()
 
     -- Password textbox
-    self.passwordTextField = self.ui:newTextField(R.skin.skin.text)
+    self.passwordTextField = self.ui:newTextField(R.skin.default.textbox)
     self.passwordTextField:setText("abc")
     self.passwordTextField:setHint(R.text.common.password)
     self.passwordTextField:setPasswordMode(true)
     self.passwordTextField:setTextChangedListener(function(textbox, value)
         print("Password: " .. value)
     end)
-    self.mainTable:add(self.passwordTextField):fillX():height(40):padLeft(5):padRight(5)
+    self.mainTable:add(self.passwordTextField):fillX():height(40):padLeft(5):padRight(5):padBottom(5)
     self.mainTable:row()
 
     -- Login button
-    self.loginButton = self.ui:newButton(R.skin.skin.login)
+    self.loginButton = self.ui:newButton(R.skin.imagebutton.login)
     self.loginButton:setClickListener(function()
         self.loginStatusLabel:setText(R.text.common.logging_in)
         self.loginButton:setEnabled(false)
@@ -52,7 +52,7 @@ function login:onCreate(screen)
     self.mainTable:add(self.loginButton):fillX():width(200):height(100)
     self.ui:add(self.mainTable):expand()
 
-    screen:setBackground(R.image.background)
+    -- screen:setBackground(R.image.background.mainmenu_bg)
 end
 
 function login:onLoginResult(success, errorCode, data)

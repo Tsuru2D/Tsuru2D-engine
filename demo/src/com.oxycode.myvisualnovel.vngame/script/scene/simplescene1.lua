@@ -7,7 +7,7 @@ return function(scene)
             clothes = R.image.character.bob.clothes.home,
             face = R.image.character.bob.face.happy,
         })
-        frame:background(R.image.bg1)
+        frame:background(R.image.background.bg1)
     end)
     scene:frame("f1", function(frame, state)
         frame:music(R.music.bg1)
