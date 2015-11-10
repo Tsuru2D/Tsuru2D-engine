@@ -37,6 +37,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private ManagedAsset<Music> mMusic;
     private ArrayDeque<BaseScreen> mScreens;
     private NetManager mNetManager;
+    private GameScreen mGameScreen;
 
     public EngineMain(PlatformApi platformApi) {
         mPlatformApi = platformApi;
@@ -127,8 +128,9 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         String frameID = saveData.mFrameId;
         LuaTable screenScript = mAssetLoader.getScreen(getMetadata().mGameScreen);
         GameScreen screen = new GameScreen(this, screenScript, globals);
-        setScreen(screen, params);
         screen.setScene(sceneID, frameID);
+        setScreen(screen, params);
+        mGameScreen=screen;
     }
 
     public void setGameScreen(AssetID sceneID, LuaValue params) {
@@ -211,5 +213,9 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     public GameMetadataInfo getMetadata() {
         return mAssetLoader.getMetadata();
+    }
+
+    public GameScreen getGameScreen(){
+        return mGameScreen;
     }
 }
