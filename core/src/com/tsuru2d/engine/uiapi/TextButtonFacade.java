@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.uiapi;
 
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.tsuru2d.engine.gameapi.BaseScreen;
@@ -36,7 +35,7 @@ public class TextButtonFacade extends ButtonFacade {
     @Override
     protected Button.ButtonStyle createStyle() {
         TextButton.TextButtonStyle style = new TextButton.TextButtonStyle();
-        style.font = new BitmapFont();
+        style.font = FontFactory.font24();
         return style;
     }
 

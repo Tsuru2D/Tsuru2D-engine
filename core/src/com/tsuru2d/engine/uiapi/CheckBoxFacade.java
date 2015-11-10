@@ -1,7 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.CheckBox;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -40,7 +39,7 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
     @Override
     protected CheckBox.CheckBoxStyle createStyle() {
         CheckBox.CheckBoxStyle style = new CheckBox.CheckBoxStyle();
-        style.font = new BitmapFont();
+        style.font = FontFactory.font24();
         return style;
     }
 

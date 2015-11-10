@@ -1,7 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.TextField;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -45,7 +44,7 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
     @Override
     protected TextField.TextFieldStyle createStyle() {
         TextField.TextFieldStyle style = new TextField.TextFieldStyle();
-        style.font = new BitmapFont();
+        style.font = FontFactory.font24();
         return style;
     }
 

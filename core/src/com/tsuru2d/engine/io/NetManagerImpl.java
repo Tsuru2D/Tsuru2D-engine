@@ -55,6 +55,13 @@ public class NetManagerImpl implements NetManager {
         Gdx.net.sendHttpRequest(request, listener);
     }
 
+    private void returnError(String errorCode, Callback callback) {
+        NetResult result = new NetResult();
+        result.mSuccess = false;
+        result.mErrorCode = errorCode;
+        callback.onResult(result);
+    }
+
     @Override
     public boolean isLoggedIn() {
         return mAuthToken != null;
@@ -63,10 +70,7 @@ public class NetManagerImpl implements NetManager {
     @Override
     public void login(String email, String password, Callback callback) {
         if (isLoggedIn()) {
-            NetResult result = new NetResult();
-            result.mSuccess = false;
-            result.mErrorCode = "already_logged_in";
-            callback.onResult(result);
+            returnError("already_logged_in", callback);
             return;
         }
 
@@ -92,6 +96,11 @@ public class NetManagerImpl implements NetManager {
 
     @Override
     public void register(String email, String password, Callback callback) {
+        if (isLoggedIn()) {
+            returnError("already_logged_in", callback);
+            return;
+        }
+
         JsonWriter jsonWriter = newJsonWriter();
         try {
             jsonWriter.object();

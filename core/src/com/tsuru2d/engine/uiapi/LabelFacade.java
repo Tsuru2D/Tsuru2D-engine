@@ -1,7 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
@@ -32,7 +31,7 @@ public class LabelFacade extends ActorFacade<Label, Label.LabelStyle> {
     @Override
     protected Label.LabelStyle createStyle() {
         Label.LabelStyle style = new Label.LabelStyle();
-        style.font = new BitmapFont();
+        style.font = FontFactory.font24();
         return style;
     }
 
