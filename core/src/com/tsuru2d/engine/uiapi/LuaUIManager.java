@@ -107,16 +107,16 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
 
     @ExposeToLua
     public TabContainerFacade newTabContainer(AssetID styleID) {
-        TabContainerFacade tabContainerFacade = new TabContainerFacade(mScreen, styleID);
-        initActor(tabContainerFacade);
-        return tabContainerFacade;
+        TabContainerFacade tabContainer = new TabContainerFacade(mScreen, styleID);
+        initActor(tabContainer);
+        return tabContainer;
     }
 
     @ExposeToLua
     public DropDownFacade newDropDown(AssetID styleID) {
-        DropDownFacade dropDownFacade = new DropDownFacade(mScreen, styleID);
-        initActor(dropDownFacade);
-        return dropDownFacade;
+        DropDownFacade dropDown = new DropDownFacade(mScreen, styleID);
+        initActor(dropDown);
+        return dropDown;
     }
 
     @Override
