@@ -28,5 +28,10 @@ return {
         up = R.image.imagebutton.album_up,
         down = R.image.imagebutton.album_down,
         hover = R.image.imagebutton.album_hover
+    },
+    register = {
+        up = R.image.imagebutton.register_up,
+        down = R.image.imagebutton.register_down,
+        hover = R.image.imagebutton.register_hover
     }
 }
