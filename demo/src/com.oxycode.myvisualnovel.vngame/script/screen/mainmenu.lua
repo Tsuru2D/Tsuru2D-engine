@@ -16,14 +16,31 @@ function mainmenu:onCreate(screen)
     self.mainTable:add(self.startGameButton):fillX():width(200):height(100)
     self.mainTable:row()
 
+    -- Continue game button
+    self.continueGameButton = self.ui:newButton(R.skin.imagebutton.continue)
+    self.continueGameButton:setClickListener(function()
+        self.netManager:enumerateSaves(0, 0, function(success, errorCode, data)
+            if not success then
+                if errorCode then
+                    print("Loading save error: " .. errorCode)
+                end
+                return
+            end
+            local saveData = data[1]
+            if not saveData then
+                print("No save data")
+                return
+            end
+            self.screen:setGameScreenResume(saveData, {})
+        end)
+    end)
+    self.mainTable:add(self.continueGameButton):fillX():width(200):height(100)
+    self.mainTable:row()
+
     -- Settings button
     self.settingsButton = self.ui:newButton(R.skin.imagebutton.settings)
     self.settingsButton:setClickListener(function()
-        if not self.netManager:isLoggedIn() then
-            self.loginStatusLabel:setText(R.text.common.not_logged_in)
-        else
-            screen:setMenuScreen(R.screen.settings)
-        end
+        screen:setMenuScreen(R.screen.settings)
     end)
     self.mainTable:add(self.settingsButton):fillX():spaceBottom(15):width(200):height(100)
     self.mainTable:row()

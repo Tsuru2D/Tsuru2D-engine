@@ -25,11 +25,11 @@ public class GameScene {
         return mNextSceneID;
     }
 
-    public AssetID getSceneID(){
+    public AssetID getSceneID() {
         return mSceneID;
     }
 
-    public String getFrameID(){
+    public String getFrameID() {
         return mFrames.get(mFrameIndex).getFrameID();
     }
 

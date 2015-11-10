@@ -24,6 +24,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
+    private static final boolean LOG_ACTIVITY = false;
+
     private final ZipFile mMainZipFile;
     private final Map<String, ZipFile> mLanguagePackFiles;
     private final AssetManager mAssetManager;
@@ -54,7 +56,9 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
         String path = findPath(rawAssetID);
         mResolvePathCache.put(rawAssetID, path);
         mAssetManager.load(path, type, params);
-        Xlog.d("Started loading asset: %s", rawAssetID);
+        if (LOG_ACTIVITY) {
+            Xlog.d("Started loading asset: %s", rawAssetID);
+        }
     }
 
     @Override
@@ -66,7 +70,9 @@ public class ZipRawAssetLoader implements RawAssetLoader, FileHandleResolver {
     public void unloadRaw(AssetID rawAssetID) {
         String path = mResolvePathCache.remove(rawAssetID);
         mAssetManager.unload(path);
-        Xlog.d("Unloading asset: %s", rawAssetID);
+        if (LOG_ACTIVITY) {
+            Xlog.d("Unloading asset: %s", rawAssetID);
+        }
     }
 
     @Override

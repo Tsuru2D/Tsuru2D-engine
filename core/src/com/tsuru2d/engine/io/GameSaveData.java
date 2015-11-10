@@ -32,9 +32,10 @@ public class GameSaveData implements Json.Serializable {
     public int mVersion;
 
     /**
-     * The time at which the save file was created, in milliseconds
+     * The time at which the save file was created, in seconds
      * from midnight, January 1, 1970 UTC. This is the value
-     * returned by {@link System#currentTimeMillis()}.
+     * returned by {@link System#currentTimeMillis()} divided
+     * by 1000.
      */
     public long mCreationTime;
 

@@ -20,12 +20,14 @@ public class GameScreen extends BaseScreen {
     private FrameApi mFrameApi;
     private LuaFunction mClickCallback;
     private Array<GameActor> mActors;
+    private boolean mSkipAnimations;
 
     public GameScreen(EngineMain game, LuaTable screenScript, LuaTable globalsTable) {
         super(game, screenScript);
         mGameState = new Globals();
         mGlobalsTable = globalsTable;
         mActors = new Array<GameActor>();
+        mSkipAnimations = false;
         mFrameApi = new FrameApi(this, mGameState, screenScript);
         // TODO: For some reason, all touch events on actors within the screen
         // still fire this click listener, which causes memory leaks when
@@ -45,11 +47,11 @@ public class GameScreen extends BaseScreen {
         });
     }
 
-    public LuaTable getGlobalsTable(){
+    public LuaTable getGlobalsTable() {
         return mGlobalsTable;
     }
 
-    public GameScene getScene(){
+    public GameScene getScene() {
         return mScene;
     }
 
@@ -66,11 +68,16 @@ public class GameScreen extends BaseScreen {
         GameScene scene = mGame.getAssetLoader().getScene(sceneID);
         mScene = scene;
         scene.runSetup(mFrameApi, mLocals, mGlobalsTable);
-        GameFrame frame;
+        GameFrame frame = scene.getFrame();
         if (frameID != null) {
-            frame = scene.gotoFrame(frameID);
-        } else {
-            frame = scene.getFrame();
+            mSkipAnimations = true;
+            String currentFrameID = scene.getFrameID();
+            while (!currentFrameID.equals(frameID)) {
+                runFrame(frame);
+                frame = mScene.nextFrame();
+                currentFrameID = frame.getFrameID();
+            }
+            mSkipAnimations = false;
         }
         runFrame(frame);
     }
@@ -79,7 +86,7 @@ public class GameScreen extends BaseScreen {
         LuaTable actorScript = mGame.getAssetLoader().getObject(id.userdata());
         GameActor actor = new GameActor(this, actorScript);
         mStage.addActor(actor.getActor());
-        actor.transform(params);
+        actor.transform(params, true);
         mActors.add(actor);
         return actor;
     }
@@ -117,7 +124,7 @@ public class GameScreen extends BaseScreen {
 
     @ExposeToLua
     public void transform(GameActor actor, LuaTable params) {
-        actor.transform(params);
+        actor.transform(params, mSkipAnimations);
     }
 
     @Override
