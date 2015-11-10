@@ -18,5 +18,5 @@ assetPaths = {
 }
 title = R.text.common.title
 author = R.text.common.author
-mainScreen = R.screen.mainmenu
+mainScreen = R.screen.splash
 gameScreen = R.screen.game

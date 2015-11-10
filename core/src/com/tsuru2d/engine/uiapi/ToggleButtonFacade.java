@@ -20,27 +20,28 @@ public class ToggleButtonFacade extends ButtonFacade {
     @Override
     protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
         super.populateStyle(style, styleTable);
-        mChecked=swapStyleImage(styleTable,"checked",mChecked);
-        mCheckedHover=swapStyleImage(styleTable,"checkedHover",mCheckedHover);
-        style.checked=toDrawable(mChecked);
-        style.checkedOver=toDrawable(mCheckedHover);
+        mChecked = swapStyleImage(styleTable, "checked", mChecked);
+        mCheckedHover = swapStyleImage(styleTable, "checkedHover", mCheckedHover);
+        style.checked = toDrawable(mChecked);
+        style.checkedOver = toDrawable(mCheckedHover);
     }
 
     @ExposeToLua
-    public void setChecked(boolean checked){
+    public void setChecked(boolean checked) {
         getActor().setProgrammaticChangeEvents(false);
         getActor().setChecked(checked);
         getActor().setProgrammaticChangeEvents(true);
     }
+
     @ExposeToLua
-    public boolean isChecked(){
+    public boolean isChecked() {
         return getActor().isChecked();
     }
 
     @Override
     public void dispose() {
-        mChecked=freeAsset(mChecked);
-        mCheckedHover=freeAsset(mCheckedHover);
+        mChecked = freeAsset(mChecked);
+        mCheckedHover = freeAsset(mCheckedHover);
         super.dispose();
     }
 }

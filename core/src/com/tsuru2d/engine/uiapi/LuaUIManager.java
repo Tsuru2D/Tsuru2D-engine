@@ -8,7 +8,6 @@ import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
-import org.luaj.vm2.LuaValue;
 
 public class LuaUIManager extends ExposedJavaClass implements Disposable {
     private final BaseScreen mScreen;
