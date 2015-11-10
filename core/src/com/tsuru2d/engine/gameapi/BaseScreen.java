@@ -23,27 +23,23 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected final EngineMain mGame;
     protected final LuaTable mScreenScript;
     protected final Stage mStage;
-    private final LuaNetManager mNetManager;
-    private final LuaUIManager mUIManager;
-    private final Table mTable;
-    private final TextureRegionDrawable mBackgroundDrawable;
+    protected Table mRootTable;
+    protected Table mUITable;
+    private LuaNetManager mNetManager;
+    private LuaUIManager mUIManager;
+    private TextureRegionDrawable mBackground;
     private ManagedAsset<Texture> mBackgroundTexture;
 
     public BaseScreen(EngineMain game, LuaTable screenScript) {
         mGame = game;
         mScreenScript = screenScript;
         mStage = new Stage(game.getViewport(), game.getSpriteBatch());
-        mBackgroundDrawable = new TextureRegionDrawable(new TextureRegion());
-        Table table = new Table();
-        table.setDebug(true);
-        table.setFillParent(true);
-        mTable = table;
-        mStage.addActor(table);
         mNetManager = new LuaNetManager(this, game.getNetManager());
-        mUIManager = new LuaUIManager(this, table);
+        mBackground = new TextureRegionDrawable(new TextureRegion());
     }
 
     public void inititialize() {
+        mUIManager = new LuaUIManager(this, mUITable);
         mScreenScript.invokemethod("onCreate", this);
     }
 
@@ -122,8 +118,8 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
             getAssetLoader().freeAsset(mBackgroundTexture);
         }
         mBackgroundTexture = texture;
-        mBackgroundDrawable.getRegion().setRegion(texture.get());
-        mTable.background(mBackgroundDrawable);
+        mBackground.getRegion().setRegion(texture.get());
+        mRootTable.background(mBackground);
     }
 
     @ExposeToLua

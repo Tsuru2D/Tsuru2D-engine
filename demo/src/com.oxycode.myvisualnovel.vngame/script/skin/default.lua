@@ -10,6 +10,12 @@ return {
         up = R.image.button.button_up,
         down = R.image.button.button_down,
         hover = R.image.button.button_hover,
+        textColor = {0.2,0.2,0.2}
+    },
+    togglebutton = {
+        up = R.image.button.button_up,
+        down = R.image.button.button_down,
+        hover = R.image.button.button_hover,
         checked = R.image.button.button_checked,
         textColor = {0.2,0.2,0.2}
     },
@@ -33,7 +39,7 @@ return {
         hover = R.image.checkbox.checkbox_hover
     },
     tabcontainer = {
-        tabStyle = R.skin.default.button
+        tabStyle = R.skin.default.togglebutton
     },
     dropdown = {
         background = R.image.dropdown.dropdown_background,

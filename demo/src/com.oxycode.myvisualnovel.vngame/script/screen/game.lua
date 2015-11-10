@@ -17,9 +17,6 @@ function game:onCreate(screen)
     self.backButton = self.ui:newTextButton(R.skin.default.button)
     self.backButton:setText(R.text.common.back_to_menu)
     self.backButton:setClickListener(function()
-        -- TODO: This next line is a workaround for the bug detailed in
-        -- GameScreen. Once the bug has been fixed, this should be removed
-        screen:setClickListener(nil)
         screen:setMenuScreen(R.screen.mainmenu)
     end)
     self.ui:add(self.backButton):top():right()
