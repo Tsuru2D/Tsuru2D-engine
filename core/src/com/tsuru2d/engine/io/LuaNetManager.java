@@ -1,10 +1,12 @@
 package com.tsuru2d.engine.io;
 
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.*;
 
 public class LuaNetManager extends ExposedJavaClass {
+    private final BaseScreen mScreen;
     private final NetManager mNetManager;
 
     private static class LuaCallback implements NetManager.Callback {
@@ -37,7 +39,8 @@ public class LuaNetManager extends ExposedJavaClass {
         }
     }
 
-    public LuaNetManager(NetManager netManager) {
+    public LuaNetManager(BaseScreen screen, NetManager netManager) {
+        mScreen = screen;
         mNetManager = netManager;
     }
 
@@ -66,20 +69,29 @@ public class LuaNetManager extends ExposedJavaClass {
         mNetManager.enumerateSaves(startIndex, endIndex, new LuaCallback(callback) {
             @Override
             public void onResult(NetResult result) {
-                // GameSaveData[] data = (GameSaveData[])result.mData;
-                // TODO
-                runCallback(result.mSuccess, result.mErrorCode);
+                if (result.mSuccess) {
+                    GameSaveData[] saves = (GameSaveData[])result.mData;
+                    LuaTable luaSaves = new LuaTable(saves.length, 0);
+                    for (int i = 0; i < saves.length; ++i) {
+                        luaSaves.set(i + 1, new LuaUserdata(saves[i]));
+                    }
+                    runCallback(true, result.mErrorCode, luaSaves);
+                } else {
+                    super.onResult(result);
+                }
             }
         });
     }
 
     @ExposeToLua
-    public void writeSave() {
-        // TODO
+    public void writeSave(int index, boolean overwrite, LuaFunction callback) {
+        GameSaveData saveData = mScreen.buildSaveData();
+        saveData.mIndex = index;
+        mNetManager.writeSave(overwrite, saveData, new LuaCallback(callback));
     }
 
     @ExposeToLua
-    public void deleteSave() {
+    public void deleteSave(long saveID, LuaFunction callback) {
         // TODO
     }
 

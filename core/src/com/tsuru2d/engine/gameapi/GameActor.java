@@ -93,32 +93,44 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         mActor.layout();
     }
 
-    public void transform(LuaTable transformation) {
+    public void transform(LuaTable transformation, boolean skipAnimation) {
         Iterator<Varargs> it = new LuaMapIterator(transformation);
         while (it.hasNext()) {
             Varargs transformKvp = it.next();
-            String key = transformKvp.arg(1).checkjstring();
-            LuaValue rawValue = transformKvp.arg(2);
-
-            if (key.equals("x")) {
-                moveToActionX(rawValue);
-            } else if (key.equals("y")) {
-                moveToActionY(rawValue);
-            } else if (key.equals("alpha")) {
-                alphaAction(rawValue);
-            } else if (key.equals("rotation")) {
-                rotateToAction(rawValue);
-            } else if (key.equals("scale")) {
-                scaleToAction(rawValue);
-            } else if (key.equals("color")) {
-                colorAction(rawValue);
-            } else {
-                Xlog.e("Unknown transform key: %s", key);
+            TemporalAction action = getAction(transformKvp);
+            if (action == null) {
+                continue;
             }
+            if (skipAnimation) {
+                action.setDuration(0f);
+            }
+            mActor.addAction(action);
         }
     }
 
-    private void moveToActionX(LuaValue rawValue) {
+    private TemporalAction getAction(Varargs transform) {
+        String key = transform.arg(1).checkjstring();
+        LuaValue rawValue = transform.arg(2);
+
+        if (key.equals("x")) {
+            return moveToActionX(rawValue);
+        } else if (key.equals("y")) {
+            return moveToActionY(rawValue);
+        } else if (key.equals("alpha")) {
+            return alphaAction(rawValue);
+        } else if (key.equals("rotation")) {
+            return rotateToAction(rawValue);
+        } else if (key.equals("scale")) {
+            return scaleToAction(rawValue);
+        } else if (key.equals("color")) {
+            return colorAction(rawValue);
+        } else {
+            Xlog.e("Unknown transform key: %s", key);
+            return null;
+        }
+    }
+
+    private TemporalAction moveToActionX(LuaValue rawValue) {
         MoveToAction action = Actions.action(MoveToAction.class);
         action.setDuration(0);
         action.setY(mActor.getY());
@@ -129,10 +141,10 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         } else {
             action.setX(checkfloat(rawValue));
         }
-        mActor.addAction(action);
+        return action;
     }
 
-    private void moveToActionY(LuaValue rawValue) {
+    private TemporalAction moveToActionY(LuaValue rawValue) {
         MoveToAction action = Actions.action(MoveToAction.class);
         action.setDuration(0);
         action.setX(mActor.getX());
@@ -143,10 +155,10 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         } else {
             action.setY(checkfloat(rawValue));
         }
-        mActor.addAction(action);
+        return action;
     }
 
-    private void alphaAction(LuaValue rawValue) {
+    private TemporalAction alphaAction(LuaValue rawValue) {
         AlphaAction action = Actions.action(AlphaAction.class);
         action.setDuration(0);
         if (rawValue.istable()) {
@@ -156,10 +168,10 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         } else {
             action.setAlpha(checkfloat(rawValue));
         }
-        mActor.addAction(action);
+        return action;
     }
 
-    private void rotateToAction(LuaValue rawValue) {
+    private TemporalAction rotateToAction(LuaValue rawValue) {
         RotateToAction action = Actions.action(RotateToAction.class);
         action.setDuration(0);
         if (rawValue.istable()) {
@@ -169,10 +181,10 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         } else {
             action.setRotation(checkfloat(rawValue));
         }
-        mActor.addAction(action);
+        return action;
     }
 
-    private void scaleToAction(LuaValue rawValue) {
+    private TemporalAction scaleToAction(LuaValue rawValue) {
         ScaleToAction action = Actions.action(ScaleToAction.class);
         action.setDuration(0);
         if (rawValue.istable()) {
@@ -192,10 +204,10 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         } else {
             action.setScale(checkfloat(rawValue));
         }
-        mActor.addAction(action);
+        return action;
     }
 
-    private void colorAction(LuaValue rawValue) {
+    private TemporalAction colorAction(LuaValue rawValue) {
         ColorAction action = Actions.action(ColorAction.class);
         action.setDuration(0);
         LuaTable table = rawValue.checktable();
@@ -216,7 +228,7 @@ public class GameActor extends ExposedJavaClass implements Disposable {
             Color color = new Color(r, g, b, a);
             action.setColor(color);
         }
-        mActor.addAction(action);
+        return action;
     }
 
     private void consumeFullParams(TemporalAction action, LuaTable table) {

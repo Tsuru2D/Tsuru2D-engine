@@ -11,6 +11,7 @@ import org.luaj.vm2.LuaTable;
 
 public class GameScene {
     private AssetID mNextSceneID;
+    private AssetID mSceneID;
     private LuaFunction mSetupFunction;
     private Array<GameFrame> mFrames;
     private int mFrameIndex;
@@ -22,6 +23,14 @@ public class GameScene {
 
     public AssetID getNextSceneID() {
         return mNextSceneID;
+    }
+
+    public AssetID getSceneID() {
+        return mSceneID;
+    }
+
+    public String getFrameID() {
+        return mFrames.get(mFrameIndex).getFrameID();
     }
 
     public void runSetup(FrameApi frameApi, LuaTable locals, LuaTable globals) {
@@ -50,10 +59,11 @@ public class GameScene {
         return mFrames.get(++mFrameIndex);
     }
 
-    public static GameScene loadFunc(LuaFunction sceneFunc) {
+    public static GameScene loadFunc(AssetID sceneID, LuaFunction sceneFunc) {
         Builder sceneBuilder = new Builder();
         LuaAssetID nextSceneID = (LuaAssetID)sceneFunc.call(sceneBuilder);
         GameScene scene = sceneBuilder.build();
+        scene.mSceneID = sceneID;
         scene.mNextSceneID = nextSceneID.userdata();
         return scene;
     }
@@ -72,8 +82,8 @@ public class GameScene {
 
         @ExposeToLua
         public void frame(String id, LuaFunction function) {
-            mScene.mFrames.add(new GameFrame(id, function));
-        }
+                mScene.mFrames.add(new GameFrame(id, function));
+            }
 
         public GameScene build() {
             return mScene;

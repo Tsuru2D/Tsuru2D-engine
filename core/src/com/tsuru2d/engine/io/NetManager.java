@@ -17,7 +17,7 @@ public interface NetManager {
 
     void enumerateSaves(int startIndex, int endIndex, Callback callback);
 
-    void writeSave(GameSaveData data, boolean overwrite, Callback callback);
+    void writeSave(boolean overwrite, GameSaveData data, Callback callback);
 
     void deleteSave(long saveID, Callback callback);
 

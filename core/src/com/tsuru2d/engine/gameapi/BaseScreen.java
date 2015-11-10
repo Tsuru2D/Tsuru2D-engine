@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
+import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.io.LuaNetManager;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.loader.AssetLoader;
@@ -38,7 +39,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         table.setFillParent(true);
         mTable = table;
         mStage.addActor(table);
-        mNetManager = new LuaNetManager(game.getNetManager());
+        mNetManager = new LuaNetManager(this, game.getNetManager());
         mUIManager = new LuaUIManager(this, table);
     }
 
@@ -97,6 +98,10 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
 
     public AssetLoader getAssetLoader() {
         return mGame.getAssetLoader();
+    }
+
+    public GameSaveData buildSaveData() {
+        return mGame.buildSaveData();
     }
 
     @ExposeToLua

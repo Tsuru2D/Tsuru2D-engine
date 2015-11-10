@@ -91,7 +91,7 @@ public class AssetLoader implements Disposable {
     public GameScene getScene(AssetID id) {
         ManagedAsset<LuaValue> sceneFuncWrapper = getAsset(AssetType.SCENE, id);
         LuaFunction sceneFunc = sceneFuncWrapper.get().checkfunction();
-        GameScene scene = GameScene.loadFunc(sceneFunc);
+        GameScene scene = GameScene.loadFunc(id,sceneFunc);
         freeAsset(sceneFuncWrapper);
         return scene;
     }

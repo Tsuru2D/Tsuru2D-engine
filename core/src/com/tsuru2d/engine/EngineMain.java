@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.tsuru2d.engine.gameapi.BaseScreen;
+import com.tsuru2d.engine.gameapi.GameScene;
 import com.tsuru2d.engine.gameapi.GameScreen;
 import com.tsuru2d.engine.gameapi.MenuScreen;
 import com.tsuru2d.engine.io.GameSaveData;
@@ -29,7 +30,6 @@ import java.util.ArrayDeque;
  */
 public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private PlatformApi mPlatformApi;
-    private BaseScreen mScreen;
     private AssetLoader mAssetLoader;
     private Viewport mViewport;
     private SpriteBatch mSpriteBatch;
@@ -37,6 +37,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private ManagedAsset<Music> mMusic;
     private ArrayDeque<BaseScreen> mScreens;
     private NetManager mNetManager;
+    private BaseScreen mCurrentScreen;
 
     public EngineMain(PlatformApi platformApi) {
         mPlatformApi = platformApi;
@@ -68,8 +69,8 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     @Override
     public void resize(int width, int height) {
-        if (mScreen != null) {
-            mScreen.resize(width, height);
+        if (mCurrentScreen != null) {
+            mCurrentScreen.resize(width, height);
         }
     }
 
@@ -77,22 +78,22 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     public void render() {
         mAssetLoader.update();
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-        if (mScreen != null) {
-            mScreen.render(Gdx.graphics.getDeltaTime());
+        if (mCurrentScreen != null) {
+            mCurrentScreen.render(Gdx.graphics.getDeltaTime());
         }
     }
 
     @Override
     public void pause() {
-        if (mScreen != null) {
-            mScreen.pause();
+        if (mCurrentScreen != null) {
+            mCurrentScreen.pause();
         }
     }
 
     @Override
     public void resume() {
-        if (mScreen != null) {
-            mScreen.resume();
+        if (mCurrentScreen != null) {
+            mCurrentScreen.resume();
         }
     }
 
@@ -159,7 +160,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         if (newScreen == null) {
             throw new GdxRuntimeException("Cannot pop the root screen");
         }
-        mScreen = newScreen;
+        mCurrentScreen = newScreen;
         showScreen(newScreen, params);
     }
 
@@ -170,14 +171,14 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     private void pushScreen(BaseScreen screen, LuaValue params) {
         mScreens.push(screen);
-        mScreen = screen;
+        mCurrentScreen = screen;
         screen.inititialize();
         showScreen(screen, params);
     }
 
     private void disposeAllScreens() {
-        if (mScreen != null) {
-            mScreen.hide();
+        if (mCurrentScreen != null) {
+            mCurrentScreen.hide();
             while (!mScreens.isEmpty()) {
                 mScreens.pop().dispose();
             }
@@ -211,5 +212,21 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     public GameMetadataInfo getMetadata() {
         return mAssetLoader.getMetadata();
+    }
+
+    public GameSaveData buildSaveData() {
+        GameSaveData saveData = new GameSaveData();
+        saveData.mCreationTime = System.currentTimeMillis() / 1000;
+        saveData.mVersion = getMetadata().mVersionCode;
+        for (BaseScreen screen : mScreens) {
+            if (screen instanceof GameScreen) {
+                GameScene currentScene = ((GameScreen)screen).getScene();
+                saveData.mSceneId = currentScene.getSceneID().toString();
+                saveData.mFrameId = currentScene.getFrameID();
+                saveData.mCustomState = ((GameScreen)screen).getGlobalsTable();
+                return saveData;
+            }
+        }
+        throw new GdxRuntimeException("No active game screen found");
     }
 }
