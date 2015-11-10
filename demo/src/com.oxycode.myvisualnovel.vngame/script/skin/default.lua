@@ -12,8 +12,8 @@ return {
 
     },
     slider = {
-        background = R.image.slider_bg,
-        knob = R.image.slider_knob
+        track = R.image.slider_bg,
+        thumb = R.image.slider_knob
     },
     scrollpane = {
         background = R.image.bg1,

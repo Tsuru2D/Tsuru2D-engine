@@ -1,7 +1,7 @@
 local settings = {}
 
 function settings:onCreate(screen)
-    print("mainmenu::onCreate()")
+    print("settings::onCreate()")
     self.screen = screen
     self.netManager = screen:getNetManager()
     self.ui = screen:getUIManager()
@@ -77,15 +77,15 @@ function settings:onReadSettingsResult(success, errorCode, data)
 end
 
 function settings:onResume(params)
-    print("mainmenu::onResume()")
+    print("settings::onResume()")
 end
 
 function settings:onPause()
-    print("mainmenu::onPause()")
+    print("settings::onPause()")
 end
 
 function settings:onDestroy()
-    print("mainmenu::onDestroy()")
+    print("settings::onDestroy()")
 end
 
 return settings
