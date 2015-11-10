@@ -23,8 +23,22 @@ return {
         verticalThumb = R.image.vertScrollBar
     },
     checkbox = {
-        off = R.image.checkbox_off,
-        on = R.image.checkbox_on,
-        over = R.image.checkbox_over
+        unchecked = R.image.checkbox_off,
+        checked = R.image.checkbox_on,
+        hover = R.image.checkbox_over
+    },
+    tabcontainer = {
+        background = R.image.bg1,
+        tabStyle = R.skin.default.button
+    },
+    dropdown = {
+        background = R.image.button_down,
+        open = R.image.button_up,
+        hover = R.image.button_hover,
+        itemBackground = R.image.button_down,
+        selectedItemBackground = R.image.button_hover,
+        textColor = {0.2,0.2,0.2},
+        itemTextColor = {0.2,0.2,0.2},
+        selectedItemTextColor = {0.2,0.2,0.2}
     }
 }
