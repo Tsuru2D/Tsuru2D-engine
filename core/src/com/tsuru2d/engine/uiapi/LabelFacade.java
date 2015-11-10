@@ -38,10 +38,10 @@ public class LabelFacade extends ActorFacade<Label, Label.LabelStyle> {
 
     @Override
     protected void populateStyle(Label.LabelStyle style, LuaTable styleTable) {
-        mBackground = swapStyleImage(styleTable, "background", mBackground);
+        mBackground = swapStyleImage(styleTable, BACKGROUND, mBackground);
 
         style.background = toDrawable(mBackground);
-        style.fontColor = tableToColor(styleTable.get("textColor"));
+        style.fontColor = tableToColor(styleTable.get(TEXT_COLOR));
     }
 
     @ExposeToLua

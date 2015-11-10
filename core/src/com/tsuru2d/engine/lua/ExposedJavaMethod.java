@@ -76,7 +76,7 @@ import java.lang.reflect.Modifier;
         } catch (IllegalAccessException e) {
             throw new AssertionError(e);
         } catch (InvocationTargetException e) {
-            throw new LuaError(e);
+            throw new LuaError(e.getCause());
         }
     }
 

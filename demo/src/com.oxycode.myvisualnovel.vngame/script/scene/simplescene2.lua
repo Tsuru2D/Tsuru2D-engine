@@ -11,7 +11,7 @@ return function(scene)
 
         -- state.linux=frame:create(R.object.linux, {x=-400, y = 50,alpha=0})
 
-        frame:background(R.image.bg2)
+        frame:background(R.image.background.bg2)
     end)
     scene:frame("f1", function(frame, state)
         frame:character(R.object.bob)

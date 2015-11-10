@@ -1,6 +1,5 @@
 package com.tsuru2d.engine.uiapi;
 
-
 import com.badlogic.gdx.scenes.scene2d.ui.Cell;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
@@ -113,26 +112,26 @@ public class CellFacade extends ExposedJavaClass {
     }
 
     @ExposeToLua
-    public CellFacade width(float height) {
-        mCell.width(height);
+    public CellFacade width(float width) {
+        mCell.width(width);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade minWidth(float height) {
-        mCell.minHeight(height);
+    public CellFacade minWidth(float width) {
+        mCell.minWidth(width);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade maxWidth(float height) {
-        mCell.maxHeight(height);
+    public CellFacade maxWidth(float width) {
+        mCell.maxWidth(width);
         return this;
     }
 
     @ExposeToLua
-    public CellFacade prefWidth(float height) {
-        mCell.prefWidth(height);
+    public CellFacade prefWidth(float width) {
+        mCell.prefWidth(width);
         return this;
     }
 

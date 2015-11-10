@@ -18,7 +18,7 @@ import org.luaj.vm2.LuaValue;
 public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<Texture> mBackground, mCursor, mSelection,
-                                  mDisabledBackground, mFocusedBackground;
+        mDisabledBackground, mFocusedBackground;
     private ManagedAsset<String> mHint;
     private LuaFunction mTextChangedCallback;
 
@@ -51,18 +51,18 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
 
     @Override
     protected void populateStyle(TextField.TextFieldStyle style, LuaTable styleTable) {
-        mBackground = swapStyleImage(styleTable, "background", mBackground);
-        mCursor = swapStyleImage(styleTable, "cursor", mCursor);
-        mSelection = swapStyleImage(styleTable, "selection", mSelection);
-        mDisabledBackground = swapStyleImage(styleTable, "disabledBackground", mDisabledBackground);
-        mFocusedBackground = swapStyleImage(styleTable, "focusedBackground", mFocusedBackground);
+        mBackground = swapStyleImage(styleTable, BACKGROUND, mBackground);
+        mCursor = swapStyleImage(styleTable, CURSOR, mCursor);
+        mSelection = swapStyleImage(styleTable, SELECTION_BACKGROUND, mSelection);
+        mDisabledBackground = swapStyleImage(styleTable, DISABLED, mDisabledBackground);
+        mFocusedBackground = swapStyleImage(styleTable, FOCUSED, mFocusedBackground);
 
         style.background = toDrawable(mBackground);
         style.cursor = toDrawable(mCursor);
         style.selection = toDrawable(mSelection);
         style.disabledBackground = toDrawable(mDisabledBackground);
         style.focusedBackground = toDrawable(mFocusedBackground);
-        style.fontColor = tableToColor(styleTable.get("textColor"));
+        style.fontColor = tableToColor(styleTable.get(TEXT_COLOR));
     }
 
     @ExposeToLua
@@ -101,13 +101,13 @@ public class TextFieldFacade extends ActorFacade<TextField, TextField.TextFieldS
     }
 
     @ExposeToLua
-    public void setDisabled(boolean disabled) {
-        getActor().setDisabled(disabled);
+    public void setEnabled(boolean enabled) {
+        getActor().setDisabled(!enabled);
     }
 
     @ExposeToLua
-    public boolean isDisabled() {
-        return getActor().isDisabled();
+    public boolean isEnabled() {
+        return !getActor().isDisabled();
     }
 
     @Override
