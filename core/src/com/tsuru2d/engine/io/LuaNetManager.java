@@ -1,22 +1,13 @@
 package com.tsuru2d.engine.io;
 
-import com.tsuru2d.engine.EngineMain;
-import com.tsuru2d.engine.gameapi.GameScene;
-import com.tsuru2d.engine.gameapi.GameScreen;
+import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.*;
 
-import java.util.ArrayList;
-
 public class LuaNetManager extends ExposedJavaClass {
+    private final BaseScreen mScreen;
     private final NetManager mNetManager;
-    private EngineMain mGame;
-    private ArrayList<GameSaveData> mSaveDatas;
-
-    public void setEngineMain(EngineMain game){
-        mGame=game;
-    }
 
     private static class LuaCallback implements NetManager.Callback {
         private final LuaFunction mCallback;
@@ -48,7 +39,8 @@ public class LuaNetManager extends ExposedJavaClass {
         }
     }
 
-    public LuaNetManager(NetManager netManager) {
+    public LuaNetManager(BaseScreen screen, NetManager netManager) {
+        mScreen = screen;
         mNetManager = netManager;
     }
 
@@ -77,44 +69,29 @@ public class LuaNetManager extends ExposedJavaClass {
         mNetManager.enumerateSaves(startIndex, endIndex, new LuaCallback(callback) {
             @Override
             public void onResult(NetResult result) {
-                if (result.mSuccess){
-                    GameSaveData[] data = (GameSaveData[])result.mData;
-                    for(GameSaveData save : data){
-                        mSaveDatas.add(save);
+                if (result.mSuccess) {
+                    GameSaveData[] saves = (GameSaveData[])result.mData;
+                    LuaTable luaSaves = new LuaTable(saves.length, 0);
+                    for (int i = 0; i < saves.length; ++i) {
+                        luaSaves.set(i + 1, new LuaUserdata(saves[i]));
                     }
+                    runCallback(true, result.mErrorCode, luaSaves);
+                } else {
+                    super.onResult(result);
                 }
-                runCallback(result.mSuccess, result.mErrorCode);
             }
         });
     }
 
     @ExposeToLua
-    public void writeSave(int index, boolean isOverWrite, final LuaFunction callback) {
-        final GameSaveData newSave = new GameSaveData();
-        int version = mGame.getMetadata().mVersionCode;
-        GameScreen gameScreen = mGame.getGameScreen();
-        LuaTable globals = gameScreen.getGlobalsTable();
-        GameScene scene = gameScreen.getScene();
-        newSave.mCreationTime=System.currentTimeMillis();
-        newSave.mVersion = version;
-        newSave.mCustomState = globals;
-        newSave.mSceneId = scene.getSceneID().toString();
-        newSave.mFrameId = scene.getFrameID();
-        newSave.mIndex = index;
-        mNetManager.writeSave(newSave, isOverWrite, new LuaCallback(callback) {
-            @Override
-            public void onResult(NetResult result) {
-                if (result.mSuccess){
-                    newSave.mId=((Number)result.mData).longValue();
-                    mSaveDatas.add(newSave);
-                }
-                runCallback(result.mSuccess,result.mErrorCode);
-            }
-        });
+    public void writeSave(int index, boolean overwrite, LuaFunction callback) {
+        GameSaveData saveData = mScreen.buildSaveData();
+        saveData.mIndex = index;
+        mNetManager.writeSave(overwrite, saveData, new LuaCallback(callback));
     }
 
     @ExposeToLua
-    public void deleteSave() {
+    public void deleteSave(long saveID, LuaFunction callback) {
         // TODO
     }
 

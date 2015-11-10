@@ -14,6 +14,11 @@ return {
         down = R.image.imagebutton.start_down,
         hover = R.image.imagebutton.start_down
 	},
+	continue = {
+		up = R.image.imagebutton.continue_up,
+		down = R.image.imagebutton.continue_down,
+		hover = R.image.imagebutton.continue_down
+	},
 	settings = {
 		up = R.image.imagebutton.settings_up,
         down = R.image.imagebutton.settings_down,

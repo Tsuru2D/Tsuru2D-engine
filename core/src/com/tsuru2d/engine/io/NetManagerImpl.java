@@ -149,7 +149,7 @@ public class NetManagerImpl implements NetManager {
     }
 
     @Override
-    public void writeSave(GameSaveData data, boolean overwrite, Callback callback) {
+    public void writeSave(boolean overwrite, GameSaveData data, Callback callback) {
         JsonWriter jsonWriter = newJsonWriter();
         try {
             jsonWriter.object();
