@@ -172,10 +172,8 @@ public class AssetLoader implements Disposable {
         if (DEBUG_LEAKS) {
             for (AssetLoaderDelegate<?, ?> delegate : mLoaderDelegates.values()) {
                 Array<AssetID> loadedIDs = delegate.getLoadedAssetIDs();
-                if (loadedIDs.size > 0) {
-                    for (AssetID leakedID : loadedIDs) {
-                        Xlog.e("Asset leaked: %s", leakedID);
-                    }
+                for (AssetID leakedID : loadedIDs) {
+                    Xlog.e("Asset leaked: %s", leakedID);
                 }
             }
         }

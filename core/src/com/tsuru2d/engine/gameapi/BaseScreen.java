@@ -40,6 +40,9 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mStage.addActor(table);
         mNetManager = new LuaNetManager(game.getNetManager());
         mUIManager = new LuaUIManager(this, table);
+    }
+
+    public void inititialize() {
         mScreenScript.invokemethod("onCreate", this);
     }
 

@@ -127,8 +127,8 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         String frameID = saveData.mFrameId;
         LuaTable screenScript = mAssetLoader.getScreen(getMetadata().mGameScreen);
         GameScreen screen = new GameScreen(this, screenScript, globals);
-        screen.setScene(sceneID, frameID);
         setScreen(screen, params);
+        screen.setScene(sceneID, frameID);
     }
 
     public void setGameScreen(AssetID sceneID, LuaValue params) {
@@ -159,17 +159,19 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
         if (newScreen == null) {
             throw new GdxRuntimeException("Cannot pop the root screen");
         }
+        mScreen = newScreen;
         showScreen(newScreen, params);
     }
 
     private void showScreen(BaseScreen screen, LuaValue params) {
-        mScreen = screen;
-        screen.show(params);
         screen.resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
+        screen.show(params);
     }
 
     private void pushScreen(BaseScreen screen, LuaValue params) {
         mScreens.push(screen);
+        mScreen = screen;
+        screen.inititialize();
         showScreen(screen, params);
     }
 

@@ -2,8 +2,11 @@ package com.tsuru2d.engine.loader;
 
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.SnapshotArray;
+import com.tsuru2d.engine.util.Xlog;
 
 public class ManagedAsset<T> implements Pool.Poolable {
+    private static final boolean DEBUG_LEAKS = true;
+
     private AssetLoaderDelegate<T, ?> mLoader;
     private AssetID mAssetID;
     private T mAsset;
@@ -39,11 +42,19 @@ public class ManagedAsset<T> implements Pool.Poolable {
     }
 
     /* package */ int incrementRef() {
-        return ++mReferenceCount;
+        int observerCount = (mObservers == null) ? 0 : mObservers.size;
+        return ++mReferenceCount + observerCount;
     }
 
     /* package */ int decrementRef() {
-        return --mReferenceCount;
+        int observerCount = (mObservers == null) ? 0 : mObservers.size;
+        int refCount =  --mReferenceCount + observerCount;
+        if (DEBUG_LEAKS) {
+            if (mReferenceCount == 0 && refCount > 0) {
+                Xlog.e("Removed all references to asset without unregistering observers: %s", mAssetID);
+            }
+        }
+        return refCount;
     }
 
     private void notifyObservers() {
@@ -83,7 +94,6 @@ public class ManagedAsset<T> implements Pool.Poolable {
 
         if (!mObservers.contains(observer, true)) {
             mObservers.add(observer);
-            incrementRef();
         }
     }
 
@@ -94,11 +104,7 @@ public class ManagedAsset<T> implements Pool.Poolable {
      */
     public void removeObserver(AssetObserver<T> observer) {
         if (mObservers != null) {
-            if (mObservers.removeValue(observer, true)) {
-                if (decrementRef() == 0) {
-                    mLoader.freeAsset(this);
-                }
-            }
+            mObservers.removeValue(observer, true);
         }
     }
 
