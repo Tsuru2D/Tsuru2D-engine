@@ -1,11 +1,22 @@
 package com.tsuru2d.engine.io;
 
+import com.tsuru2d.engine.EngineMain;
+import com.tsuru2d.engine.gameapi.GameScene;
+import com.tsuru2d.engine.gameapi.GameScreen;
 import com.tsuru2d.engine.lua.ExposeToLua;
 import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.*;
 
+import java.util.ArrayList;
+
 public class LuaNetManager extends ExposedJavaClass {
     private final NetManager mNetManager;
+    private EngineMain mGame;
+    private ArrayList<GameSaveData> mSaveDatas;
+
+    public void setEngineMain(EngineMain game){
+        mGame=game;
+    }
 
     private static class LuaCallback implements NetManager.Callback {
         private final LuaFunction mCallback;
@@ -66,16 +77,40 @@ public class LuaNetManager extends ExposedJavaClass {
         mNetManager.enumerateSaves(startIndex, endIndex, new LuaCallback(callback) {
             @Override
             public void onResult(NetResult result) {
-                // GameSaveData[] data = (GameSaveData[])result.mData;
-                // TODO
+                if (result.mSuccess){
+                    GameSaveData[] data = (GameSaveData[])result.mData;
+                    for(GameSaveData save : data){
+                        mSaveDatas.add(save);
+                    }
+                }
                 runCallback(result.mSuccess, result.mErrorCode);
             }
         });
     }
 
     @ExposeToLua
-    public void writeSave() {
-        // TODO
+    public void writeSave(int index, boolean isOverWrite, final LuaFunction callback) {
+        final GameSaveData newSave = new GameSaveData();
+        int version = mGame.getMetadata().mVersionCode;
+        GameScreen gameScreen = mGame.getGameScreen();
+        LuaTable globals = gameScreen.getGlobalsTable();
+        GameScene scene = gameScreen.getScene();
+        newSave.mCreationTime=System.currentTimeMillis();
+        newSave.mVersion = version;
+        newSave.mCustomState = globals;
+        newSave.mSceneId = scene.getSceneID().toString();
+        newSave.mFrameId = scene.getFrameID();
+        newSave.mIndex = index;
+        mNetManager.writeSave(newSave, isOverWrite, new LuaCallback(callback) {
+            @Override
+            public void onResult(NetResult result) {
+                if (result.mSuccess){
+                    newSave.mId=((Number)result.mData).longValue();
+                    mSaveDatas.add(newSave);
+                }
+                runCallback(result.mSuccess,result.mErrorCode);
+            }
+        });
     }
 
     @ExposeToLua

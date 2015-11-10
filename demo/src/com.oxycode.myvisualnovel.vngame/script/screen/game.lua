@@ -4,6 +4,7 @@ function game:onCreate(screen)
     print("game::onCreate()")
     self.screen = screen
     self.ui = screen:getUIManager()
+    self.net = screen:getNetManager()
     screen:setClickListener(function()
         screen:nextFrame()
     end)
@@ -22,6 +23,22 @@ function game:onCreate(screen)
         screen:setMenuScreen(R.screen.mainmenu)
     end)
     self.ui:add(self.backButton):top():right()
+
+    -- save test
+    self.saveButton = self.ui:newTextButton(R.skin.default.button)
+    self.saveButton:setText(R.text.common.save)
+    self.saveButton:setClickListener(function()
+        print("write save data")
+        self.net:writeSave(6, false, function(success, errorCode)
+            if not success then
+                if errorCode then
+                    print("Login error: " .. errorCode)
+                end
+            end
+        end)
+    end)
+    self.ui:add(self.saveButton):top():right()
+
 end
 
 function game:onResume(params)

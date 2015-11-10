@@ -45,6 +45,14 @@ public class GameScreen extends BaseScreen {
         });
     }
 
+    public LuaTable getGlobalsTable(){
+        return mGlobalsTable;
+    }
+
+    public GameScene getScene(){
+        return mScene;
+    }
+
     public void setScene(AssetID sceneID, String frameID) {
         for (GameActor actor : mActors) {
             Actor gdxActor = actor.getActor();
