@@ -28,11 +28,10 @@ function game:onCreate(screen)
     self.saveButton = self.ui:newTextButton(R.skin.default.button)
     self.saveButton:setText(R.text.common.save)
     self.saveButton:setClickListener(function()
-        print("write save data")
         self.net:writeSave(0, true, function(success, errorCode)
             if not success then
                 if errorCode then
-                    print("Login error: " .. errorCode)
+                    print("Save error: " .. errorCode)
                 end
             end
         end)
