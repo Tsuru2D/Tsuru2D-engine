@@ -10,8 +10,8 @@ import com.tsuru2d.engine.lua.ExposeToLua;
 import org.luaj.vm2.LuaTable;
 
 public class ScrollPaneFacade extends ActorFacade<ScrollPane, ScrollPane.ScrollPaneStyle> {
-    private ManagedAsset<Texture> mBackground, mCorner, mHorizontalTrack,
-                                  mHorizontalThumb, mVerticalTrack, mVerticalThumb;
+    private ManagedAsset<Texture> mBackground, mHorizontalTrack,
+        mHorizontalThumb, mVerticalTrack, mVerticalThumb;
 
     public ScrollPaneFacade(BaseScreen screen, AssetID styleID) {
         super(screen, styleID);
@@ -289,15 +289,13 @@ public class ScrollPaneFacade extends ActorFacade<ScrollPane, ScrollPane.ScrollP
 
     @Override
     protected void populateStyle(ScrollPane.ScrollPaneStyle style, LuaTable styleTable) {
-        mBackground = swapStyleImage(styleTable, "background", mBackground);
-        mCorner = swapStyleImage(styleTable, "corner", mCorner);
-        mHorizontalTrack = swapStyleImage(styleTable, "horizontalTrack", mHorizontalTrack);
-        mHorizontalThumb = swapStyleImage(styleTable, "horizontalThumb", mHorizontalThumb);
-        mVerticalTrack = swapStyleImage(styleTable, "verticalTrack", mVerticalTrack);
-        mVerticalThumb = swapStyleImage(styleTable, "verticalThumb", mVerticalThumb);
+        mBackground = swapStyleImage(styleTable, BACKGROUND, mBackground);
+        mHorizontalTrack = swapStyleImage(styleTable, HORIZONTAL_TRACK, mHorizontalTrack);
+        mHorizontalThumb = swapStyleImage(styleTable, HORIZONTAL_THUMB, mHorizontalThumb);
+        mVerticalTrack = swapStyleImage(styleTable, VERTICAL_TRACK, mVerticalTrack);
+        mVerticalThumb = swapStyleImage(styleTable, VERTICAL_THUMB, mVerticalThumb);
 
         style.background = toDrawable(mBackground);
-        style.corner = toDrawable(mCorner);
         style.hScroll = toDrawable(mHorizontalTrack);
         style.hScrollKnob = toDrawable(mHorizontalThumb);
         style.vScroll = toDrawable(mVerticalTrack);
@@ -307,7 +305,6 @@ public class ScrollPaneFacade extends ActorFacade<ScrollPane, ScrollPane.ScrollP
     @Override
     public void dispose() {
         mBackground = freeAsset(mBackground);
-        mCorner = freeAsset(mCorner);
         mHorizontalTrack = freeAsset(mHorizontalTrack);
         mHorizontalThumb = freeAsset(mHorizontalThumb);
         mVerticalTrack = freeAsset(mVerticalTrack);

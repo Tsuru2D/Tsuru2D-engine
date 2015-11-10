@@ -64,13 +64,6 @@ public class LuaUIManager extends ExposedJavaClass implements Disposable {
     }
 
     @ExposeToLua
-    public ToggleButtonFacade newToggleButton(AssetID styleID) {
-        ToggleButtonFacade button = new ToggleButtonFacade(mScreen, styleID);
-        initActor(button);
-        return button;
-    }
-
-    @ExposeToLua
     public LabelFacade newLabel(AssetID styleID) {
         LabelFacade label = new LabelFacade(mScreen, styleID);
         initActor(label);

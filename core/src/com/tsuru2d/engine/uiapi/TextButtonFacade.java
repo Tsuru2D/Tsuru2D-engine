@@ -44,7 +44,7 @@ public class TextButtonFacade extends ButtonFacade {
     protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
         super.populateStyle(style, styleTable);
         TextButton.TextButtonStyle realStyle = (TextButton.TextButtonStyle)style;
-        realStyle.fontColor = tableToColor(styleTable.get("textColor"));
+        realStyle.fontColor = tableToColor(styleTable.get(TEXT_COLOR));
     }
 
     @ExposeToLua

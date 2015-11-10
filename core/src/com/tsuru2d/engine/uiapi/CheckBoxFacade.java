@@ -18,7 +18,7 @@ import org.luaj.vm2.LuaValue;
 public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle> {
     private final AssetUpdatedObserver mAssetUpdatedObserver;
     private ManagedAsset<Texture> mCheckboxOff, mCheckboxOffDisabled,
-                                  mCheckboxOn, mCheckboxOnDisabled, mCheckboxOver;
+        mCheckboxOn, mCheckboxOnDisabled, mCheckboxOver;
     private ManagedAsset<String> mText;
     private LuaFunction mCheckedChangedCallback;
 
@@ -46,18 +46,18 @@ public class CheckBoxFacade extends ActorFacade<CheckBox, CheckBox.CheckBoxStyle
 
     @Override
     protected void populateStyle(CheckBox.CheckBoxStyle style, LuaTable styleTable) {
-        mCheckboxOff = swapStyleImage(styleTable, "off", mCheckboxOff);
-        mCheckboxOffDisabled = swapStyleImage(styleTable, "offDisabled", mCheckboxOffDisabled);
-        mCheckboxOn = swapStyleImage(styleTable, "on", mCheckboxOn);
-        mCheckboxOnDisabled = swapStyleImage(styleTable, "onDisabled", mCheckboxOnDisabled);
-        mCheckboxOver = swapStyleImage(styleTable, "over", mCheckboxOver);
+        mCheckboxOff = swapStyleImage(styleTable, UNCHECKED, mCheckboxOff);
+        mCheckboxOffDisabled = swapStyleImage(styleTable, UNCHECKED_DISABLED, mCheckboxOffDisabled);
+        mCheckboxOn = swapStyleImage(styleTable, CHECKED, mCheckboxOn);
+        mCheckboxOnDisabled = swapStyleImage(styleTable, CHECKED_DISABLED, mCheckboxOnDisabled);
+        mCheckboxOver = swapStyleImage(styleTable, HOVER, mCheckboxOver);
 
         style.checkboxOff = toDrawable(mCheckboxOff);
         style.checkboxOffDisabled = toDrawable(mCheckboxOffDisabled);
         style.checkboxOn = toDrawable(mCheckboxOn);
         style.checkboxOnDisabled = toDrawable(mCheckboxOnDisabled);
         style.checkboxOver = toDrawable(mCheckboxOver);
-        style.fontColor = tableToColor(styleTable.get("textColor"));
+        style.fontColor = tableToColor(styleTable.get(TEXT_COLOR));
     }
 
     @ExposeToLua

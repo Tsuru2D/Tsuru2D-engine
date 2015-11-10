@@ -15,7 +15,7 @@ import com.tsuru2d.engine.lua.ExposedJavaClass;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
-public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJavaClass implements Disposable {
+public abstract class ActorFacade<TActor extends Actor, TStyle> extends ExposedJavaClass implements Disposable, StyleNames {
     private final BaseScreen mScreen;
     private final ManagedAsset<LuaTable> mStyleTable;
     private TActor mActor;

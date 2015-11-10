@@ -13,8 +13,8 @@ import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
 public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
-    private ManagedAsset<Texture> mBackground, mDisabledBackground,
-                                  mKnob, mDisabledKnob;
+    private ManagedAsset<Texture> mTrack, mTrackDisabled,
+        mThumb, mThumbDisabled;
     private LuaFunction mValueChangedCallback;
 
     public SliderFacade(BaseScreen screen, AssetID styleID) {
@@ -38,15 +38,15 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
 
     @Override
     protected void populateStyle(Slider.SliderStyle style, LuaTable styleTable) {
-        mBackground = swapStyleImage(styleTable, "background", mBackground);
-        mDisabledBackground = swapStyleImage(styleTable, "disabledBackground", mDisabledBackground);
-        mKnob = swapStyleImage(styleTable, "knob", mKnob);
-        mDisabledKnob = swapStyleImage(styleTable, "disabledKnob", mDisabledKnob);
+        mTrack = swapStyleImage(styleTable, TRACK, mTrack);
+        mTrackDisabled = swapStyleImage(styleTable, TRACK_DISABLED, mTrackDisabled);
+        mThumb = swapStyleImage(styleTable, THUMB, mThumb);
+        mThumbDisabled = swapStyleImage(styleTable, THUMB_DISABLED, mThumbDisabled);
 
-        style.background = toDrawable(mBackground);
-        style.disabledBackground = toDrawable(mDisabledBackground);
-        style.knob = toDrawable(mKnob);
-        style.disabledKnob = toDrawable(mDisabledKnob);
+        style.background = toDrawable(mTrack);
+        style.disabledBackground = toDrawable(mTrackDisabled);
+        style.knob = toDrawable(mThumb);
+        style.disabledKnob = toDrawable(mThumbDisabled);
     }
 
     @ExposeToLua
@@ -91,10 +91,10 @@ public class SliderFacade extends ActorFacade<Slider, Slider.SliderStyle> {
 
     @Override
     public void dispose() {
-        mBackground = freeAsset(mBackground);
-        mDisabledBackground = freeAsset(mDisabledBackground);
-        mKnob = freeAsset(mKnob);
-        mDisabledKnob = freeAsset(mDisabledKnob);
+        mTrack = freeAsset(mTrack);
+        mTrackDisabled = freeAsset(mTrackDisabled);
+        mThumb = freeAsset(mThumb);
+        mThumbDisabled = freeAsset(mThumbDisabled);
         super.dispose();
     }
 

@@ -53,8 +53,8 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
 
     @Override
     protected void populateStyle(TabContainerStyle style, LuaTable styleTable) {
-        mBackground = swapStyleImage(styleTable, "background", mBackground);
-        style.tabStyle = (AssetID)styleTable.get("buttonStyle").checkuserdata(AssetID.class);
+        mBackground = swapStyleImage(styleTable, BACKGROUND, mBackground);
+        style.tabStyle = (AssetID)styleTable.get(TAB_STYLE).checkuserdata(AssetID.class);
         style.background = toDrawable(mBackground);
     }
 
@@ -102,8 +102,8 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
     private class CallbackWrapper extends ZeroArgFunction {
         private LuaFunction mCallback;
 
-        public CallbackWrapper(LuaFunction function) {
-            mCallback = function;
+        public CallbackWrapper(LuaFunction callback) {
+            mCallback = callback;
         }
 
         @Override
@@ -114,28 +114,9 @@ public class TabContainerFacade extends ActorFacade<Table, TabContainerFacade.Ta
         }
     }
 
-    private class Tab extends TextButtonFacade {
-        private ManagedAsset<Texture> mChecked;
-
+    private static class Tab extends TextButtonFacade {
         public Tab(BaseScreen screen, AssetID styleID) {
             super(screen, styleID);
-        }
-
-        /*
-         * will use the "down" as checked texture
-         */
-        @Override
-        protected void populateStyle(Button.ButtonStyle style, LuaTable styleTable) {
-            super.populateStyle(style, styleTable);
-            mChecked = swapStyleImage(styleTable, "down", mChecked);
-            TextButton.TextButtonStyle s = (TextButton.TextButtonStyle)style;
-            s.checked = toDrawable(mChecked);
-        }
-
-        @Override
-        public void dispose() {
-            mChecked = freeAsset(mChecked);
-            super.dispose();
         }
     }
 }
