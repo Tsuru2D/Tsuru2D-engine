@@ -18,9 +18,9 @@ function login:onCreate(screen)
     self.usernameTextField = self.ui:newTextField(R.skin.default.textbox)
     self.usernameTextField:setHint(R.text.common.username)
     self.usernameTextField:setText("test@test.com")
-    self.usernameTextField:setTextChangedListener(function(textbox, value)
+    --[[self.usernameTextField:setTextChangedListener(function(textbox, value)
         print("Username: " .. value)
-    end)
+    end)]]
     self.mainTable:add(self.usernameTextField):fillX():height(55):padLeft(5):padRight(5):padBottom(5):colspan(2)
     self.mainTable:row()
 
@@ -29,9 +29,9 @@ function login:onCreate(screen)
     self.passwordTextField:setText("abc")
     self.passwordTextField:setHint(R.text.common.password)
     self.passwordTextField:setPasswordMode(true)
-    self.passwordTextField:setTextChangedListener(function(textbox, value)
+    --[[self.passwordTextField:setTextChangedListener(function(textbox, value)
         print("Password: " .. value)
-    end)
+    end)]]
     self.mainTable:add(self.passwordTextField):fillX():height(55):padLeft(5):padRight(5):padBottom(5):colspan(2)
     self.mainTable:row()
 
@@ -54,7 +54,7 @@ function login:onCreate(screen)
             end
         end)
     end)
-    self.mainTable:add(self.loginButton):fillX():width(200):height(100)
+    self.mainTable:add(self.loginButton):fillX():width(200):height(100):spaceRight(10)
 
     -- Register button
     self.registerButton = self.ui:newButton(R.skin.imagebutton.register)
@@ -75,7 +75,7 @@ function login:onCreate(screen)
             end
         end)
     end)
-    self.mainTable:add(self.registerButton):fillX():width(200):height(100)
+    self.mainTable:add(self.registerButton):fillX():width(200):height(100):spaceLeft(10)
 
     self.ui:add(self.mainTable):expand()
 
