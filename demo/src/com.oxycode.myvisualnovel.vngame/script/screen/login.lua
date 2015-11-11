@@ -57,7 +57,7 @@ function login:onCreate(screen)
     self.mainTable:add(self.loginButton):fillX():width(200):height(100)
 
     -- Register button
-    self.registerButton = self.ui:newButton(R.skin.imagebutton.login)
+    self.registerButton = self.ui:newButton(R.skin.imagebutton.register)
     self.registerButton:setClickListener(function()
         self.loginStatusLabel:setText(R.text.common.registering)
         self.loginButton:setEnabled(false)
