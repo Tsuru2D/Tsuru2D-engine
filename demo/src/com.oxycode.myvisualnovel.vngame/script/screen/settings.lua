@@ -26,58 +26,119 @@ function settings:onCreate(screen)
     self.ui:row()
 
     self.tabContainer = self.ui:newTabContainer(R.skin.default.tabcontainer)
-    self.tabContainer:addTab(R.text.common.settings1, function()
+    self.tabContainer:addTab(R.text.settingtext.tab1, function()
         local tabContent = self.ui:newTable()
 
-        -- Slider
+        -- Volumn Slider
         local slider = self.ui:newSlider(R.skin.default.slider)
+        local label = self.ui:newLabel(R.skin.default.label)
+        local localtable = self.ui:newTable()
         slider:setValueChangedListener(function(slider, value)
             print("Slider value: " .. value)
-            self.settings.sliderValue = value
+            label:setText(R.text.settingtext.volumnlabel)
+            self.settings.volumn = value
         end)
-        tabContent:add(slider):width(200):fillX():spaceBottom(15)
-        tabContent:row()
 
-        -- CheckBox
+        -- Volumn off CheckBox
         local checkBox = self.ui:newCheckBox(R.skin.default.checkbox)
-        checkBox:setText(R.text.common.check_me)
+        checkBox:setText(R.text.settingtext.volumnon)
         checkBox:setCheckedChangedListener(function(checkbox, value)
             print("Checkbox value: " .. (value and "true" or "false"))
-            self.settings.checkBoxValue = value
+            self.settings.volumnOn = value
+            if value then slider:setEnabled(false) else slider:setEnabled(true) end
         end)
-        tabContent:add(checkBox):left():spaceBottom(15)
-
+        --tabContent:add(checkBox):left():spaceBottom(15)
+        localtable:add(checkBox):expandX():left():spaceBottom(30)
+        localtable:row()
+        localtable:add(label):width(200):fillX():spaceBottom(30)
+        localtable:row()
+        localtable:add(slider):width(200):fillX():spaceBottom(30)
+        localtable:row()
+        tabContent:add(localtable):expand()
+    ------------------------------------------------------------------------------------------------
         self.refreshAction = function(data)
-            slider:setValue(data.sliderValue or 0)
-            checkBox:setChecked(data.checkBoxValue or false)
+            slider:setValue(data.volumn or 0)
+            checkBox:setChecked(data.volumnOn or false)
+            slider:setEnabled(not checkBox:isChecked())
         end
         self.refreshAction(self.settings)
         return tabContent
     end)
-    self.tabContainer:addTab(R.text.common.settings2, function()
+    -----------------------------------------------------------------------------------
+    self.tabContainer:addTab(R.text.settingtext.tab2, function()
         local tabContent = self.ui:newTable()
+        local labeltable = self.ui:newTable()
+        local label
 
         -- Dropdown
         local dropdown = self.ui:newDropDown(R.skin.default.dropdown)
         dropdown:setItems({
-            {value = 1, text = R.text.common.dropdown_item1},
-            {value = 2, text = R.text.common.dropdown_item2},
-            {value = 3, text = R.text.common.dropdown_item3},
-            {value = 4, text = R.text.common.dropdown_item4}
+            {value = 1, text = R.text.settingtext.color1},
+            {value = 2, text = R.text.settingtext.color2},
+            {value = 3, text = R.text.settingtext.color3},
+            {value = 4, text = R.text.settingtext.color4},
+            {value = 5, text = R.text.settingtext.color5}
         })
         dropdown:setSelectedValue(1);
+        tabContent:add(dropdown):expandX():width(200):spaceBottom(130)
+        tabContent:row()
+        tabContent:add(labeltable):expandX()
+        self.changeLabelColor = function(value)
+            if value == 1 then
+                if label ~= nil then
+                    labeltable:remove(label)
+                end
+                label = self.ui:newLabel(R.skin.colorfulLabel.labelblue)
+                labeltable:add(label)
+            end
+            if value == 2 then
+                if label ~= nil then
+                    labeltable:remove(label)
+                end
+                label = self.ui:newLabel(R.skin.colorfulLabel.labelpink)
+                labeltable:add(label)
+            end
+            if value == 3 then
+                if label ~= nil then
+                    labeltable:remove(label)
+                end
+                label = self.ui:newLabel(R.skin.colorfulLabel.labelbrown)
+                labeltable:add(label)
+            end
+            if value == 4 then
+                if label ~= nil then
+                    labeltable:remove(label)
+                end
+                label = self.ui:newLabel(R.skin.colorfulLabel.labelorange)
+                labeltable:add(label)
+            end
+            if value == 5 then
+                if label ~= nil then
+                    labeltable:remove(label)
+                end
+                label = self.ui:newLabel(R.skin.colorfulLabel.labelwhite)
+                labeltable:add(label)
+            end
+            label:setText(R.text.settingtext.colorlabeltext)
+        end
         dropdown:setValueChangedListener(function(dropdown, value)
             print("Dropdown value: " .. value)
             self.settings.dropdownValue = value
+            self.changeLabelColor(dropdown:getSelectedValue())
         end)
-        tabContent:add(dropdown):width(200):fillX()
-
         self.refreshAction = function(data)
             dropdown:setSelectedValue(data.dropdownValue or 1)
+            self.changeLabelColor(dropdown:getSelectedValue())
         end
         self.refreshAction(self.settings)
         return tabContent
     end)
+
+    self.tabContainer:addTab(R.text.settingtext.tab3, function()
+        local tabContent = self.ui:newTable()
+        return tabContent
+    end)
+
     self.ui:add(self.tabContainer):colspan(2):expandY():fill()
 
     self.netManager:readGameSettings(function(success, errorCode, data)
