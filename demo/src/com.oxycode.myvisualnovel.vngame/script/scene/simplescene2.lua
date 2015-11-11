@@ -2,81 +2,73 @@ return function(scene)
     scene:setup(function(frame, state)
         state.alice = frame:create(R.object.alice, {
             x = 1500,
-            y = 50
+            y = 80
         })
         state.bob = frame:create(R.object.bob, {
             x = -400,
-            y = 50
+            y = 80
         })
-
-        -- state.linux=frame:create(R.object.linux, {x=-400, y = 50,alpha=0})
-
         frame:background(R.image.background.bg2)
     end)
     scene:frame("f1", function(frame, state)
-        frame:character(R.object.bob)
         frame:transform(state.bob, {
             x = {value = 200, duration = 1, interpolation = "pow2"}
         })
         frame:transform(state.alice, {
             x = {value = 800, duration = 1, interpolation = "pow2"}
         })
-        frame:text(R.text.simplescene1.next_scene)
     end)
     scene:frame("f2", function(frame, state)
         frame:character(R.object.bob)
-        frame:transform(state.bob, {
-            x = {value = 400, duration = 0.5, interpolation = "pow2"}
-        })
-        frame:text(R.text.simplescene1.greet_Alice)
+        frame:text(R.text.simplescene2.hey_alice)
     end)
     scene:frame("f3", function(frame, state)
         frame:character(R.object.alice)
-        frame:transform(state.bob, {
-            x = {value =150, duration = 0.5, interpolation = "pow3"}
-        })
-        frame:transform(state.alice, {
-            x = {value =460, duration = 1, interpolation = "sineIn"}
-        })
-        frame:text(R.text.simplescene1.pretty)
+        frame:text(R.text.simplescene2.hey_bob)
+    end)
+    scene:frame("f4", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.giving_demo)
     end)
     scene:frame("f4", function(frame, state)
         frame:character(R.object.alice)
-        frame:transform(state.alice, {
-            x = {value =430, duration = 0.5, interpolation = "sineIn"},
-            scale= {value=1.1, duration=0.5,interpolation="pow4"}
-        })
-        frame:text(R.text.simplescene1.ugly)
-    end)
-    scene:frame("f4", function(frame, state)
-        frame:character(R.object.alice)
-        frame:transform(state.alice, {x =460, scale={value=1, duration=0.5,interpolation="pow4"}})
-
-        frame:text(R.text.simplescene1.drag)
+        frame:text(R.text.simplescene2.whats_that)
     end)
     scene:frame("f5", function(frame, state)
         frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.cross_platform_engine)
+    end)
+    scene:frame("f6", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.runs_on)
+    end)
+    scene:frame("f7", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.sync_data)
+    end)
+    scene:frame("f8", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.written_in)
+    end)
+    scene:frame("f9", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.wait_what)
+    end)
+    scene:frame("f10", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.lets_fix_that)
+    end)
+    scene:frame("f11", function(frame, state)
+        frame:character(R.object.bob)
+        frame:text(R.text.simplescene2.see_you_all)
+    end)
+    scene:frame("f12", function(frame, state)
         frame:transform(state.bob, {
-            x = {value =460, duration = 1.5, interpolation = "sineIn"}
+            x = {value = 1500, duration = 1, interpolation = "pow2"}
         })
         frame:transform(state.alice, {
-            x = {value =800, duration = 1, interpolation = "sineIn"}
+            x = {value = -400, duration = 1, interpolation = "pow2"}
         })
-        frame:text(R.text.simplescene1.copyright)
     end)
-
-    -- scene:frame("f6", function(frame, state)
-    --     frame:character(R.object.bob)
-    --     frame:transform(state.bob, {
-    --         x = {value =-400, duration = 1.5, interpolation = "sineIn"}
-    --     })
-    --     frame:transform(state.alice, {
-    --         x = {value =2000, duration = 1, interpolation = "sineIn"}
-    --     })
-    --     frame:transform(state.linux,{x = {value =400, duration = 1, interpolation = "bounceIn"},
-    --                                 alpha={value=1, duration=1, interpolation="sineIn"}})
-    --     frame:text(R.text.simplescene1.linux)
-    -- end)
-
     return R.scene.simplescene1
 end

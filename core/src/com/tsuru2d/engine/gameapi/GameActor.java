@@ -73,7 +73,6 @@ public class GameActor extends ExposedJavaClass implements Disposable {
         mActorScript = actorScript;
         mActor = new Image();
         mActor.setZIndex(1);
-        mActor.setDebug(true);
         mActorScript.invokemethod("onCreate", this);
     }
 
