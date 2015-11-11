@@ -28,26 +28,26 @@ function settings:onCreate(screen)
     self.tabContainer = self.ui:newTabContainer(R.skin.default.tabcontainer)
     self.tabContainer:addTab(R.text.settingtext.tab1, function()
         local tabContent = self.ui:newTable()
-
-        -- Volumn Slider
         local slider = self.ui:newSlider(R.skin.default.slider)
         local label = self.ui:newLabel(R.skin.default.label)
+        local checkBox = self.ui:newCheckBox(R.skin.default.checkbox)
         local localtable = self.ui:newTable()
-        slider:setValueChangedListener(function(slider, value)
-            print("Slider value: " .. value)
-            label:setText(R.text.settingtext.volumnlabel)
-            self.settings.volumn = value
+
+        -- Sound CheckBox
+        checkBox:setText(R.text.settingtext.checkboxtext)
+        checkBox:setCheckedChangedListener(function(checkbox, value)
+            print("Sound enabled: " .. (value and "true" or "false"))
+            self.settings.soundEnabled = value
+            slider:setEnabled(value)
         end)
 
-        -- Volumn off CheckBox
-        local checkBox = self.ui:newCheckBox(R.skin.default.checkbox)
-        checkBox:setText(R.text.settingtext.volumnon)
-        checkBox:setCheckedChangedListener(function(checkbox, value)
-            print("Checkbox value: " .. (value and "true" or "false"))
-            self.settings.volumnOn = value
-            if value then slider:setEnabled(false) else slider:setEnabled(true) end
+        -- Volume Slider
+        slider:setValueChangedListener(function(slider, value)
+            print("Volume: " .. value)
+            label:setText(R.text.settingtext.volumefmt, math.floor(value * 100))
+            self.settings.volume = value
         end)
-        --tabContent:add(checkBox):left():spaceBottom(15)
+
         localtable:add(checkBox):expandX():left():spaceBottom(30)
         localtable:row()
         localtable:add(label):width(200):fillX():spaceBottom(30)
@@ -57,9 +57,10 @@ function settings:onCreate(screen)
         tabContent:add(localtable):expand()
     ------------------------------------------------------------------------------------------------
         self.refreshAction = function(data)
-            slider:setValue(data.volumn or 0)
-            checkBox:setChecked(data.volumnOn or false)
-            slider:setEnabled(not checkBox:isChecked())
+            slider:setValue(data.volume or 0)
+            checkBox:setChecked(data.soundEnabled or false)
+            label:setText(R.text.settingtext.volumefmt, math.floor((data.volume or 0) * 100))
+            slider:setEnabled(checkBox:isChecked())
         end
         self.refreshAction(self.settings)
         return tabContent
@@ -131,11 +132,6 @@ function settings:onCreate(screen)
             self.changeLabelColor(dropdown:getSelectedValue())
         end
         self.refreshAction(self.settings)
-        return tabContent
-    end)
-
-    self.tabContainer:addTab(R.text.settingtext.tab3, function()
-        local tabContent = self.ui:newTable()
         return tabContent
     end)
 
