@@ -1,8 +1,11 @@
 package com.tsuru2d.engine.gameapi;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Array;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.loader.AssetID;
@@ -21,6 +24,7 @@ public class GameScreen extends BaseScreen {
     private LuaFunction mClickCallback;
     private Array<GameActor> mActors;
     private boolean mSkipAnimations;
+    private Group mGameGroup;
 
     public GameScreen(EngineMain game, LuaTable screenScript, LuaTable globalsTable) {
         super(game, screenScript);
@@ -29,10 +33,17 @@ public class GameScreen extends BaseScreen {
         mActors = new Array<GameActor>();
         mSkipAnimations = false;
         mFrameApi = new FrameApi(this, mGameState, screenScript);
-        // TODO: For some reason, all touch events on actors within the screen
-        // still fire this click listener, which causes memory leaks when
-        // leaving a game screen.
-        mStage.addListener(new InputListener() {
+        createActorGraph();
+    }
+
+    private void createActorGraph() {
+        Table rootTable = new Table();
+        rootTable.setFillParent(true);
+        Stack stack = new Stack();
+        stack.setFillParent(true);
+
+        Group gameGroup = new Group();
+        gameGroup.addListener(new InputListener() {
             @Override
             public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
                 return true;
@@ -45,6 +56,18 @@ public class GameScreen extends BaseScreen {
                 }
             }
         });
+        stack.addActor(gameGroup);
+
+        Table uiTable = new Table();
+        uiTable.setFillParent(true);
+        stack.addActor(uiTable);
+
+        rootTable.addActor(stack);
+
+        mGameGroup = gameGroup;
+        mRootTable = rootTable;
+        mUITable = uiTable;
+        mStage.addActor(rootTable);
     }
 
     public LuaTable getGlobalsTable() {
@@ -85,7 +108,7 @@ public class GameScreen extends BaseScreen {
     public GameActor createActor(LuaAssetID id, LuaTable params) {
         LuaTable actorScript = mGame.getAssetLoader().getObject(id.userdata());
         GameActor actor = new GameActor(this, actorScript);
-        mStage.addActor(actor.getActor());
+        mGameGroup.addActor(actor.getActor());
         actor.transform(params, true);
         mActors.add(actor);
         return actor;

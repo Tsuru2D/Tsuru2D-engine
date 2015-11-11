@@ -34,7 +34,7 @@ import com.badlogic.gdx.utils.Array;
     protected abstract void onRawAssetInvalidated(AssetID baseRawAssetID);
     protected abstract Array<AssetID> getLoadedAssetIDs();
 
-    protected AssetLoaderParameters<TRaw> getParameters() {
+    protected AssetLoaderParameters<TRaw> getParameters(AssetID rawAssetID) {
         // Sub-classes must override this method if they use a
         // non-standard parameter type, or if they want to add
         // additional parameters
@@ -50,7 +50,7 @@ import com.badlogic.gdx.utils.Array;
     }
 
     protected void startLoadingRaw(AssetID rawAssetID) {
-        AssetLoaderParameters<TRaw> params = getParameters();
+        AssetLoaderParameters<TRaw> params = getParameters(rawAssetID);
         params.loadedCallback = new LoadedCallbackImpl(rawAssetID);
         mAssetLoader.startLoadingRaw(rawAssetID, mRawType, params);
     }

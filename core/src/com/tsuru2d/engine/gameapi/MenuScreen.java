@@ -1,10 +1,12 @@
 package com.tsuru2d.engine.gameapi;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.tsuru2d.engine.EngineMain;
 import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.loader.AssetID;
 import com.tsuru2d.engine.lua.ExposeToLua;
+import com.tsuru2d.engine.uiapi.LuaUIManager;
 import org.luaj.vm2.LuaTable;
 import org.luaj.vm2.LuaValue;
 
@@ -14,8 +16,19 @@ import org.luaj.vm2.LuaValue;
  * features to Lua.
  */
 public class MenuScreen extends BaseScreen {
+    private LuaUIManager mUIManager;
+
     public MenuScreen(EngineMain game, LuaTable screenScript) {
         super(game, screenScript);
+        createActorGraph();
+    }
+
+    private void createActorGraph() {
+        Table table = new Table();
+        table.setFillParent(true);
+        mRootTable = table;
+        mUITable = table;
+        mStage.addActor(table);
     }
 
     // TODO: better naming

@@ -1,7 +1,6 @@
 package com.tsuru2d.engine.uiapi;
 
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.ui.List;
 import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
@@ -65,13 +64,13 @@ public class DropDownFacade extends ActorFacade<SelectBox<DropDownFacade.Item>, 
         mSelectedItemBackground = swapStyleImage(styleTable, SELECTED_ITEM_BACKGROUND, mSelectedItemBackground);
 
         List.ListStyle listStyle = new List.ListStyle();
-        listStyle.font = new BitmapFont();
+        listStyle.font = FontFactory.font24();
         listStyle.fontColorSelected = tableToColor(styleTable.get(SELECTED_ITEM_TEXT_COLOR));
         listStyle.fontColorUnselected = tableToColor(styleTable.get(ITEM_TEXT_COLOR));
         listStyle.selection = toDrawable(mSelectedItemBackground);
         listStyle.background = toDrawable(mItemBackground);
 
-        style.font = new BitmapFont();
+        style.font = FontFactory.font24();
         style.background = toDrawable(mBackground);
         style.backgroundDisabled = toDrawable(mBackgroundDisabled);
         style.backgroundOpen = toDrawable(mBackgroundOpen);

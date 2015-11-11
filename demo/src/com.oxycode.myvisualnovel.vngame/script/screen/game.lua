@@ -9,20 +9,15 @@ function game:onCreate(screen)
         screen:nextFrame()
     end)
 
-    -- Text label
-    self.textLabel = self.ui:newLabel(R.skin.default.label)
-    self.ui:add(self.textLabel):bottom():expand()
+    self.controlTable = self.ui:newTable()
 
     -- Back to menu button
     self.backButton = self.ui:newTextButton(R.skin.default.button)
     self.backButton:setText(R.text.common.back_to_menu)
     self.backButton:setClickListener(function()
-        -- TODO: This next line is a workaround for the bug detailed in
-        -- GameScreen. Once the bug has been fixed, this should be removed
-        screen:setClickListener(nil)
         screen:setMenuScreen(R.screen.mainmenu)
     end)
-    self.ui:add(self.backButton):top():right()
+    self.controlTable:add(self.backButton)
 
     -- Save button
     self.saveButton = self.ui:newTextButton(R.skin.default.button)
@@ -36,8 +31,13 @@ function game:onCreate(screen)
             end
         end)
     end)
-    self.ui:add(self.saveButton):top():right()
+    self.controlTable:add(self.saveButton)
+    self.ui:add(self.controlTable):top():right()
+    self.ui:row()
 
+    -- Text label
+    self.textLabel = self.ui:newLabel(R.skin.default.label)
+    self.ui:add(self.textLabel):bottom():expand()
 end
 
 function game:onResume(params)
