@@ -14,6 +14,7 @@ import com.tsuru2d.engine.gameapi.BaseScreen;
 import com.tsuru2d.engine.gameapi.GameScene;
 import com.tsuru2d.engine.gameapi.GameScreen;
 import com.tsuru2d.engine.gameapi.MenuScreen;
+import com.tsuru2d.engine.io.GameLocalSaves;
 import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.io.NetManager;
 import com.tsuru2d.engine.io.NetManagerImpl;
@@ -37,6 +38,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     private ManagedAsset<Music> mMusic;
     private ArrayDeque<BaseScreen> mScreens;
     private NetManager mNetManager;
+    private GameLocalSaves mLocalSaves;
     private BaseScreen mCurrentScreen;
 
     public EngineMain(PlatformApi platformApi) {
@@ -47,6 +49,7 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
     public void create() {
         mAssetLoader = new AssetLoader(mPlatformApi.getRawAssetLoader());
         mNetManager = new NetManagerImpl(getMetadata().mPackageName);
+        mLocalSaves = new GameLocalSaves(getMetadata().mPackageName);
         MetadataLoader.Resolution resolution = getMetadata().mResolution;
         if (Gdx.app.getType() == Application.ApplicationType.Desktop) {
             Gdx.graphics.setDisplayMode(resolution.getWidth(), resolution.getHeight(), false);
@@ -212,6 +215,10 @@ public class EngineMain implements ApplicationListener, AssetObserver<String> {
 
     public GameMetadataInfo getMetadata() {
         return mAssetLoader.getMetadata();
+    }
+
+    public GameLocalSaves getLocalSaves() {
+        return mLocalSaves;
     }
 
     public GameSaveData buildSaveData() {

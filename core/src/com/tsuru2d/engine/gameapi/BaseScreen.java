@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.tsuru2d.engine.EngineMain;
+import com.tsuru2d.engine.io.GameLocalSaves;
 import com.tsuru2d.engine.io.GameSaveData;
 import com.tsuru2d.engine.io.LuaNetManager;
 import com.tsuru2d.engine.loader.AssetID;
@@ -27,6 +28,7 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
     protected Table mUITable;
     private LuaNetManager mNetManager;
     private LuaUIManager mUIManager;
+    private GameLocalSaves mLocalSaves;
     private TextureRegionDrawable mBackground;
     private ManagedAsset<Texture> mBackgroundTexture;
 
@@ -34,7 +36,8 @@ public abstract class BaseScreen extends ExposedJavaClass implements Screen {
         mGame = game;
         mScreenScript = screenScript;
         mStage = new Stage(game.getViewport(), game.getSpriteBatch());
-        mNetManager = new LuaNetManager(this, game.getNetManager());
+        mLocalSaves = game.getLocalSaves();
+        mNetManager = new LuaNetManager(this, game.getNetManager(), mLocalSaves);
         mBackground = new TextureRegionDrawable(new TextureRegion());
     }
 
