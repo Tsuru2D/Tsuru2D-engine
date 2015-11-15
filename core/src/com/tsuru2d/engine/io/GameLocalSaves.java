@@ -5,8 +5,6 @@ import com.badlogic.gdx.Preferences;
 import org.luaj.vm2.LuaTable;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 public class GameLocalSaves {
     private static int MAXSAVESLOTS = 200;
@@ -58,9 +56,7 @@ public class GameLocalSaves {
         newPreference.putInteger("version", save.mVersion);
         newPreference.putString("scene_id", save.mSceneId);
         newPreference.putString("frame_id", save.mFrameId);
-        Map<String, LuaTable> customState = new HashMap<String, LuaTable>();
-        customState.put("custom_state", save.mCustomState); //TODO this is wrong, but I don't know how to fix it
-        newPreference.put(customState);
+        newPreference.putBoolean("custom_state", false); //TODO this is wrong, but I don't know how to fix it. I dont know what is supposed to be inside the LuaTable of customState
         newPreference.flush();
         return index;
     }
@@ -92,9 +88,7 @@ public class GameLocalSaves {
         if (pref.contains("index")) {
             GameSaveData save = new GameSaveData();
             save.mCreationTime = pref.getLong("time");
-            Map<String, ?> customStateMap = pref.get();
-            LuaTable customState = (LuaTable)customStateMap.get("custom_state");
-            save.mCustomState = customState;
+            save.mCustomState = new LuaTable(); //TODO this is not right
             save.mFrameId = pref.getString("frame_id");
             save.mIndex = index;
             save.mId = pref.getLong("id");
