@@ -10,8 +10,7 @@ public class FileBroswer {
     private JTable mTable1;
     private JButton mOpenButton;
     private JButton mTestButton;
-    private JButton mUploadButton;
-    private JButton mButton1;
+    private JButton mUploadButton1;
 
     private void createUIComponents() {
         // TODO: place custom component creation code here
