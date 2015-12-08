@@ -38,6 +38,19 @@ function game:onCreate(screen)
     -- Text label
     self.textLabel = self.ui:newLabel(R.skin.default.label)
     self.ui:add(self.textLabel):bottom():expand()
+
+    --save menu button
+    self.saveMenuButton = self.ui:newTextButton(R.skin.default.button)
+    self.saveMenuButton:setText(R.text.common.save)
+    self.saveMenuButton:setClickListener(function()
+        self.net:createTempSave()
+        screen:setMenuScreen(R.screen.save)
+    end)
+    self.controlTable:add(self.saveMenuButton)
+    self.ui:add(self.controlTable):top():right()
+    self.ui:row()
+
+
 end
 
 function game:onResume(params)

@@ -12,8 +12,8 @@ import java.io.StringWriter;
 
 public class NetManagerImpl implements NetManager {
     private static class TsuruApi {
-        // private static final String BASE_URL = "http://127.0.0.1:8080/apiv1/";
-        private static final String BASE_URL = "http://tsuru2d.herokuapp.com/apiv1/";
+        private static final String BASE_URL = "http://127.0.0.1:8080/apiv1/";
+        //        private static final String BASE_URL = "http://tsuru2d.herokuapp.com/apiv1/";
         public static final String CREATE_USER = BASE_URL + "create_user";
         public static final String LOGIN = BASE_URL + "login";
         public static final String LOGOUT = BASE_URL + "logout";
