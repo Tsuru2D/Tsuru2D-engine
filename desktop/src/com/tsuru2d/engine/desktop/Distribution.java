@@ -63,6 +63,7 @@ public class Distribution {
         metadata.addUserMetadata("imagUrl", imagUrl);
         metadata.addUserMetadata("author", author);
         metadata.addUserMetadata("gameName", gameName);
+        metadata.addUserMetadata("key", size+"");
         s3.putObject(new PutObjectRequest(VNBucket, size + "", VNgame).withMetadata(metadata));
     }
 

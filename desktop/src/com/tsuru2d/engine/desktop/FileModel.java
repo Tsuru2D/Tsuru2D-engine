@@ -26,7 +26,7 @@ public class FileModel implements Serializable {
     ////////*test////////
 
     private FileModel() {
-        mFileFolder = System.getProperty("user.home") + "/Tsuru-Game/";
+        mFileFolder = System.getProperty("user.home") + "\\Tsuru-Game\\";
         File fileFolder = new File(mFileFolder);
         if (!fileFolder.exists()) {
             fileFolder.mkdir();
@@ -68,7 +68,7 @@ public class FileModel implements Serializable {
 
             ArrayList<Map<String,String>> rawList = Distribution.generateList();
             for(Map<String, String> map : rawList){
-                cloudList.add(new GameInfo(map.get("gameName"), map.get("author"), "com.tusuru." + map.get("gameName"), map.get("key"), new ImageIcon(new URL(url))));
+                cloudList.add(new GameInfo(map.get("gamename"), map.get("author"), "com.tusuru." + map.get("gamename"), map.get("key"), new ImageIcon(new URL(url))));
             }
 //            String url = "http://awsassets.panda.org/img/original/google__small.png";
 //            test.add(new GameInfo("hello" + mInt++, "me", "com.oxycode.myvisualnovel.vngame.zip", "x", new ImageIcon(new URL(url))));
@@ -81,7 +81,7 @@ public class FileModel implements Serializable {
     }
 
     public boolean downloadFile(GameInfo gameInfo) {
-        String filePath = mFileFolder + "game/" + gameInfo.mFileName;
+        String filePath = mFileFolder + "game\\" + gameInfo.mFileName;
         if(Distribution.download(filePath, gameInfo.mKey)) {
             mMetaData.put(gameInfo.mName, gameInfo);
             saveMetadata();
