@@ -39,13 +39,13 @@ public class Distribution {
         s3.setRegion(usWest2);
     }
 
-//    public static void main(String[] args)  throws IOException  {
+    public static void main(String[] args)  throws IOException  {
 //        File file = new File("D:\\CS196Project\\aws-java-sample\\com.oxycode.myvisualnovel.vngame");
 //
 //        upload(file, "sample", "Tsuru2Dgroup", "sampleGame");
 //        download("d:\\a.vngame", "161");
-//        ArrayList<Map<String, String>> test = generateList();
-//    }
+        ArrayList<Map<String, String>> test = generateList();
+    }
 
 //    @para File the FileHandle of the game;
 //    @para String the intended url of the game;

@@ -76,7 +76,11 @@ public class FileBrowser extends JFrame {
 			public void actionPerformed(ActionEvent e) {
 				//System.out.println("Open Pressed at " + getLocalSelection());
 				if(getSelection(table_1) >= 0){
-					mFileModel.openFile(mLocalEntries.get(getSelection(table_1)));
+					try {
+						mFileModel.openFile(mLocalEntries.get(getSelection(table_1)));
+					} catch (Exception e1) {
+						e1.printStackTrace();
+					}
 					hideWindow();
 				}
 			}

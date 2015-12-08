@@ -10,7 +10,10 @@ import com.tsuru2d.engine.loader.zip.ZipRawAssetLoader;
 import javax.swing.*;
 import java.io.*;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.Hashtable;
+import java.util.Map;
 
 public class FileModel implements Serializable {
     private String mFileFolder;
@@ -60,14 +63,16 @@ public class FileModel implements Serializable {
 
     public ArrayList<GameInfo> cloudList() {
         ArrayList<GameInfo> cloudList = new ArrayList<>();
+        String url = "http://awsassets.panda.org/img/original/google__small.png";
         try{
-//            ArrayList<Map<String,String>> rawList = Distribution.generateList();
-//            for(Map<String, String> map : rawList){
-//                cloudList.add(new GameInfo(map.get("gameName"), map.get("author"), "com.tusuru." + map.get("gameName"), map.get("key")));
-//            }
-            String url = "http://awsassets.panda.org/img/original/google__small.png";
-            test.add(new GameInfo("hello" + mInt++, "me", "com.oxycode.myvisualnovel.vngame.zip", "x", new ImageIcon(new URL(url))));
-            return test;
+
+            ArrayList<Map<String,String>> rawList = Distribution.generateList();
+            for(Map<String, String> map : rawList){
+                cloudList.add(new GameInfo(map.get("gameName"), map.get("author"), "com.tusuru." + map.get("gameName"), map.get("key"), new ImageIcon(new URL(url))));
+            }
+//            String url = "http://awsassets.panda.org/img/original/google__small.png";
+//            test.add(new GameInfo("hello" + mInt++, "me", "com.oxycode.myvisualnovel.vngame.zip", "x", new ImageIcon(new URL(url))));
+//            return test;
         }catch (Exception e) {
             e.printStackTrace();
         }
@@ -77,18 +82,18 @@ public class FileModel implements Serializable {
 
     public boolean downloadFile(GameInfo gameInfo) {
         String filePath = mFileFolder + "game/" + gameInfo.mFileName;
-//        if(Distribution.download(filePath, gameInfo.mKey)) {
+        if(Distribution.download(filePath, gameInfo.mKey)) {
             mMetaData.put(gameInfo.mName, gameInfo);
             saveMetadata();
             return true;
-//        }
-//        return false;
+        }
+        return false;
     }
 
-    public String openFile(GameInfo gameInfo) {
+    public String openFile(GameInfo gameInfo) throws Exception {
         saveMetadata();
-//      if (!mMetaData.containsKey(name))
-//          throw new Exception("No Game File named: " + name);
+      if (!mMetaData.containsKey("name"))
+          throw new Exception("No Game File named: " + "name");
         String filePath = mFileFolder + "game/" + gameInfo.mFileName;
         System.out.println(filePath);
         File gameZipFile = new File(filePath);
