@@ -7,7 +7,13 @@ import com.tsuru2d.engine.PlatformApi;
 import com.tsuru2d.engine.loader.RawAssetLoader;
 import com.tsuru2d.engine.loader.zip.ZipRawAssetLoader;
 
+<<<<<<< HEAD
+import javax.swing.*;
 import java.io.*;
+import java.net.URL;
+=======
+import java.io.*;
+>>>>>>> d84f572b69e0a96632f7e5abfa61b0ca5445f726
 import java.util.*;
 
 public class FileModel implements Serializable {
@@ -15,6 +21,14 @@ public class FileModel implements Serializable {
     private Hashtable<String, GameInfo> mMetaData;
     public static FileModel mInstance;
 
+<<<<<<< HEAD
+    /////////test////////
+    private ArrayList<GameInfo> test = new ArrayList<>();
+    private int mInt = 0;
+    ////////*test////////
+
+=======
+>>>>>>> d84f572b69e0a96632f7e5abfa61b0ca5445f726
     private FileModel() {
         mFileFolder = System.getProperty("user.home") + "/Tsuru-Game/";
         File fileFolder = new File(mFileFolder);
@@ -22,10 +36,18 @@ public class FileModel implements Serializable {
             fileFolder.mkdir();
             new File(mFileFolder + "/game/").mkdir();
             mMetaData = new Hashtable<>();
+<<<<<<< HEAD
+            saveMetadata();
+=======
+>>>>>>> d84f572b69e0a96632f7e5abfa61b0ca5445f726
         } else {
             try {
                 ObjectInputStream objectInputStream = new ObjectInputStream(new FileInputStream(mFileFolder + "config.conf"));
                 mMetaData = (Hashtable<String, GameInfo>)objectInputStream.readObject();
+<<<<<<< HEAD
+                System.out.println("MetaData successfully loaded");
+=======
+>>>>>>> d84f572b69e0a96632f7e5abfa61b0ca5445f726
                 objectInputStream.close();
             } catch (Exception e) {
                 e.printStackTrace();
@@ -49,6 +71,61 @@ public class FileModel implements Serializable {
         return list;
     }
 
+<<<<<<< HEAD
+    public ArrayList<GameInfo> cloudList() {
+        ArrayList<GameInfo> cloudList = new ArrayList<>();
+        try{
+//            ArrayList<Map<String,String>> rawList = Distribution.generateList();
+//            for(Map<String, String> map : rawList){
+//                cloudList.add(new GameInfo(map.get("gameName"), map.get("author"), "com.tusuru." + map.get("gameName"), map.get("key")));
+//            }
+            String url = "http://awsassets.panda.org/img/original/google__small.png";
+            test.add(new GameInfo("hello" + mInt++, "me", "com.oxycode.myvisualnovel.vngame.zip", "x", new ImageIcon(new URL(url))));
+            return test;
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return cloudList;
+    }
+
+    public boolean downloadFile(GameInfo gameInfo) {
+        String filePath = mFileFolder + "game/" + gameInfo.mFileName;
+//        if(Distribution.download(filePath, gameInfo.mKey)) {
+            mMetaData.put(gameInfo.mName, gameInfo);
+            saveMetadata();
+            return true;
+//        }
+//        return false;
+    }
+
+    public String openFile(GameInfo gameInfo) {
+        saveMetadata();
+//      if (!mMetaData.containsKey(name))
+//          throw new Exception("No Game File named: " + name);
+        String filePath = mFileFolder + "game/" + gameInfo.mFileName;
+        System.out.println(filePath);
+        File gameZipFile = new File(filePath);
+        RawAssetLoader rawAssetLoader = new ZipRawAssetLoader(gameZipFile, null);
+        PlatformApi api = new PlatformApi(null, null, rawAssetLoader);
+        LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+        new LwjglApplication(new EngineMain(api), config);
+        return null;
+    }
+
+    public void uploadFile(File file, String url, String author, String name) {
+        Distribution.upload(file, url, author, name);
+    }
+
+    private void saveMetadata() {
+        try{
+            ObjectOutputStream objectOutputStream = new ObjectOutputStream(new FileOutputStream(mFileFolder + "config.conf"));
+            objectOutputStream.writeObject(mMetaData);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+
+=======
     public String[] cloudList() {
         return null;
     }
@@ -76,17 +153,30 @@ public class FileModel implements Serializable {
             e.printStackTrace();
         }
         return null;
+>>>>>>> d84f572b69e0a96632f7e5abfa61b0ca5445f726
     }
 
     public class GameInfo implements Serializable {
         public String mName;
         public String mAuthor;
         public String mFileName;
+<<<<<<< HEAD
+        public String mKey;
+        public ImageIcon mImageIcon;
+
+        public GameInfo(String name, String author, String fileName, String key, ImageIcon imageIcon) {
+            mName = name;
+            mAuthor = author;
+            mFileName = fileName;
+            mKey = key;
+            mImageIcon = imageIcon;
+=======
 
         public GameInfo(String name, String author, String fileName) {
             mName = name;
             mAuthor = author;
             mFileName = fileName;
+>>>>>>> d84f572b69e0a96632f7e5abfa61b0ca5445f726
         }
 
         public String toString() {
