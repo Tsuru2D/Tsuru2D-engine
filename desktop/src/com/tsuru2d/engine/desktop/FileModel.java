@@ -92,9 +92,9 @@ public class FileModel implements Serializable {
 
     public String openFile(GameInfo gameInfo) throws Exception {
         saveMetadata();
-      if (!mMetaData.containsKey("name"))
-          throw new Exception("No Game File named: " + "name");
-        String filePath = mFileFolder + "game/" + gameInfo.mFileName;
+//      if (!mMetaData.containsKey(name))
+//          throw new Exception("No Game File named: " + "name");
+        String filePath = mFileFolder + "game\\" + gameInfo.mFileName;
         System.out.println(filePath);
         File gameZipFile = new File(filePath);
         RawAssetLoader rawAssetLoader = new ZipRawAssetLoader(gameZipFile, null);
